@@ -1,0 +1,20 @@
+{
+  "name": "performance",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "engines": {
+    "node": ">=20.x",
+    "npm": ">=10.x"
+  },
+  "dependencies": {
+    "artillery": "^2.0.17"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.2",
+    "@types/node": "^20.14.11"
+  }
+}
