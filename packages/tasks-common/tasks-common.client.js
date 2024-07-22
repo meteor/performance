@@ -12,8 +12,10 @@ const App = () => {
   const firstTask = tasks[0];
   const lastTask = tasks[tasks.length - 1];
 
-  const onAction = useCallback(() => {
-    if (!reactive) fetchTasks();
+  const onAction = useCallback(async () => {
+    if (!reactive) {
+      await fetchTasks();
+    }
   }, [reactive]);
 
   const onAddClick = useCallback(async () => {
