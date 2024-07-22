@@ -12,20 +12,25 @@ const App = () => {
   const firstTask = tasks[0];
   const lastTask = tasks[tasks.length - 1];
 
-  const onAddClick = useCallback(async () => {
-    const parts = lastTask?.description?.split(' ') || [];
-    const nextTaskNum = (parseFloat(parts[parts.length - 1] || '0') || 0) + 1;
-    await Meteor.callAsync('insertTask', { description: `New Task ${nextTaskNum}` });
-    if (!reactive) fetchTasks();
-  }, [reactive, lastTask?._id]);
-  const onRemoveClick = useCallback(async () => {
-    await Meteor.callAsync('removeTask', { taskId: firstTask?._id });
-    if (!reactive) fetchTasks();
-  }, [reactive, firstTask?._id]);
-  const onRemoveAllClick = useCallback(async () => {
-    await Meteor.callAsync('removeAllTasks');
+  const onAction = useCallback(() => {
     if (!reactive) fetchTasks();
   }, [reactive]);
+
+  const onAddClick = useCallback(async () => {
+    const descriptionsParts = lastTask?.description?.split(' ') || [];
+    const lastDescriptionNum = (parseFloat(descriptionsParts[descriptionsParts.length - 1] || '0') || 0);
+    const nextTaskNum = lastDescriptionNum + 1;
+    await Meteor.callAsync('insertTask', { description: `New Task ${nextTaskNum}` });
+    onAction();
+  }, [onAction, lastTask?._id]);
+  const onRemoveClick = useCallback(async () => {
+    await Meteor.callAsync('removeTask', { taskId: firstTask?._id });
+    onAction();
+  }, [onAction, firstTask?._id]);
+  const onRemoveAllClick = useCallback(async () => {
+    await Meteor.callAsync('removeAllTasks');
+    onAction();
+  }, [onAction]);
 
   const fetchTasks = useCallback(async () => {
     if (reactive) return;
