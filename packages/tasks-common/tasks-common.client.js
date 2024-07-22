@@ -13,8 +13,8 @@ const App = () => {
   const lastTask = tasks[tasks.length - 1];
 
   const onAddClick = useCallback(async () => {
-    const parts = lastTask?.description?.split(' ');
-    const nextTaskNum = (parseFloat(parts[parts.length - 1]) || 0) + 1;
+    const parts = lastTask?.description?.split(' ') || [];
+    const nextTaskNum = (parseFloat(parts[parts.length - 1] || '0') || 0) + 1;
     await Meteor.callAsync('insertTask', { description: `New Task ${nextTaskNum}` });
     if (!reactive) fetchTasks();
   }, [reactive, lastTask?._id]);
