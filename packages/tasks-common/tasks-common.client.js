@@ -55,7 +55,7 @@ const App = () => {
         <div style={{ display: 'flex' }}>
           <button className="add-task" onClick={onAddClick} style={{ margin: 4 }}>Add task</button>
           <button className="remove-task" onClick={onRemoveClick} style={{ margin: 4 }}>Remove task</button>
-          <button className="remove-all-tasks" onClick={onRemoveAllClick} style={{ margin: 4 }}>Remove all task</button>
+          <button className="remove-all-tasks" onClick={onRemoveAllClick} style={{ margin: 4 }}>Remove all tasks</button>
         </div>
         {reactive ? <AppReactive tasks={tasks} setTasks={setTasks} /> : <AppNonReactive tasks={tasks} setTasks={setTasks} fetchTasks={fetchTasks} />}
       </div>
