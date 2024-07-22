@@ -1,5 +1,8 @@
-// Write your package code here!
+import { TasksCollection  } from './tasks-collection';
+import { registerTaskApi  } from './tasks-api';
 
-// Variables exported by this module can be imported by other packages and
-// applications. See tasks-common-tests.js for an example of importing.
-export const name = 'tasks-common';
+function initializeTaskCollection() {
+  return TasksCollection;
+}
+
+export { TasksCollection, initializeTaskCollection, registerTaskApi };
