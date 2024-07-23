@@ -2,8 +2,9 @@ import { TasksCollection } from './tasks-common.client';
 
 export const registerTaskApi = () => {
   Meteor.methods({
-    insertTask({ description }) {
+    insertTask({ description, sessionId }) {
       return TasksCollection.insertAsync({
+        sessionId,
         description,
         createdAt: new Date(),
       });
@@ -11,8 +12,8 @@ export const registerTaskApi = () => {
     removeTask({ taskId }) {
       return TasksCollection.removeAsync({ _id: taskId });
     },
-    removeAllTasks() {
-      return TasksCollection.removeAsync({});
+    removeAllTasks({ sessionId }) {
+      return TasksCollection.removeAsync({ sessionId });
     },
     fetchTasks() {
       return TasksCollection.find({}).fetch();
