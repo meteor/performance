@@ -1,4 +1,4 @@
-export const addAndRemoveTasks = async ({ page, reactive, taskCount }) => {
+const addAndRemoveTasks = async ({ page, reactive, taskCount }) => {
   await page.goto('http://localhost:3000/');
   await page.getByLabel(reactive ? 'Reactive' : 'No Reactive', { exact: true }).check();
 
@@ -24,3 +24,19 @@ export const addAndRemoveTasks = async ({ page, reactive, taskCount }) => {
 
   await page.getByRole('button', { name: 'Remove all tasks' }).click();
 };
+
+async function reactiveAddAndRemoveTasks(page) {
+  const taskCount = parseFloat(process.env.TASK_COUNT || 10);
+  await addAndRemoveTasks({ page, reactive: false, taskCount });
+}
+
+async function nonReactiveAddAndRemoveTasks(page) {
+  const taskCount = parseFloat(process.env.TASK_COUNT || 10);
+  await addAndRemoveTasks({ page, reactive: true, taskCount });
+}
+
+module.exports = {
+  reactiveAddAndRemoveTasks,
+  nonReactiveAddAndRemoveTasks,
+  addAndRemoveTasks,
+}
