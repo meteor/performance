@@ -10,11 +10,11 @@
     "node": ">=20.x",
     "npm": ">=10.x"
   },
-  "dependencies": {
-    "artillery": "^2.0.17"
-  },
   "devDependencies": {
     "@playwright/test": "^1.45.2",
-    "@types/node": "^20.14.11"
+    "@types/node": "^20.14.11",
+    "artillery": "^2.0.17",
+    "minimist": "^1.2.8",
+    "pidusage": "^3.0.2"
   }
 }

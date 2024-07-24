@@ -1,12 +1,14 @@
+const timeout = 60000;
+
 const addAndRemoveTasks = async ({ page, reactive, taskCount }) => {
+  page.setDefaultTimeout(timeout);
+
   await page.goto('http://localhost:3000/');
   await page.getByLabel(reactive ? 'Reactive' : 'No Reactive', { exact: true }).check();
 
   await page.getByRole('button', { name: 'Remove all tasks' }).click();
 
   const sessionId = await page.textContent('span#sessionId');
-
-  console.log("-> sessionId", sessionId);
 
   const tasks = Array.from({ length: taskCount });
   let addedNum = 1;
@@ -26,12 +28,12 @@ const addAndRemoveTasks = async ({ page, reactive, taskCount }) => {
 };
 
 async function reactiveAddAndRemoveTasks(page) {
-  const taskCount = parseFloat(process.env.TASK_COUNT || 10);
+  const taskCount = parseFloat(process.env.TASK_COUNT || 25);
   await addAndRemoveTasks({ page, reactive: false, taskCount });
 }
 
 async function nonReactiveAddAndRemoveTasks(page) {
-  const taskCount = parseFloat(process.env.TASK_COUNT || 10);
+  const taskCount = parseFloat(process.env.TASK_COUNT || 25);
   await addAndRemoveTasks({ page, reactive: true, taskCount });
 }
 
