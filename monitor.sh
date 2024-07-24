@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 
+
 # app. Application directory name within ./apps/*
 # script. Artillery script name within ./artillery/*
 app="${1}"
 script="${2}"
+logName="${3:-''}"
 if [[ -z "$app" ]] || [[ -z "$script" ]]; then
   echo "Usage: monitor.sh <app_name> <script_name>"
   exit 1;
 fi
+
+# Redirect stdout (1) and stderr (2) to a file
+mkdir -p logs
+exec > ./logs/${logName}-${app}-${script}.log 2>&1
 
 # Initialize script constants
 baseDir="${PWD}"
