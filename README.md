@@ -25,7 +25,8 @@ This repository includes:
 To run a stress test on your machine:
 
 ```shell
-npm install ./scripts/monitor.sh <app> <artillery-script> <log-context>
+npm install
+./scripts/monitor.sh <app> <artillery-script> <log-context>
 ```
 
 - `<app>`: The app folder name within `./apps` to stress test.
