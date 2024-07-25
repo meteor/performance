@@ -60,8 +60,8 @@ rm -rf "${appPath}/.meteor/local"
 METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor run --port ${appPort} &
 waitMeteorApp
 
-appPid="$(getPidByName "${app}/.meteor/local/db")"
-dbPid="$(getPidByName "${app}/.meteor/local/build/main.js")"
+appPid="$(getPidByName "${app}/.meteor/local/build/main.js")"
+dbPid="$(getPidByName "${app}/.meteor/local/db")"
 echo "APP PID: ${appPid}"
 echo "DB PID: ${dbPid}"
 

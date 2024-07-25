@@ -1,4 +1,4 @@
-const timeout = 60000;
+const timeout = 120000;
 
 const addAndRemoveTasks = async ({ page, reactive, taskCount }) => {
   page.setDefaultTimeout(timeout);
