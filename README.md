@@ -46,4 +46,4 @@ Non sective scenario will come next.
 
 Non-selective scenario will follow.
 
-More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2-vs-3/README.md)
+More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2-vs-3)
