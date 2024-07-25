@@ -70,8 +70,8 @@ npx artillery run "${baseDir}/artillery/${script}" &
 artPid="$!"
 
 # Run CPU and RAM monitoring for meteor app and db
-node "${baseDir}/scripts/monitor-cpu-ram.js" "${appPid}" "APP" &
-node "${baseDir}/scripts/monitor-cpu-ram.js" "${dbPid}" "DB" &
+node "${baseDir}/scripts/helpers/monitor-cpu-ram.js" "${appPid}" "APP" &
+node "${baseDir}/scripts/helpers/monitor-cpu-ram.js" "${dbPid}" "DB" &
 
 # Wait for artillery script to finish the process
 wait "${artPid}"
