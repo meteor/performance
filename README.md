@@ -40,10 +40,8 @@ Your machine might struggle with the default artillery configuration, but it sho
 
 ### Meteor 2 vs 3
 
-Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **reactive scenario**.
+Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **non-reactive scenario**.
 
-Non sective scenario will come next.
-
-Non-selective scenario will follow.
+Reactive scenario will come next.
 
 More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2-vs-3/README.md)
