@@ -62,6 +62,16 @@ This test was run with the following artillery configuration:
 | 2     | 2 minutes 6 seconds | 65.02% | 470 MB | ~= time, 17.79% less cpu, 12.17% more ram |
 | 3     | 2 min 10 seconds    | 64.44% | 460 MB | ~= time, 18.98% less cpu, 4.78% more ram  |
 
+#### Alternative configuration 
+
+Another detail to note is that in a reactive scenario, Meteor 3.0 crashes when handling subscription data for 4 new connections per second over a minute. Meteor 2.0 manages this, suggesting a possible regression in 3.0. The configuration of 3 connections per second is used to be able to compare both effectively.
+
+Meteor 2 result of successful run with 4 connections per second is as follow:
+
+| # Run | Time             | CPU    | RAM    |
+| ----- |------------------|--------|--------|
+| 1     | 2 min 52 seconds | 87,00% | 497 MB |
+
 ### Conclusion
 
 Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **non-reactive scenario**.
