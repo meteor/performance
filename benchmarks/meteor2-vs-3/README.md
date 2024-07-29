@@ -44,28 +44,6 @@ This test was run with the following artillery configuration:
 
 This test was run with the following artillery configuration:
 
-- Every second, 3 new connections are made. Over 1 minute, tasks are created, removed, and visualized for non-reactive.
-
-#### Meteor 2
-
-| # Run | Time                 | CPU     | RAM    |
-| ----- |----------------------| ------- | ------ |
-| 1     | 2 min 6 seconds      | 116,06% | 442 MB |
-| 2     | 2 minutes 50 seconds | 118.29% | 458 MB |
-| 3     | 3 minutes            | 116.87% | 455 MB |
-
-####  Meteor 3
-
-| # Run | Time                | CPU     | RAM    | Comparison with 2                               |
-| ----- | ------------------- | ------- | ------ | ----------------------------------------------- |
-| 1     | 1 minute 56 seconds | 110.85% | 369 MB | 28.39% faster, 4.48% less cpu, 16.51% less ram  |
-| 2     | 2 minutes 2 seconds | 101.21% | 390 MB | 28.23% faster, 14.43% less cpu, 15.03% less ram |
-| 3     | 2 minutes 6 seconds | 104.90% | 377 MB | 30% faster, 10.24% less cpu, 17.14% less ram    |
-
-### Reactive Results
-
-This test was run with the following artillery configuration:
-
 - Every second, 3 new connections are made. Over 1 minute, tasks are created, removed, and visualized for reactive.
 
 #### Meteor 2
