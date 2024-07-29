@@ -1,3 +1,4 @@
+# Meteor performance
 
 ## Motivation
 
@@ -25,7 +26,8 @@ This repository includes:
 To run a stress test on your machine:
 
 ```shell
-npm install ./scripts/monitor.sh <app> <artillery-script> <log-context>
+npm install
+./scripts/monitor.sh <app> <artillery-script> <log-context>
 ```
 
 - `<app>`: The app folder name within `./apps` to stress test.
@@ -42,6 +44,6 @@ Your machine might struggle with the default artillery configuration, but it sho
 
 Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **non-reactive scenario**.
 
-Reactive scenario will come next.
+Reactive scenario will follow.
 
-More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2-vs-3/README.md)
+More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2-vs-3)
