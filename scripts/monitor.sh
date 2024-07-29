@@ -53,11 +53,14 @@ function cleanup() {
 }
 trap cleanup SIGINT SIGTERM
 
-
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
 rm -rf "${appPath}/.meteor/local"
-METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor run --port ${appPort} &
+if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
+  METEOR_PACKAGE_DIRS="${baseDir}/packages" ${METEOR_CHECKOUT_PATH}/meteor run --port ${appPort} &
+else
+  METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor run --port ${appPort} &
+fi
 waitMeteorApp
 
 appPid="$(getPidByName "${app}/.meteor/local/build/main.js")"
