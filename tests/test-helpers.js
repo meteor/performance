@@ -29,12 +29,12 @@ const addAndRemoveTasks = async ({ page, reactive, taskCount }) => {
 
 async function reactiveAddAndRemoveTasks(page) {
   const taskCount = parseFloat(process.env.TASK_COUNT || 20);
-  await addAndRemoveTasks({ page, reactive: false, taskCount });
+  await addAndRemoveTasks({ page, reactive: true, taskCount });
 }
 
 async function nonReactiveAddAndRemoveTasks(page) {
   const taskCount = parseFloat(process.env.TASK_COUNT || 20);
-  await addAndRemoveTasks({ page, reactive: true, taskCount });
+  await addAndRemoveTasks({ page, reactive: false, taskCount });
 }
 
 module.exports = {

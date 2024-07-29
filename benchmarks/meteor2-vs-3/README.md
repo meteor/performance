@@ -18,11 +18,11 @@ This test measures the performance impact of Meteor 2 and 3, focusing on DDP pro
 - SSD WD Black SN850X
 - Docker container
 
-### Reactive Results
+### Non-reactive Results
 
 This test was run with the following artillery configuration:
 
-- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized for reactive.
+- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized for non-reactive.
 
 #### Meteor 2
 
@@ -42,4 +42,4 @@ This test was run with the following artillery configuration:
 
 #### Conclusion
 
-Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a reactive scenario.
+Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a non-reactive scenario.
