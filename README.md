@@ -58,3 +58,8 @@ To deploy each app:
 npm install
 ./scripts/deploy.sh <app>
 ```
+
+Current apps are accessible at:
+
+- tasks-2.x: http://tasks-2.0-perf.meteorapp.com
+- tasks-3.x: http://tasks-3.0-perf.meteorapp.com
