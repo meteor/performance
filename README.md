@@ -55,7 +55,6 @@ The apps are deployed to galaxy to benefit of further analysis with MontiAPM too
 To deploy each app:
 
 ```shell
-npm install
 ./scripts/deploy.sh <app>
 ```
 
