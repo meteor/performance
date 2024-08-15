@@ -3,7 +3,7 @@ const timeout = 120000;
 const addAndRemoveTasks = async ({ page, reactive, taskCount }) => {
   page.setDefaultTimeout(timeout);
 
-  await page.goto('http://localhost:3000/');
+  await page.goto(process.env.REMOTE_URL || 'http://localhost:3000/');
   await page.getByLabel(reactive ? 'Reactive' : 'No Reactive', { exact: true }).check();
 
   await page.getByRole('button', { name: 'Remove all tasks' }).click();
