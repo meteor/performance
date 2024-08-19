@@ -50,7 +50,9 @@ mongo-decimal@0.1.4-beta300.7
 mongo-dev-server@1.1.1
 mongo-id@1.0.9
 montiapm:agent@3.0.0-beta.5
+montiapm:agent-binary-deps@3.0.0
 montiapm:meteorx@2.3.1
+montiapm:profiler@1.7.0-beta.2
 npm-mongo@4.17.3
 ordered-dict@1.2.0
 promise@1.0.0
