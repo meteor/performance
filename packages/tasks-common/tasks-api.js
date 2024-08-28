@@ -1,6 +1,8 @@
 import { TasksCollection } from './tasks-common.client';
 
-export const registerTaskApi = () => {
+export const registerTaskApi = async () => {
+  await import('./monitoring');
+
   Meteor.methods({
     insertTask({ description, sessionId }) {
       return TasksCollection.insertAsync({
