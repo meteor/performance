@@ -1,0 +1,20 @@
+config:
+  target: http://localhost:3000
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      name: Warm up
+  ensure:
+    maxErrorRate: 1
+    max: 500
+  # Load the Playwright engine:
+  engines:
+    playwright:
+      globalTimeout: 240000
+      launchOptions:
+        slowMo: 2000
+  # Path to JavaScript file that defines Playwright test functions
+  processor: '../tests/test-helpers.js'
+scenarios:
+  - engine: playwright
+    testFunction: 'nonReactiveAddAndRemoveTasks'

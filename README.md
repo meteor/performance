@@ -47,3 +47,18 @@ Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less 
 Meteor 3 is in average **~equal on time**, uses **~18% less CPU** and **~10% more of RAM** in a **reactive scenario**.
 
 More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2-vs-3)
+
+## Deploy
+
+The apps are deployed to galaxy to benefit of further analysis with MontiAPM tool.
+
+To deploy each app:
+
+```shell
+./scripts/deploy.sh <app>
+```
+
+Current apps are accessible at:
+
+- tasks-2.x: http://tasks-2.0-perf.meteorapp.com
+- tasks-3.x: http://tasks-3.0-perf.meteorapp.com
