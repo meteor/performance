@@ -26,7 +26,7 @@ This test measures the performance impact of Meteor 2 and 3, focusing on DDP pro
 
 This test was run with the following artillery configuration:
 
-- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized for non-reactive.
+- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a method (non-reactive).
 
 #### Meteor 2
 
@@ -50,7 +50,7 @@ This test was run with the following artillery configuration:
 
 This test was run with the following artillery configuration:
 
-- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized for reactive.
+- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a subscription (reactive).
 
 #### Meteor 2
 
