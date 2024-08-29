@@ -1,6 +1,6 @@
 # Benchmarks
 
-## Meteor 2 vs 3
+## Meteor 2.16 vs 3.0.1
 
 To verify Meteor's performance, we have two apps, `tasks-2.x` and `tasks-3.x`, that:
 
