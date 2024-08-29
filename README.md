@@ -42,6 +42,12 @@ The process will take some time, and the logs are updated live at `./logs`.
 
 Your machine might struggle with the default artillery configuration, but it should still reveal performance differences between the tests. Adjust the configuration as needed by learning from [artillery.io options](https://www.artillery.io/docs).
 
+You can analyze performance using a Meteor checkout. This allows you to quickly measure the impact of ongoing changes and ensure consistent or improved performance.
+
+```shell
+METEOR_CHECKOUT_PATH=<path-to-meteor-checkout> ./scripts/monitor.sh <app> <artillery-script> <log-context>
+```
+
 ### Running remotely
 
 > Currently, only Meteor staff can fully manage the entire process for the tasks app.
