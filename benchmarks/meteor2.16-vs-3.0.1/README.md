@@ -2,6 +2,8 @@
 
 ## Meteor 2.16 vs 3.0.1
 
+### Methodology
+
 To verify Meteor's performance, we have two apps, `tasks-2.x` and `tasks-3.x`, that:
 
 - Create 20 connection-scoped tasks via a button and a Meteor method.
