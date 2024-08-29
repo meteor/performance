@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { initializeTaskCollection, registerTaskApi } from 'meteor/tasks-common';
+import { tryMonitorExtras, initializeTaskCollection, registerTaskApi } from 'meteor/tasks-common';
 import { Monti } from 'meteor/montiapm:agent';
 
 if (Meteor.isProduction) {
@@ -7,6 +7,7 @@ if (Meteor.isProduction) {
 }
 
 Meteor.startup(() => {
+  tryMonitorExtras();
   initializeTaskCollection();
   registerTaskApi();
 });
