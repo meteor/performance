@@ -75,4 +75,4 @@ Meteor 3 is in average **~36% faster**, uses **~18% less CPU** and  **~17% less 
 
 Meteor 3 is in average **~12% faster**, uses **~43% less CPU** and **~30% less of RAM** in a **reactive scenario**.
 
-The improvement [from the previous version 3.0.1 report](../meteor2.16-vs-3.0.1#conclusion) is substantial. Both scenarios show better performance, with the reactive scenario showing a significant boost.
+The improvement [from the previous version 3.0.1 report](../meteor2.16-vs-3.0.1#conclusion) is substantial. Both scenarios show better performance, with the reactive scenario showing a significant boost, an additional connection (4) is now possible for fair comparisons.
