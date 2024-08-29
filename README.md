@@ -67,21 +67,11 @@ Remote stress testing helps gather extra metrics from MontiAPM for deeper perfor
 
 For each benchmark, we recommend using a new Galaxy container to ensure a clean environment, preventing any interference with your performance results.
 
-## Benchmarks
+### Deploy
 
-### Meteor 2 vs 3
+The apps are deployed to Galaxy to benefit of further analysis with MontiAPM tool.
 
-Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **non-reactive scenario**.
-
-Meteor 3 is in average **~equal on time**, uses **~18% less CPU** and **~10% more of RAM** in a **reactive scenario**.
-
-More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2-vs-3)
-
-## Deploy
-
-The apps are deployed to galaxy to benefit of further analysis with MontiAPM tool.
-
-To deploy each app:
+To deploy each app after changes:
 
 ```shell
 ./scripts/deploy.sh <app>
@@ -91,3 +81,14 @@ Current apps are accessible at:
 
 - tasks-2.x: http://tasks-2.0-perf.meteorapp.com
 - tasks-3.x: http://tasks-3.0-perf.meteorapp.com
+
+
+## Benchmarks
+
+### Meteor 2 vs 3
+
+Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **non-reactive scenario**.
+
+Meteor 3 is in average **~equal on time**, uses **~18% less CPU** and **~10% more of RAM** in a **reactive scenario**.
+
+More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2-vs-3)
