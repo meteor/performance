@@ -15,6 +15,8 @@ appPort=3000
 
 # Ensure proper cleanup on interrupt the process
 function cleanup() {
+    builtin cd "${appPath}"
+    METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor remove apm-agent
     builtin cd ${baseDir};
     exit 0
 }
@@ -22,6 +24,9 @@ trap cleanup SIGINT SIGTERM
 
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
+
+METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor add apm-agent
+
 rm -rf "${appPath}/.meteor/local"
 hostname="${app//x/0}-perf.meteorapp.com"
 echo "Deploying to ${hostname}"
