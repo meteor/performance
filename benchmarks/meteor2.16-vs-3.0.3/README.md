@@ -63,7 +63,7 @@ This test was run with the following artillery configuration:
 
 ####  Meteor 3 (no compression)
 
-| # Run | Time                 | CPU    | RAM    | Comparison with 2                               |
+| # Run | Time                 | CPU    | RAM    | Comparison with 2 (compression)                 |
 | ----- | -------------------- | ------ | ------ | ----------------------------------------------- |
 | 1     | 2 minutes 30 seconds | 49.39% | 405 MB | 11.76% faster, 42.99% less cpu, 32.72% less ram |
 | 2     | 2 minutes 34 seconds | 49.97% | 381 MB | 10.46% faster, 42.77% less cpu, 35.53% less ram |
@@ -79,8 +79,9 @@ Disabling compression in Meteor 2 also leads to significant gains. This suggests
 
 ### Conclusion
 
-Meteor 3 is in average **~36% faster**, uses **~18% less CPU** and  **~17% less of RAM** in a **non-reactive scenario**.
+Meteor 3 is in average **~36% faster**, uses **~18% less CPU** and  **~17% less of RAM** in a **non-reactive scenario** without compression.
 
-Meteor 3 is in average **~12% faster**, uses **~43% less CPU** and **~30% less of RAM** in a **reactive scenario**.
+Meteor 3 is in average **~12% faster**, uses **~43% less CPU** and **~30% less of RAM** in a **reactive scenario** without compression.
 
-The improvement [from the previous version 3.0.1 report](../meteor2.16-vs-3.0.1#conclusion) is substantial. Both scenarios show better performance, with the reactive scenario showing a significant boost, an additional connection (4) is now possible for fair comparisons.
+Meteor 2 can improve performance by disabling compression. Offering users the ability to adjust or disable compression effectively would be beneficial. However, the regression in Meteor 3 persists (initially identified in [3.0.1 report](../meteor2.16-vs-3.0.1#conclusion)), with higher RAM usage for the same process and more time introduced. This fact might still reveal the regression and requires further investigation.
+
