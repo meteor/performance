@@ -26,7 +26,7 @@ This test measures the performance impact of Meteor 2 and 3, focusing on DDP pro
 
 This test was run with the following artillery configuration:
 
-- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a method (non-reactive).
+- 240 connections in 1 minute. Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a method (non-reactive).
 
 #### Meteor 2
 
@@ -50,7 +50,7 @@ This test was run with the following artillery configuration:
 
 This test was run with the following artillery configuration:
 
-- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a subscription (reactive).
+- 240 connections in 1 minute. Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a subscription (reactive).
 
 #### Meteor 2 (compression)
 
@@ -85,5 +85,7 @@ Meteor 3 is in average **~36% faster**, uses **~18% less CPU** and  **~17% less 
 
 Meteor 3 is in average **~12% faster**, uses **~43% less CPU** and **~30% less of RAM** in a **reactive scenario** without compression.
 
-Meteor 2 can improve performance by disabling compression. Offering users the ability to adjust or disable compression effectively would be beneficial. However, the regression in Meteor 3 persists (initially identified in [3.0.1 report](../meteor2.16-vs-3.0.1#conclusion)), with higher RAM usage for the same process and more time introduced. This fact might still reveal the regression and requires further investigation.
+Meteor 3, without compression, can manage 240 connections in 1 minute, a regression noted in the [3.0.1 report](../meteor2.16-vs-3.0.1#conclusion).
+
+Meteor 2 can improve performance by disabling compression. Offering users the ability to adjust or disable compression effectively would be beneficial. However, the regression in Meteor 3 persists (initially identified in ), with higher RAM usage for the same process and more time introduced. This fact might still reveal the regression and requires further investigation.
 
