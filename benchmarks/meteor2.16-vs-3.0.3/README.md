@@ -52,7 +52,7 @@ This test was run with the following artillery configuration:
 
 - Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a subscription (reactive).
 
-#### Meteor 2
+#### Meteor 2 (compression)
 
 | # Run | Time                 | CPU    | RAM    |
 | ----- | -------------------- | ------ | ------ |
@@ -61,13 +61,21 @@ This test was run with the following artillery configuration:
 | 3     | 2 minutes 46 seconds | 88.54% | 587 MB |
 
 
-####  Meteor 3
+####  Meteor 3 (no compression)
 
 | # Run | Time                 | CPU    | RAM    | Comparison with 2                               |
 | ----- | -------------------- | ------ | ------ | ----------------------------------------------- |
 | 1     | 2 minutes 30 seconds | 49.39% | 405 MB | 11.76% faster, 42.99% less cpu, 32.72% less ram |
 | 2     | 2 minutes 34 seconds | 49.97% | 381 MB | 10.46% faster, 42.77% less cpu, 35.53% less ram |
 | 3     | 2 minutes 24 seconds | 49.25% | 442 MB | 13.25% faster, 44.37% less cpu, 24.70% less ram |
+
+#### Meteor 2 (no compression)
+
+| # Run | Time                 | CPU    | RAM    |
+| ----- | -------------------- | ------ | ------ |
+| 1     | 2 minutes 12 seconds | 52.38% | 348 MB |
+
+Disabling compression in Meteor 2 also leads to significant gains. This suggests that while disabling compression might benefit your app, it may not be the main cause of the regression in Meteor 3. It's even faster and less RAM consuming than in Meteor 3.
 
 ### Conclusion
 
