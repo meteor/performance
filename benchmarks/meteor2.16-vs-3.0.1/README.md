@@ -79,3 +79,5 @@ Meteor 2 result of successful run with **240 connections in 1 minute** is as fol
 Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **non-reactive scenario**.
 
 Meteor 3 is in average **~equal on time**, uses **~18% less CPU** and **~10% more of RAM** in a **reactive scenario**.
+
+Meteor 3 shows a performance regression when exceeding 180 connections per minute; it can't handle the load, causing the process to break. We should investigate how to improve Meteor 3 with this machine configuration to manage a configuration with at least 240 connections per minute, as Meteor 2 does.
