@@ -93,8 +93,10 @@ Current apps are accessible at:
 
 ### Meteor 2 vs 3
 
-Meteor 3 is in average **~36% faster**, uses **~18% less CPU** and  **~17% less of RAM** in a **non-reactive scenario**.
+Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **non-reactive scenario**.
 
-Meteor 3 is in average **~12% faster**, uses **~43% less CPU** and **~30% less of RAM** in a **reactive scenario**.
+Meteor 3 is in average **~equal on time**, uses **~18% less CPU** and **~10% more of RAM** in a **reactive scenario**.
 
-More details on this benchmark can be found at [`./benchmarks/meteor2.16-vs-3.0.3`](./benchmarks/meteor2.16-vs-3.0.3)
+More details on this benchmark can be found at [`./benchmarks/meteor2-vs-3`](./benchmarks/meteor2.16-vs-3.0.1), where we observed a performance regression in Meteor 3 related to reactivity.
+
+We have found that disabling compression can improve performance. More information is at [`./benchmarks/meteor2.16-vs-3.0.3`](./benchmarks/meteor2.16-vs-3.0.3). We will keep investigating how to address the regression that persists in Meteor 3 with reactivity.
