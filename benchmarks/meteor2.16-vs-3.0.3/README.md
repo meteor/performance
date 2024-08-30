@@ -71,11 +71,11 @@ This test was run with the following artillery configuration:
 
 #### Meteor 2 (no compression)
 
-| # Run | Time                 | CPU    | RAM    |
-| ----- | -------------------- | ------ | ------ |
-| 1     | 2 minutes 12 seconds | 52.38% | 348 MB |
-| 2     | 2 minutes 10 seconds | 56.48% | 362 MB |
-| 3     | 2 minutes 10 seconds | 58.15% | 377 MB |
+| # Run | Time                 | CPU    | RAM    | Comparison with 2 (no compression)              |
+| ----- | -------------------- | ------ | ------ | ----------------------------------------------- |
+| 1     | 2 minutes 12 seconds | 52.38% | 348 MB | 12% faster, 6.05% more cpu, 14.07% less ram |
+| 2     | 2 minutes 10 seconds | 56.48% | 362 MB | 15.58% faster, 13.02% more cpu, 4.98% less ram |
+| 3     | 2 minutes 10 seconds | 58.15% | 377 MB | 9.72% faster, 18.07% more cpu, 14.70% less ram |
 
 Disabling compression in Meteor 2 also leads to significant gains. This suggests that while disabling compression might benefit your app, it may not be the main cause of the regression in Meteor 3. It's even faster and less RAM consuming than in Meteor 3.
 
