@@ -24,7 +24,7 @@ This test measures the performance impact of Meteor 2 and 3, focusing on DDP pro
 
 This test was run with the following artillery configuration:
 
-- Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a method (non-reactive).
+- 240 connections in 1 minute. Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a method (non-reactive).
 
 #### Meteor 2
 
@@ -46,7 +46,7 @@ This test was run with the following artillery configuration:
 
 This test was run with the following artillery configuration:
 
-- Every second, 3 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a subscription (reactive).
+- 180 connections in 1 minute. Every second, 3 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a subscription (reactive).
 
 #### Meteor 2
 
@@ -66,9 +66,9 @@ This test was run with the following artillery configuration:
 
 #### Alternative configuration 
 
-Another detail to note is that in a reactive scenario, Meteor 3.0 crashes when handling subscription data for 4 new connections per second over a minute. Meteor 2.0 manages this, suggesting a possible regression in 3.0. The configuration of 3 connections per second is used to be able to compare both effectively.
+Another detail to note is that in a reactive scenario, Meteor 3.0 crashes when handling subscription data for 240 connections in 1 minute. Meteor 2.0 manages this, suggesting **a possible regression in 3.0**. The configuration of 180 connections in 1 minute is used to be able to compare both effectively.
 
-Meteor 2 result of successful run with 4 connections per second is as follow:
+Meteor 2 result of successful run with **240 connections in 1 minute** is as follow:
 
 | # Run | Time             | CPU    | RAM    |
 | ----- |------------------|--------|--------|
