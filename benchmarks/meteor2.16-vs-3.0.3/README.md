@@ -71,7 +71,7 @@ This test was run with the following artillery configuration:
 
 #### Meteor 2 (no compression)
 
-| # Run | Time                 | CPU    | RAM    | Comparison with 2 (no compression)              |
+| # Run | Time                 | CPU    | RAM    | Comparison with 3 (no compression)              |
 | ----- | -------------------- | ------ | ------ | ----------------------------------------------- |
 | 1     | 2 minutes 12 seconds | 52.38% | 348 MB | 12% faster, 6.05% more cpu, 14.07% less ram |
 | 2     | 2 minutes 10 seconds | 56.48% | 362 MB | 15.58% faster, 13.02% more cpu, 4.98% less ram |
