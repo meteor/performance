@@ -28,7 +28,7 @@ This test was run with the following artillery configuration:
 
 - 240 connections in 1 minute. Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a method (non-reactive).
 
-#### Meteor 2
+#### Meteor 2 (compression)
 
 | # Run | Time                 | CPU     | RAM    |
 | ----- | -------------------- | ------- | ------ |
@@ -37,14 +37,18 @@ This test was run with the following artillery configuration:
 | 3     | 2 minutes 32 seconds | 115.46% | 454 MB |
 
 
-####  Meteor 3
+#### Meteor 3 (no compression)
 
-| # Run | Time                | CPU    | RAM    | Comparison with 2                               |
+| # Run | Time                | CPU    | RAM    | Comparison with 2 (compression)                 |
 | ----- | ------------------- | ------ | ------ | ----------------------------------------------- |
 | 1     | 1 minute 40 seconds | 90.16% | 377 MB | 43.18% faster, 23.20% less cpu, 16.96% less ram |
 | 2     | 1 minute 40 seconds | 98.49% | 389 MB | 36.70% faster, 13.47% less cpu,14.32% less ram  |
 | 3     | 1 minute 50 seconds | 95.15% | 364 MB | 27.63% faster, 17.59% less cpu, 22.02% less ram |
 
+
+This non-reactive scenario helps assess how removing compression in Meteor 3 improves performance compared to Meteor 2, which likely has compression enabled. A similar analysis is done for the reactive scenario in the next section.
+
+Refer to the next section for a comparison of performance without compression in both Meteor 3 and Meteor 2. The fair analysis is also important to show that while disabling compression may improve performance in both versions, Meteor 3 might still have some regressions that need attention.
 
 ### Reactive Results
 
