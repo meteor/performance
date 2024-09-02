@@ -75,13 +75,12 @@ export class EventLoopMonitor extends EventEmitter {
 
 
       if (lag >= 100) {
+        console.log('lag', lag, AHCapture.active);
         AHCapture.active = true;
       } else {
         AHCapture.active = false;
       }
       
-      console.log('lag', lag, AHCapture.active);
-
       if (!self._stopped) {
         self.emit('lag', lag);
         self._detectLag();
