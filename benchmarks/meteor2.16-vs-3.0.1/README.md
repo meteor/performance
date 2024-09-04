@@ -21,13 +21,13 @@ This test measures the performance impact of Meteor 2 and 3, focusing on DDP pro
 - Meteor 2.16 and Meteor 3.0.1
 - Built-in Mongo
 - Polling strategy for handling reactive data (high-demand scenario)
+- Docker container
 
 #### Machine
 
 - Intel Core Raptor Lake i9 13900K
 - 64 RAM DDR5 6000 MHz CL30
 - SSD WD Black SN850X
-- Docker container
 
 ### Non-reactive results
 

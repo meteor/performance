@@ -25,6 +25,7 @@ This test measures the performance impact of Meteor 2 and 3, focusing on DDP pro
 - Meteor 2.16 and Meteor 3.0.1
 - Built-in Mongo
 - Polling strategy for handling reactive data (high-demand scenario)
+- Docker container
 - For a "no compression setup", set `SERVER_WEBSOCKET_COMPRESSION=false` in the environment configuration.
     - To confirm compression is disabled, open `meteor shell` and run `Meteor.server.stream_server.server.options.faye_server_options.extensions`; it should return `[]`.
 
@@ -33,7 +34,6 @@ This test measures the performance impact of Meteor 2 and 3, focusing on DDP pro
 - Intel Core Raptor Lake i9 13900K
 - 64 RAM DDR5 6000 MHz CL30
 - SSD WD Black SN850X
-- Docker container
 
 ### Non-reactive results
 
