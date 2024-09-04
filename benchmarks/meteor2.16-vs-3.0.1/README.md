@@ -8,19 +8,28 @@ To verify Meteor's performance, we have two apps, `tasks-2.x` and `tasks-3.x`, t
 
 - Create 20 connection-scoped tasks via a button and a Meteor method.
 - Remove each of the 20 tasks one by one via a button and a Meteor method.
-- Display all tasks reactively using a Meteor subscription and non-reactively using a Meteor method that fetches them on each action.
+- Display all tasks reactively using one Meteor subscription and non-reactively using one Meteor method that fetches them on each action.
 
 This test measures the performance impact of Meteor 2 and 3, focusing on DDP protocol management for methods and subscriptions. Multiple runs trying to stress the machine with several configurations were performed to gather results.
 
-### Machine Specs
+> The test methodology follows an incremental approach, starting with simple setups and processes before moving to complex ones. If an issue arises in a simpler scenario, it provides a chance to address a more isolated performance problem, so we focus on analyzing and resolving it. Often, fixing issues in simpler examples can also improve performance in more complex scenarios, as these build on the same primitives.
+
+### Specs
+
+#### Software
 
 - Meteor 2.16 and Meteor 3.0.1
+- Built-in Mongo
+- Polling strategy for handling reactive data (high-demand scenario)
+
+#### Machine
+
 - Intel Core Raptor Lake i9 13900K
 - 64 RAM DDR5 6000 MHz CL30
 - SSD WD Black SN850X
 - Docker container
 
-### Non-reactive Results
+### Non-reactive results
 
 This test was run with the following artillery configuration:
 
@@ -42,7 +51,7 @@ This test was run with the following artillery configuration:
 | 2     | 2 minutes 2 seconds | 101.21% | 390 MB | 28.23% faster, 14.43% less cpu, 15.03% less ram |
 | 3     | 2 minutes 6 seconds | 104.90% | 377 MB | 30% faster, 10.24% less cpu, 17.14% less ram    |
 
-### Reactive Results
+### Reactive results
 
 This test was run with the following artillery configuration:
 
@@ -73,6 +82,15 @@ Meteor 2 result of successful run with **240 connections in 1 minute** is as fol
 | # Run | Time             | CPU    | RAM    |
 | ----- |------------------|--------|--------|
 | 1     | 2 min 52 seconds | 87,00% | 497 MB |
+
+
+### Remote results
+
+We also used our remote setup to stress test the apps. Remote testing on Galaxy provides additional metrics beyond those from the Monti APM tool. We use this data to explore regression causes, implement fixes, or assess configurations for improved performance.
+
+For example, when comparing "PubSub response time" and "Method response time" in both reactive and non-reactive scenarios, the results indicate that in Meteor 2, subscriptions are faster and methods are slower in reactive scenarios. In contrast, Meteor 3 shows the opposite pattern for non-reactive scenarios with the same process.
+
+![image](https://github.com/user-attachments/assets/0d8d2d68-880d-4628-8fbc-6d47775247ec)
 
 ### Conclusion
 

@@ -2,7 +2,9 @@
 
 ## Meteor 2.16 vs 3.0.3
 
-The purpose of benchmarking in 3.0.3 is to measure the impact of optimizations made to [address performance issues in reactive flows from version 3.0.1](../meteor2.16-vs-3.0.1), especially after disabling compression on reactive messages. Additional details on the changes can be [found here](https://github.com/meteor/meteor/pull/13320).
+In the Meteor 3.0.3 release, we aim to [fix performance issues in reactive flows identified in version 3.0.1](../meteor2.16-vs-3.0.1). While we haven't discovered the exact cause yet, we explored other performance optimizations in Meteor 2 and 3 by disabling compression.
+
+This report details the impact of disabling compression on your Meteor apps. To address the reactivity issue in Meteor 3, we'll continue our research in the next version.
 
 ### Methodology
 
@@ -10,19 +12,30 @@ To verify Meteor's performance, we have two apps, `tasks-2.x` and `tasks-3.x`, t
 
 - Create 20 connection-scoped tasks via a button and a Meteor method.
 - Remove each of the 20 tasks one by one via a button and a Meteor method.
-- Display all tasks reactively using a Meteor subscription and non-reactively using a Meteor method that fetches them on each action.
+- Display all tasks reactively using one Meteor subscription and non-reactively using one Meteor method that fetches them on each action.
 
 This test measures the performance impact of Meteor 2 and 3, focusing on DDP protocol management for methods and subscriptions. Multiple runs trying to stress the machine with several configurations were performed to gather results.
 
-### Machine Specs
+> The test methodology follows an incremental approach, starting with simple setups and processes before moving to complex ones. If an issue arises in a simpler scenario, it provides a chance to address a more isolated performance problem, so we focus on analyzing and resolving it. Often, fixing issues in simpler examples can also improve performance in more complex scenarios, as these build on the same primitives.
 
-- Meteor 2.16 and Meteor 3.0.3
+### Specs
+
+#### Software
+
+- Meteor 2.16 and Meteor 3.0.1
+- Built-in Mongo
+- Polling strategy for handling reactive data (high-demand scenario)
+- For a "no compression setup", set `SERVER_WEBSOCKET_COMPRESSION=false` in the environment configuration.
+    - To confirm compression is disabled, open `meteor shell` and run `Meteor.server.stream_server.server.options.faye_server_options.extensions`; it should return `[]`.
+
+#### Machine
+
 - Intel Core Raptor Lake i9 13900K
 - 64 RAM DDR5 6000 MHz CL30
 - SSD WD Black SN850X
 - Docker container
 
-### Non-reactive Results
+### Non-reactive results
 
 This test was run with the following artillery configuration:
 
@@ -50,7 +63,7 @@ This non-reactive scenario helps assess how removing compression in Meteor 3 imp
 
 Refer to the next section for a comparison of performance without compression in both Meteor 3 and Meteor 2. The fair analysis is also important to show that while disabling compression may improve performance in both versions, Meteor 3 might still have some regressions that need attention.
 
-### Reactive Results
+### Reactive results
 
 This test was run with the following artillery configuration:
 
@@ -91,5 +104,4 @@ Meteor 3 is in average **~12% faster**, uses **~43% less CPU** and **~30% less o
 
 Meteor 3, without compression, can manage 240 connections in 1 minute, a regression noted in the [3.0.1 report](../meteor2.16-vs-3.0.1).
 
-Meteor 2 can improve performance by disabling compression as well as Meteor 3. Offering users the ability to adjust or disable compression effectively would be beneficial. However, the regression in Meteor 3 persists (initially identified in the [3.0.1 report](../meteor2.16-vs-3.0.1)), with higher RAM usage for the same process and more time introduced. This fact might still reveal the regression and requires further investigation.
-
+Meteor 2 can improve performance by disabling compression as well as Meteor 3. However, the regression in Meteor 3 persists (initially identified in the [3.0.1 report](../meteor2.16-vs-3.0.1)), with higher RAM usage for the same process and more time introduced. This fact might still reveal the regression and requires further investigation.
