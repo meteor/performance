@@ -99,6 +99,6 @@ Meteor 3 is in average **~equal on time**, uses **~18% less CPU** and **~10% mor
 
 More details on this benchmark can be found at [`./benchmarks/meteor2.16-vs-3.0.1`](./benchmarks/meteor2.16-vs-3.0.1), where we observed a performance regression in Meteor 3 related to reactivity.
 
-As part of the Meteor 3.0.3 release, we have found that disabling compression can improve performance. More information is at [`./benchmarks/meteor2.16-vs-3.0.3`](./benchmarks/meteor2.16-vs-3.0.3).
+As part of the Meteor 3.0.3 release, we have found that disabling compression can improve performance. More information is at [`./benchmarks/meteor2.16-vs-3.0.3-disable-compression`](./benchmarks/meteor2.16-vs-3.0.3-disable-compression).
 
 We will keep investigating how to address the regression that persists in Meteor 3 with reactivity.

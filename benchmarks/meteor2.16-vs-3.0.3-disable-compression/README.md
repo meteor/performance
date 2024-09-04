@@ -105,3 +105,5 @@ Meteor 3 is in average **~12% faster**, uses **~43% less CPU** and **~30% less o
 Meteor 3, without compression, can manage 240 connections in 1 minute, a regression noted in the [3.0.1 report](../meteor2.16-vs-3.0.1).
 
 Meteor 2 can improve performance by disabling compression as well as Meteor 3. However, the regression in Meteor 3 persists (initially identified in the [3.0.1 report](../meteor2.16-vs-3.0.1)), with higher RAM usage for the same process and more time introduced. This fact might still reveal the regression and requires further investigation.
+
+Disabling compression can lead to increased resource usage, such as higher bandwidth consumption. While bandwidth is generally less costly, it’s worth considering this when adopting the solution. We also plan to include bandwidth monitoring in our performance suite to track and measure this effect.
