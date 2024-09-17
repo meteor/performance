@@ -86,6 +86,14 @@ Meteor 2 result of successful run with **240 connections in 1 minute** is as fol
 
 ### Remote results
 
+#### Galaxy container specs
+
+Compact (Pro)
+512MB
+0.5 ECU
+
+#### Results
+
 We also used our remote setup to stress test the apps. Remote testing on Galaxy provides additional metrics beyond those from the Monti APM tool. We use this data to explore regression causes, implement fixes, or assess configurations for improved performance.
 
 For example, when comparing "PubSub response time" and "Method response time" in both reactive and non-reactive scenarios, the results indicate that in Meteor 2, subscriptions are faster and methods are slower. In contrast, Meteor 3 shows the opposite pattern with the same process.
