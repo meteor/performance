@@ -11,8 +11,9 @@ if [[ -z "$app" ]] || [[ -z "$script" ]]; then
 fi
 
 # Redirect stdout (1) and stderr (2) to a file
+logFile="logs/${logName}-${app}-${script}.log"
 mkdir -p logs
-exec > ./logs/${logName}-${app}-${script}.log 2>&1
+exec > "./${logFile}" 2>&1
 
 # Initialize script constants
 baseDir="${PWD}"
@@ -56,9 +57,28 @@ function isRunningUrl() {
 
 # Ensure proper cleanup on interrupt the process
 function cleanup() {
+    verify="${1}"
+
+    # Verify valid output
+    if [[ "${verify}" == "true" ]]; then
+      sleep 6
+      if cat "${baseDir}/${logFile}" | grep -q "Timeout"; then
+        echo -e "${RED}*** !!! ERROR: SOMETHING WENT WRONG !!! ***${NC}"
+        echo -e "${RED}Output triggered an unexpected timeout (${logFile})${NC}"
+        echo -e "${RED} Galaxy container is overloaded and unable to provide accurate comparison results.${NC}"
+        echo -e "${RED} Try switching to a configuration that Galaxy container can handle.${NC}"
+
+        exit 1
+      else
+        echo -e "${GREEN}Output is suitable for comparisons (${logFile})${NC}"
+        echo -e "${GREEN} Galaxy container managed the configuration correctly.${NC}"
+
+        exit 0
+      fi
+    fi
+
     builtin cd ${baseDir};
     # Kill all background processes
-    # pkill -P ${artPid}
     pkill -P $$
     exit 0
 }
@@ -97,4 +117,5 @@ artPid="$!"
 
 # Wait for artillery script to finish the process
 wait "${artPid}"
-cleanup
+
+cleanup "true"
