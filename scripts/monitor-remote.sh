@@ -49,6 +49,10 @@ function getRemoteUrl() {
   echo "$(eval "echo \${REMOTE_URL_$(formatToEnv ${app})}")"
 }
 
+function getGalaxyAppId() {
+  echo "$(eval "echo \${GALAXY_$(formatToEnv ${app})_APPID}")"
+}
+
 function isRunningUrl() {
   local url="${1}"
   local urlStatus="$(curl -Is "${url}" | head -1)"
@@ -99,12 +103,68 @@ if [[ -z "${REMOTE_URL}" ]]; then
   exit 1;
 fi
 
+function waitRunningApp() {
+  echo "Waiting \"${REMOTE_URL}\""
+  local waitTimeoutSecs=$((900000 / 1000))
+  local waitSecs=0
+  while ! isRunningUrl "${REMOTE_URL}" && [[ "${waitSecs}" -lt "${waitTimeoutSecs}" ]]; do
+    sleep 1
+    waitSecs=$((waitSecs + 1))
+  done
+}
+
+function waitStoppedApp() {
+  echo "Stopping \"${REMOTE_URL}\""
+  local waitTimeoutSecs=$((900000 / 1000))
+  local waitSecs=0
+  while isRunningUrl "${REMOTE_URL}" && [[ "${waitSecs}" -lt "${waitTimeoutSecs}" ]]; do
+    sleep 1
+    waitSecs=$((waitSecs + 1))
+  done
+}
+
 # Cleaning the collection from production first
 npx m mongo "${MONGO_VERSION}" "${mongoUrl}" --ssl --sslAllowInvalidCertificates <<EOF
 db.getCollectionNames().forEach(function(collectionName) {
    db[collectionName].deleteMany({});
 });
 EOF
+
+galaxyAppId="$(getGalaxyAppId)"
+# Prepare Galaxy container
+if [[ -z "${SKIP_KILL_CONTAINERS}" ]] && [[ -n "${GALAXY_API_KEY}" ]] && [[ -n "${galaxyAppId}" ]]; then
+  if ! isRunningUrl "${REMOTE_URL}"; then
+    echo "Start app ${REMOTE_URL} ${galaxyAppId}"
+    curl -s \
+      -X POST \
+      -H "Content-Type: application/json" \
+      -H "galaxy-api-key: ${GALAXY_API_KEY}" \
+      --data "{\"query\": \"mutation { startApp(appId: \\\"${galaxyAppId}\\\") { _id } }\"}" \
+      https://us-east-1.api.meteor.com/graphql
+  else
+    containers="$(curl -s \
+      -X POST \
+      -H "Content-Type: application/json" \
+      -H "galaxy-api-key: ${GALAXY_API_KEY}" \
+      --data "{\"query\": \"{ app(hostname: \\\"$(echo "$REMOTE_URL" | sed 's/^https\?:\/\///')\\\") { _id containers { _id } } }\"}" \
+      https://us-east-1.api.meteor.com/graphql | jq -c '.data.app.containers[]'
+    )"
+    # Iterate over containers
+    for container in ${containers}; do
+      container_id=$(echo "${container}" | jq -r '._id')  # Extract container ID
+      echo "Kill container: ${container_id}"  # Do something with the container ID
+      curl -s \
+        -X POST \
+        -H "Content-Type: application/json" \
+        -H "galaxy-api-key: ${GALAXY_API_KEY}" \
+        --data "{\"query\": \"mutation { killContainer(appId: \\\"${galaxyAppId}\\\", containerId: \\\"${container_id}\\\") { _id } }\"}" \
+        https://us-east-1.api.meteor.com/graphql
+    done
+    waitStoppedApp
+  fi
+
+  waitRunningApp
+fi
 
 if ! isRunningUrl "${REMOTE_URL}"; then
   echo "No app running at ${REMOTE_URL}"
