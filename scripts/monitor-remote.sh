@@ -164,6 +164,8 @@ if [[ -z "${SKIP_KILL_CONTAINERS}" ]] && [[ -n "${GALAXY_API_KEY}" ]] && [[ -n "
   fi
 
   waitRunningApp
+
+  sleep 10
 fi
 
 if ! isRunningUrl "${REMOTE_URL}"; then
