@@ -130,6 +130,7 @@ db.getCollectionNames().forEach(function(collectionName) {
 });
 EOF
 
+galaxyAppHost=$(echo "$REMOTE_URL" | sed 's/^https\?:\/\///')
 galaxyAppId="$(getGalaxyAppId)"
 # Prepare Galaxy container
 if [[ -z "${SKIP_KILL_CONTAINERS}" ]] && [[ -n "${GALAXY_API_KEY}" ]] && [[ -n "${galaxyAppId}" ]]; then
@@ -146,7 +147,7 @@ if [[ -z "${SKIP_KILL_CONTAINERS}" ]] && [[ -n "${GALAXY_API_KEY}" ]] && [[ -n "
       -X POST \
       -H "Content-Type: application/json" \
       -H "galaxy-api-key: ${GALAXY_API_KEY}" \
-      --data "{\"query\": \"{ app(hostname: \\\"$(echo "$REMOTE_URL" | sed 's/^https\?:\/\///')\\\") { _id containers { _id } } }\"}" \
+      --data "{\"query\": \"{ app(hostname: \\\"${galaxyAppHost}\\\") { _id containers { _id } } }\"}" \
       https://us-east-1.api.meteor.com/graphql | jq -c '.data.app.containers[]'
     )"
     # Iterate over containers
@@ -179,5 +180,7 @@ artPid="$!"
 
 # Wait for artillery script to finish the process
 wait "${artPid}"
+
+GALAXY_APP="${galaxyAppHost}" node ./scripts/helpers/monitor-remote-cpu-ram.js
 
 cleanup "true"
