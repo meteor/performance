@@ -77,6 +77,8 @@ For each benchmark, we recommend using a new Galaxy container to ensure a clean 
 
 The apps are deployed to Galaxy to benefit of further analysis with MontiAPM tool.
 
+To enable MontiAPM, use `ENABLE_APM`. MontiAPM may overload the app, so measure the metrics carefully, especially during CPU profiling. Enable or disable it in both apps for a fair comparison.
+
 To deploy each app after changes:
 
 ```shell

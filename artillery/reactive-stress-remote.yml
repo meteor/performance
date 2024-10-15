@@ -1,8 +1,8 @@
 config:
   target: http://localhost:3000
   phases:
-    - duration: 30
-      arrivalRate: 1
+    - duration: 60
+      arrivalRate: 2
       name: Warm up
   ensure:
     maxErrorRate: 1
@@ -12,7 +12,7 @@ config:
     playwright:
       globalTimeout: 240000
       launchOptions:
-        slowMo: 2500
+        slowMo: 500
   # Path to JavaScript file that defines Playwright test functions
   processor: '../tests/test-helpers.js'
 scenarios:
