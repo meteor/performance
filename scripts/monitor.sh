@@ -59,7 +59,10 @@ function logScriptConfig() {
 function logMeteorVersion() {
   echo -e "==============================="
   if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
+    local oldPath="${PWD}"
+    builtin cd "${METEOR_CHECKOUT_PATH}"
     echo -e " Meteor checkout version - $(git rev-parse HEAD)"
+    builtin cd "${oldPath}"
   else
     echo -e " Meteor version - $(meteor --version)"
   fi
