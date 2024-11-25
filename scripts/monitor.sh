@@ -64,7 +64,7 @@ function logMeteorVersion() {
     echo -e " Meteor checkout version - $(git rev-parse HEAD)"
     builtin cd "${oldPath}"
   else
-    echo -e " Meteor version - $(meteor --version)"
+    echo -e " Meteor version - $(cat .meteor/release)"
   fi
   echo -e "==============================="
 }
