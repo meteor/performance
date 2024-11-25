@@ -48,6 +48,24 @@ function waitMeteorApp() {
   done
 }
 
+function logScriptConfig() {
+  echo -e "==============================="
+  echo -e " Artillery Configuration - $(date) "
+  echo -e "==============================="
+  cat "${baseDir}/artillery/${script}"
+  echo -e "==============================="
+}
+
+function logMeteorVersion() {
+  echo -e "==============================="
+  if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
+    echo -e " Meteor checkout version - $(git rev-parse HEAD)"
+  else
+    echo -e " Meteor version - $(meteor --version)"
+  fi
+  echo -e "==============================="
+}
+
 # Ensure proper cleanup on interrupt the process
 function cleanup() {
     verify="${1}"
@@ -77,9 +95,12 @@ function cleanup() {
 }
 trap cleanup SIGINT SIGTERM
 
+logScriptConfig
+
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
 rm -rf "${appPath}/.meteor/local"
+logMeteorVersion
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
   METEOR_PACKAGE_DIRS="${baseDir}/packages" ${METEOR_CHECKOUT_PATH}/meteor run --port ${appPort} &
 else
