@@ -52,6 +52,11 @@ function waitMeteorApp() {
 function cleanup() {
     verify="${1}"
 
+    builtin cd ${baseDir};
+    # Kill all background processes
+    pkill -P ${artPid}
+    pkill -P $$
+
     # Verify valid output
     if [[ "${verify}" == "true" ]]; then
       sleep 6
@@ -70,10 +75,6 @@ function cleanup() {
       fi
     fi
 
-    builtin cd ${baseDir};
-    # Kill all background processes
-    pkill -P ${artPid}
-    pkill -P $$
     exit 0
 }
 trap cleanup SIGINT SIGTERM
