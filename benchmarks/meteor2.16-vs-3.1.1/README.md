@@ -86,7 +86,7 @@ The asynchronous queue enabling parallelization has allowed Meteor 3 to surpass 
 
 Once we enabled Meteor to surpass its connection limits and improve timing, we focused on optimizing CPU and RAM usage, which had grown significantly, as shown earlier.
 
-After thorough research, we found, as in the 3.0.3 report, that compression code in Meteor 3 performs poorly due to the latest Node upgrade. A memory snapshot analysis showed that Meteor 3 uses significantly more memory for the same processes, load, and duration as Meteor 2.
+After thorough research, we found, as in the [3.0.3 report](../meteor2.16-vs-3.0.3-disable-compression), that compression code in Meteor 3 performs poorly due to the latest Node upgrade. A memory snapshot analysis showed that Meteor 3 uses significantly more memory for the same processes, load, and duration as Meteor 2.
 
 Adjusting the compression to trigger at a specific message size and tweaking defaults for optimal speed resulted in significant benchmark improvements.
 
