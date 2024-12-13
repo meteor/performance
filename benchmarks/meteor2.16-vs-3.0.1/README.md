@@ -1,4 +1,4 @@
-# Benchmarks
+**# Benchmarks**
 
 ## Meteor 2.16 vs 3.0.1
 
