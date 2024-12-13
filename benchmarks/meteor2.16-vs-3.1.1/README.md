@@ -30,8 +30,6 @@ To verify Meteor's performance, we have two apps, `tasks-2.x` and `tasks-3.x`, t
 - Remove each of the 20 tasks one by one via a button and a Meteor method.
 - Display all tasks reactively using one Meteor subscription and non-reactively using one Meteor method that fetches them on each action.
 
-This test measures the performance impact of Meteor 2 and 3, focusing on DDP protocol management for methods and subscriptions. Multiple runs trying to stress the machine with several configurations were performed to gather results.
-
 > The test methodology follows an incremental approach, starting with simple setups and processes before moving to complex ones. If an issue arises in a simpler scenario, it provides a chance to address a more isolated performance problem, so we focus on analyzing and resolving it. Often, fixing issues in simpler examples can also improve performance in more complex scenarios, as these build on the same primitives.
 
 ## Specs
