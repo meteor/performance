@@ -72,15 +72,16 @@ function logMeteorVersion() {
 # Ensure proper cleanup on interrupt the process
 function cleanup() {
     verify="${1}"
+
     builtin cd ${baseDir};
     # Kill all background processes
     pkill -P ${artPid}
     pkill -P $$
-    sleep 6
 
     # Verify valid output
     if [[ "${verify}" == "true" ]]; then
-      if cat "${baseDir}/${logFile}" | grep -q "TimeoutError"; then
+      sleep 6
+      if cat "${baseDir}/${logFile}" | grep -q "Timeout"; then
         echo -e "${RED}*** !!! ERROR: SOMETHING WENT WRONG !!! ***${NC}"
         echo -e "${RED}Output triggered an unexpected timeout (${logFile})${NC}"
         echo -e "${RED} Your machine is overloaded and unable to provide accurate comparison results.${NC}"
@@ -94,6 +95,7 @@ function cleanup() {
         exit 0
       fi
     fi
+
     exit 0
 }
 trap cleanup SIGINT SIGTERM
