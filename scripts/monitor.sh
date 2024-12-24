@@ -32,6 +32,28 @@ function getPidByName() {
   ps aux | grep "${1}" | grep -v grep | awk '{print $2}'
 }
 
+function loadEnv() {
+  if [[ -f $1 ]]; then
+    # shellcheck disable=SC1090
+    source "${1}"
+    while read -r line; do
+      eval "export ${line}"
+    done <"$1"
+  fi
+}
+
+function formatToEnv() {
+  local str="${1}"
+  str=$(echo ${str} | sed -r -- 's/ /_/g')
+  str=$(echo ${str} | sed -r -- 's/\./_/g')
+  str=$(echo ${str} | sed -r -- 's/\-/_/g')
+  str=$(echo ${str} | tr -d "[@^\\\/<>\"'=]" | tr -d '*')
+  str=$(echo ${str} | sed -r -- 's/\//_/g')
+  str=$(echo ${str} | sed -r -- 's/,/_/g')
+  str=$(echo ${str} | sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
+  echo "${str}"
+}
+
 function isRunningUrl() {
   local url="${1}"
   local urlStatus="$(curl -Is "${url}" | head -1)"
@@ -46,6 +68,14 @@ function waitMeteorApp() {
     sleep 1
     waitSecs=$((waitSecs + 1))
   done
+}
+
+function getMontiAppId() {
+  echo "$(eval "echo \${MONTI_APP_ID_$(formatToEnv ${app})}")"
+}
+
+function getMontiAppSecret() {
+  echo "$(eval "echo \${MONTI_APP_SECRET_$(formatToEnv ${app})}")"
 }
 
 function logScriptConfig() {
@@ -73,6 +103,10 @@ function logMeteorVersion() {
 function cleanup() {
     verify="${1}"
 
+    if [[ -n "${ENABLE_APM}" ]]; then
+      METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor remove apm-agent
+    fi
+
     builtin cd ${baseDir};
     # Kill all background processes
     pkill -P ${artPid}
@@ -81,7 +115,7 @@ function cleanup() {
     # Verify valid output
     if [[ "${verify}" == "true" ]]; then
       sleep 6
-      if cat "${baseDir}/${logFile}" | grep -q "Timeout"; then
+      if cat "${baseDir}/${logFile}" | grep -q " Timeout "; then
         echo -e "${RED}*** !!! ERROR: SOMETHING WENT WRONG !!! ***${NC}"
         echo -e "${RED}Output triggered an unexpected timeout (${logFile})${NC}"
         echo -e "${RED} Your machine is overloaded and unable to provide accurate comparison results.${NC}"
@@ -102,8 +136,20 @@ trap cleanup SIGINT SIGTERM
 
 logScriptConfig
 
+loadEnv "${baseDir}/.env"
+
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
+
+if [[ -n "${ENABLE_APM}" ]]; then
+  export MONTI_APP_ID="$(getMontiAppId)"
+  export MONTI_APP_SECRET="$(getMontiAppSecret)"
+  METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor add apm-agent
+fi
+
+echo "MONTI_APP_ID ${MONTI_APP_ID}"
+echo "MONTI_APP_SECRET ${MONTI_APP_SECRET}"
+
 rm -rf "${appPath}/.meteor/local"
 logMeteorVersion
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then

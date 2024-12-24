@@ -66,7 +66,7 @@ function cleanup() {
     # Verify valid output
     if [[ "${verify}" == "true" ]]; then
       sleep 6
-      if cat "${baseDir}/${logFile}" | grep -q "Timeout"; then
+      if cat "${baseDir}/${logFile}" | grep -q " Timeout "; then
         echo -e "${RED}*** !!! ERROR: SOMETHING WENT WRONG !!! ***${NC}"
         echo -e "${RED}Output triggered an unexpected timeout (${logFile})${NC}"
         echo -e "${RED} Galaxy container is overloaded and unable to provide accurate comparison results.${NC}"
