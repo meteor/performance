@@ -41,11 +41,7 @@ const logAverageMetrics = () => {
     const avgCpu = totalCpu / count;
     const avgMemory = totalMemory / count;
 
-    console.log('----------');
-    console.log(name);
-    console.log('Average CPU usage (%):', avgCpu.toFixed(2));
-    console.log('Average Memory usage (bytes):', prettyBytes(avgMemory));
-    console.log('----------');
+    console.log(`----------\n${name}\nAverage CPU usage (%): ${avgCpu.toFixed(2)}\nAverage Memory usage (bytes): ${prettyBytes(avgMemory)}\n----------`);
 };
 
 const monitorCpuRam = () => {
