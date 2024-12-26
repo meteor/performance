@@ -110,6 +110,8 @@ function cleanup() {
     builtin cd ${baseDir};
     # Kill all background processes
     pkill -P ${artPid}
+    kill -s TERM ${cpuRamAppPid} || true
+    kill -s TERM ${cpuRamDbPid} || true
     pkill -P $$
 
     # Verify valid output
@@ -168,6 +170,12 @@ artPid="$!"
 # Run CPU and RAM monitoring for meteor app and db
 node "${baseDir}/scripts/helpers/monitor-cpu-ram.js" "${appPid}" "APP" &
 node "${baseDir}/scripts/helpers/monitor-cpu-ram.js" "${dbPid}" "DB" &
+
+cpuRamAppPid="$(getPidByName "${baseDir}/scripts/helpers/monitor-cpu-ram.js ${appPid} APP")"
+cpuRamDbPid="$(getPidByName "${baseDir}/scripts/helpers/monitor-cpu-ram.js ${dbPid} DB")"
+
+echo "Monitor CpuRam APP Pid ${cpuRamAppPid}"
+echo "Monitor CpuRam DB Pid ${cpuRamDbPid}"
 
 # Wait for artillery script to finish the process
 wait "${artPid}"
