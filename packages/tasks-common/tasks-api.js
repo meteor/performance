@@ -1,4 +1,4 @@
-import { TasksCollection } from './tasks-common.client';
+import { TasksCollection } from './tasks-collection';
 
 export const registerTaskApi = async () => {
   Meteor.methods({
