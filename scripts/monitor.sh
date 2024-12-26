@@ -147,9 +147,6 @@ if [[ -n "${ENABLE_APM}" ]]; then
   METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor add apm-agent
 fi
 
-echo "MONTI_APP_ID ${MONTI_APP_ID}"
-echo "MONTI_APP_SECRET ${MONTI_APP_SECRET}"
-
 rm -rf "${appPath}/.meteor/local"
 logMeteorVersion
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
