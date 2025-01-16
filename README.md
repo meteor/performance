@@ -93,7 +93,7 @@ Current apps are accessible at:
 
 ## Benchmarks
 
-### Meteor 2 vs 3
+### Meteor 2.16 vs 3.1.1
 
 Meteor **3.1.1** is in average **~28% faster**, uses **~51% less CPU** and **~17% less of RAM** in a **reactive scenario**.
 
