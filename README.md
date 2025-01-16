@@ -100,3 +100,9 @@ Meteor **3.1.1** is in average **~28% faster**, uses **~51% less CPU** and **~17
 Meteor **3.1.1** is in average **~19% faster**, uses **~28,82% more CPU** and **~27% more of RAM** in a **non-reactive scenario**.
 
 More details on this benchmark can be found at [`./benchmarks/meteor2.16-vs-3.1.1`](./benchmarks/meteor2.16-vs-3.1.1).
+
+## Challenge ahead
+
+Performance is an ongoing effort that requires continuous attention. The performance suite helps detect regressions and uncover improvements in future Meteor versions.
+
+Performance is highly variable and depends on your use case coverage. Looking ahead, we aim to develop a more real benchmarking process. This would test additional Meteor scenarios (like having more observers, collections and subscriptions) while incorporating widely used community packages from real-world applications (publish-composite, redis-oplog, apm, etc).
