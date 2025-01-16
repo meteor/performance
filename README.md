@@ -77,6 +77,8 @@ For each benchmark, we recommend using a new Galaxy container to ensure a clean 
 
 The apps are deployed to Galaxy to benefit of further analysis with MontiAPM tool.
 
+To enable MontiAPM, use `ENABLE_APM`. MontiAPM may overload the app, so measure the metrics carefully, especially during CPU profiling. Enable or disable it in both apps for a fair comparison.
+
 To deploy each app after changes:
 
 ```shell
@@ -93,12 +95,14 @@ Current apps are accessible at:
 
 ### Meteor 2 vs 3
 
-Meteor 3 is in average **~28% faster**, uses **~10% less CPU** and  **~16% less of RAM** in a **non-reactive scenario**.
+Meteor **3.1.1** is in average **~28% faster**, uses **~51% less CPU** and **~17% less of RAM** in a **reactive scenario**.
 
-Meteor 3 is in average **~equal on time**, uses **~18% less CPU** and **~10% more of RAM** in a **reactive scenario**. However, Meteor 3 handles fewer connections per minute, indicating a regression.
+Meteor **3.1.1** is in average **~19% faster**, uses **~28,82% more CPU** and **~27% more of RAM** in a **non-reactive scenario**.
 
-More details on this benchmark can be found at [`./benchmarks/meteor2.16-vs-3.0.1`](./benchmarks/meteor2.16-vs-3.0.1), where we observed a performance regression in Meteor 3 related to reactivity.
+More details on this benchmark can be found at [`./benchmarks/meteor2.16-vs-3.1.1`](./benchmarks/meteor2.16-vs-3.1.1).
 
-As part of the Meteor 3.0.3 release, we have found that disabling compression can improve performance. More information is at [`./benchmarks/meteor2.16-vs-3.0.3-disable-compression`](./benchmarks/meteor2.16-vs-3.0.3-disable-compression).
+## Challenge ahead
 
-We will keep investigating how to address the regression that persists in Meteor 3 with reactivity.
+Performance is an ongoing effort that requires continuous attention. The performance suite helps detect regressions and uncover improvements in future Meteor versions.
+
+Performance is highly variable and depends on your use case coverage. Looking ahead, we aim to develop a more real benchmarking process. This would test additional Meteor scenarios (like having more observers, collections and subscriptions) while incorporating widely used community packages from real-world applications (publish-composite, redis-oplog, apm, etc).

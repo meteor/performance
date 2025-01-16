@@ -1,0 +1,1650 @@
+===============================
+ Artillery Configuration - Mon Nov 25 05:13:54 PM CET 2024 
+===============================
+config:
+  target: http://localhost:3000
+  phases:
+    - duration: 60
+      arrivalRate: 3
+      name: Warm up
+  ensure:
+    maxErrorRate: 1
+    max: 500
+  # Load the Playwright engine:
+  engines:
+    playwright:
+      globalTimeout: 240000
+      launchOptions:
+        slowMo: 500
+  # Path to JavaScript file that defines Playwright test functions
+  processor: '../tests/test-helpers.js'
+scenarios:
+  - engine: playwright
+    testFunction: 'reactiveAddAndRemoveTasks'
+===============================
+===============================
+ Meteor checkout version - d7e90d8f49e6fc314d4c88b71590f4bff50af905
+===============================
+=> Running Meteor from a checkout -- overrides project version (Meteor 3.0.2)
+[[[[[ ~/meteor/performance/apps/tasks-3.x ]]]]]
+
+=> Started proxy.
+=> Started HMR server.
+=> Started MongoDB.
+
+Changes to your project's package version selections:
+
+babel-compiler         upgraded from 7.11.0 to 7.11.2-beta310.0
+blaze-tools            removed from your project
+caching-compiler       upgraded from 2.0.0 to 2.0.1
+caching-html-compiler  removed from your project
+check                  upgraded from 1.4.2 to 1.4.4
+ddp-client             upgraded from 3.0.1 to 3.0.3-beta310.0
+ddp-server             upgraded from 3.0.1 to 3.0.3-beta310.0
+ecmascript             upgraded from 0.16.9 to 0.16.10-beta310.1
+ecmascript-runtime     upgraded from 0.8.2 to 0.8.3
+html-tools             removed from your project
+htmljs                 removed from your project
+meteor                 upgraded from 2.0.1 to 2.0.2-beta310.0
+minifier-js            upgraded from 3.0.0 to 3.0.1-beta310.0
+minimongo              upgraded from 2.0.1 to 2.0.2-beta310.0
+modules                upgraded from 0.20.1 to 0.20.3-beta310.0
+mongo                  upgraded from 2.0.1 to 2.0.3-beta310.0
+mongo-decimal          upgraded from 0.1.4-beta300.7 to 0.1.6-beta310.0
+npm-mongo              downgraded from 4.17.4 to 4.17.3-beta310.0
+shell-server           upgraded from 0.6.0 to 0.6.1-beta310.0
+spacebars-compiler     removed from your project
+static-html            upgraded from 1.3.3 to 1.4.0
+static-html-tools      added, version 1.0.0
+templating-tools       removed from your project
+typescript             upgraded from 5.4.3 to 5.6.3-beta310.0
+underscore             removed from your project
+webapp                 upgraded from 2.0.1 to 2.0.4-beta310.0
+
+(node:48888) Warning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+=> Started your app.
+
+=> App running at: http://localhost:3000/
+APP PID: 49232
+DB PID: 48982
+Test run id: twxcx_8h3yg3zbqf8j5tn6385rn9c4rczjz_y8ky
+DB | Cpu 0 Memory 176922624
+APP | Cpu 0 Memory 144547840
+Phase started: Warm up (index: 0, duration: 60s) 17:14:12(+0100)
+
+APP | Cpu 55.00000000000001 Memory 191586304
+DB | Cpu 3 Memory 190902272
+--------------------------------------
+Metrics for period to: 17:14:20(+0100) (width: 6.192s)
+--------------------------------------
+
+browser.http_requests: ......................................................... 1250
+browser.page.FCP.http://localhost:3000/:
+  min: ......................................................................... 151
+  max: ......................................................................... 218.9
+  mean: ........................................................................ 167.9
+  median: ...................................................................... 162.4
+  p95: ......................................................................... 210.6
+  p99: ......................................................................... 210.6
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 1.2
+  max: ......................................................................... 1.5
+  mean: ........................................................................ 1.4
+  median: ...................................................................... 1.3
+  p95: ......................................................................... 1.5
+  p99: ......................................................................... 1.5
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 161.4
+  max: ......................................................................... 976.3
+  mean: ........................................................................ 322.3
+  median: ...................................................................... 175.9
+  p95: ......................................................................... 925.4
+  p99: ......................................................................... 925.4
+browser.page.TTFB.http://localhost:3000/:
+  min: ......................................................................... 2.1
+  max: ......................................................................... 6.5
+  mean: ........................................................................ 3.8
+  median: ...................................................................... 3.9
+  p95: ......................................................................... 5.9
+  p99: ......................................................................... 5.9
+browser.page.codes.200: ........................................................ 1253
+vusers.created: ................................................................ 21
+vusers.created_by_name.0: ...................................................... 21
+
+
+I20241125-17:14:31.974(1)? Exception from task Error: Removed called on document 9iTuhhCykpktX7mxi that does not exist
+I20241125-17:14:31.979(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:31.979(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:31.979(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:31.979(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:31.979(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:31.979(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:31.979(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:31.979(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:31.979(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:31.979(1)?     at packages/meteor.js:878:24
+I20241125-17:14:31.979(1)?     at async Promise.all (index 0)
+I20241125-17:14:31.979(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:31.979(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:31.979(1)? Exception in queued task Error: Removed called on document 9iTuhhCykpktX7mxi that does not exist
+I20241125-17:14:31.979(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:31.979(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:31.979(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:31.979(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:31.979(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:31.979(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:31.979(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:31.980(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:31.980(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:31.980(1)?     at packages/meteor.js:878:24
+I20241125-17:14:31.980(1)?     at async Promise.all (index 0)
+I20241125-17:14:31.980(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:31.980(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+APP | Cpu 85 Memory 248209408
+DB | Cpu 9 Memory 188522496
+--------------------------------------
+Metrics for period to: 17:14:30(+0100) (width: 9.986s)
+--------------------------------------
+
+browser.http_requests: ......................................................... 1543
+browser.page.FCP.http://localhost:3000/:
+  min: ......................................................................... 159.6
+  max: ......................................................................... 1192.6
+  mean: ........................................................................ 351.8
+  median: ...................................................................... 278.7
+  p95: ......................................................................... 820.7
+  p99: ......................................................................... 1085.9
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 1.3
+  max: ......................................................................... 13.2
+  mean: ........................................................................ 2.7
+  median: ...................................................................... 1.7
+  p95: ......................................................................... 5
+  p99: ......................................................................... 10.3
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 176.9
+  max: ......................................................................... 1079.7
+  mean: ........................................................................ 393
+  median: ...................................................................... 232.8
+  p95: ......................................................................... 820.7
+  p99: ......................................................................... 820.7
+browser.page.TTFB.http://localhost:3000/:
+  min: ......................................................................... 2.1
+  max: ......................................................................... 53.3
+  mean: ........................................................................ 10.4
+  median: ...................................................................... 3.7
+  p95: ......................................................................... 44.3
+  p99: ......................................................................... 49.9
+browser.page.codes.200: ........................................................ 1542
+vusers.created: ................................................................ 30
+vusers.created_by_name.0: ...................................................... 30
+
+
+I20241125-17:14:35.809(1)? Exception from task Error: Removed called on document osFoqAzi8jjYHGi8z that does not exist
+I20241125-17:14:35.809(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:35.809(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:35.810(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:35.810(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:35.810(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:35.810(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:35.810(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:35.810(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:35.810(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:35.810(1)?     at packages/meteor.js:878:24
+I20241125-17:14:35.810(1)?     at async Promise.all (index 0)
+I20241125-17:14:35.810(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:35.810(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:35.810(1)? Exception in queued task Error: Removed called on document osFoqAzi8jjYHGi8z that does not exist
+I20241125-17:14:35.810(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:35.810(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:35.810(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:35.811(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:35.811(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:35.811(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:35.811(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:35.811(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:35.811(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:35.811(1)?     at packages/meteor.js:878:24
+I20241125-17:14:35.811(1)?     at async Promise.all (index 0)
+I20241125-17:14:35.811(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:35.811(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:36.509(1)? Exception from task Error: Removed called on document neGqnz9oDkGfZo4sC that does not exist
+I20241125-17:14:36.509(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:36.509(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:36.509(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:36.509(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:36.509(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:36.509(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:36.509(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:36.509(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:36.509(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:36.509(1)?     at packages/meteor.js:878:24
+I20241125-17:14:36.509(1)?     at async Promise.all (index 0)
+I20241125-17:14:36.509(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:36.509(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:36.509(1)? Exception in queued task Error: Removed called on document neGqnz9oDkGfZo4sC that does not exist
+I20241125-17:14:36.509(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:36.509(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:36.509(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:36.509(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:36.509(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:36.509(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:36.509(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:36.509(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:36.509(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:36.509(1)?     at packages/meteor.js:878:24
+I20241125-17:14:36.509(1)?     at async Promise.all (index 0)
+I20241125-17:14:36.509(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:36.509(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:37.845(1)? Exception from task Error: Removed called on document 6gEbWGmfCxsG5PHfz that does not exist
+I20241125-17:14:37.846(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:37.846(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:37.846(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:37.846(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:37.846(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:37.846(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:37.846(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:37.846(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:37.846(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:37.846(1)?     at packages/meteor.js:878:24
+I20241125-17:14:37.846(1)?     at async Promise.all (index 0)
+I20241125-17:14:37.846(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:37.846(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:37.847(1)? Exception in queued task Error: Removed called on document 6gEbWGmfCxsG5PHfz that does not exist
+I20241125-17:14:37.847(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:37.847(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:37.847(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:37.847(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:37.847(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:37.847(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:37.847(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:37.847(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:37.847(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:37.847(1)?     at packages/meteor.js:878:24
+I20241125-17:14:37.847(1)?     at async Promise.all (index 0)
+I20241125-17:14:37.847(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:37.848(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:37.946(1)? Exception from task Error: Removed called on document sH9AAtePAdTHrjvbT that does not exist
+I20241125-17:14:37.946(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:37.946(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:37.946(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:37.946(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:37.946(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:37.946(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:37.946(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:37.947(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:37.947(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:37.947(1)?     at packages/meteor.js:878:24
+I20241125-17:14:37.947(1)?     at async Promise.all (index 0)
+I20241125-17:14:37.947(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:37.947(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:37.947(1)? Exception in queued task Error: Removed called on document sH9AAtePAdTHrjvbT that does not exist
+I20241125-17:14:37.947(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:37.947(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:37.947(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:37.947(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:37.947(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:37.947(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:37.947(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:37.947(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:37.947(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:37.947(1)?     at packages/meteor.js:878:24
+I20241125-17:14:37.947(1)?     at async Promise.all (index 0)
+I20241125-17:14:37.947(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:37.947(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:38.237(1)? Exception from task Error: Removed called on document LfMCbPMkezbPLtKQc that does not exist
+I20241125-17:14:38.237(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:38.237(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:38.237(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:38.237(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:38.237(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:38.238(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:38.238(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:38.238(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:38.238(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:38.238(1)?     at packages/meteor.js:878:24
+I20241125-17:14:38.238(1)?     at async Promise.all (index 0)
+I20241125-17:14:38.238(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:38.238(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:38.238(1)? Exception in queued task Error: Removed called on document LfMCbPMkezbPLtKQc that does not exist
+I20241125-17:14:38.238(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:38.238(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:38.238(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:38.238(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:38.238(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:38.238(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:38.238(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:38.238(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:38.238(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:38.238(1)?     at packages/meteor.js:878:24
+I20241125-17:14:38.238(1)?     at async Promise.all (index 0)
+I20241125-17:14:38.238(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:38.238(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:39.750(1)? Exception from task Error: Removed called on document 66FBNfFp6TLcuhpQn that does not exist
+I20241125-17:14:39.750(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:39.750(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:39.750(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:39.750(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:39.750(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:39.750(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:39.750(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:39.750(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:39.751(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:39.751(1)?     at packages/meteor.js:878:24
+I20241125-17:14:39.751(1)?     at async Promise.all (index 0)
+I20241125-17:14:39.751(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:39.751(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:39.751(1)? Exception in queued task Error: Removed called on document 66FBNfFp6TLcuhpQn that does not exist
+I20241125-17:14:39.751(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:39.751(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:39.751(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:39.751(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:39.751(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:39.751(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:39.751(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:39.751(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:39.751(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:39.751(1)?     at packages/meteor.js:878:24
+I20241125-17:14:39.751(1)?     at async Promise.all (index 0)
+I20241125-17:14:39.751(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:39.751(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:39.832(1)? Exception from task Error: Removed called on document yj4C8zXj9jtHxLz6J that does not exist
+I20241125-17:14:39.832(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:39.832(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:39.832(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:39.832(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:39.840(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:39.841(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:39.841(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:39.841(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:39.841(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:39.841(1)?     at packages/meteor.js:878:24
+I20241125-17:14:39.841(1)?     at async Promise.all (index 0)
+I20241125-17:14:39.841(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:39.841(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:39.841(1)? Exception in queued task Error: Removed called on document yj4C8zXj9jtHxLz6J that does not exist
+I20241125-17:14:39.841(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:39.841(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:39.841(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:39.841(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:39.841(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:39.841(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:39.841(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:39.841(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:39.841(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:39.841(1)?     at packages/meteor.js:878:24
+I20241125-17:14:39.841(1)?     at async Promise.all (index 0)
+I20241125-17:14:39.841(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:39.841(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:39.913(1)? Exception from task Error: Removed called on document 9GGjqYL8NEcGNrzZo that does not exist
+I20241125-17:14:39.913(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:39.913(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:39.913(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:39.913(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:39.913(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:39.913(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:39.914(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:39.914(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:39.914(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:39.914(1)?     at packages/meteor.js:878:24
+I20241125-17:14:39.914(1)?     at async Promise.all (index 0)
+I20241125-17:14:39.914(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:39.914(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:39.915(1)? Exception in queued task Error: Removed called on document 9GGjqYL8NEcGNrzZo that does not exist
+I20241125-17:14:39.915(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:39.915(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:39.915(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:39.915(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:39.915(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:39.915(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:39.915(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:39.915(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:39.915(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:39.915(1)?     at packages/meteor.js:878:24
+I20241125-17:14:39.916(1)?     at async Promise.all (index 0)
+I20241125-17:14:39.916(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:39.916(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:40.061(1)? Exception from task Error: Removed called on document stoCYZmSfycQBs7n4 that does not exist
+I20241125-17:14:40.063(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:40.064(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:40.064(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:40.064(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:40.064(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:40.064(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:40.064(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:40.064(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:40.064(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:40.064(1)?     at packages/meteor.js:878:24
+I20241125-17:14:40.064(1)?     at async Promise.all (index 0)
+I20241125-17:14:40.064(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:40.064(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:40.065(1)? Exception in queued task Error: Removed called on document stoCYZmSfycQBs7n4 that does not exist
+I20241125-17:14:40.065(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:40.065(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:40.065(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:40.065(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:40.065(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:40.065(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:40.065(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:40.065(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:40.065(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:40.065(1)?     at packages/meteor.js:878:24
+I20241125-17:14:40.065(1)?     at async Promise.all (index 0)
+I20241125-17:14:40.066(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:40.066(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:41.401(1)? Exception from task Error: Removed called on document abYPcRJKkJ4XptQGv that does not exist
+I20241125-17:14:41.401(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:41.401(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:41.401(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:41.401(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:41.402(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:41.402(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:41.402(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:41.402(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:41.402(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:41.402(1)?     at packages/meteor.js:878:24
+I20241125-17:14:41.402(1)?     at async Promise.all (index 0)
+I20241125-17:14:41.402(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:41.402(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:41.402(1)? Exception in queued task Error: Removed called on document abYPcRJKkJ4XptQGv that does not exist
+I20241125-17:14:41.402(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:41.402(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:41.402(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:41.402(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:41.402(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:41.402(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:41.402(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:41.402(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:41.402(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:41.402(1)?     at packages/meteor.js:878:24
+I20241125-17:14:41.402(1)?     at async Promise.all (index 0)
+I20241125-17:14:41.402(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:41.402(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:42.201(1)? Exception from task Error: Removed called on document TkKywEz88pyR8zRDy that does not exist
+I20241125-17:14:42.201(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:42.201(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:42.201(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:42.201(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:42.201(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:42.201(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:42.201(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:42.201(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:42.201(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:42.201(1)?     at packages/meteor.js:878:24
+I20241125-17:14:42.201(1)?     at async Promise.all (index 0)
+I20241125-17:14:42.201(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:42.201(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:42.201(1)? Exception in queued task Error: Removed called on document TkKywEz88pyR8zRDy that does not exist
+I20241125-17:14:42.201(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:42.201(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:42.201(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:42.201(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:42.201(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:42.201(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:42.201(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:42.201(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:42.201(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:42.201(1)?     at packages/meteor.js:878:24
+I20241125-17:14:42.201(1)?     at async Promise.all (index 0)
+I20241125-17:14:42.201(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:42.201(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+APP | Cpu 99 Memory 366669824
+DB | Cpu 8 Memory 189865984
+I20241125-17:14:44.293(1)? Exception from task Error: Removed called on document nMCXM4di5NoFW7ZkZ that does not exist
+I20241125-17:14:44.294(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:44.294(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:44.294(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:44.294(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:44.294(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:44.294(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:44.294(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:44.294(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:44.294(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:44.294(1)?     at packages/meteor.js:878:24
+I20241125-17:14:44.294(1)?     at async Promise.all (index 0)
+I20241125-17:14:44.294(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:44.294(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:44.295(1)? Exception in queued task Error: Removed called on document nMCXM4di5NoFW7ZkZ that does not exist
+I20241125-17:14:44.295(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:44.295(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:44.295(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:44.295(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:44.295(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:44.295(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:44.295(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:44.295(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:44.295(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:44.295(1)?     at packages/meteor.js:878:24
+I20241125-17:14:44.295(1)?     at async Promise.all (index 0)
+I20241125-17:14:44.295(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:44.295(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+--------------------------------------
+Metrics for period to: 17:14:40(+0100) (width: 9.982s)
+--------------------------------------
+
+browser.http_requests: ......................................................... 1527
+browser.page.FCP.http://localhost:3000/:
+  min: ......................................................................... 2437.6
+  max: ......................................................................... 7903
+  mean: ........................................................................ 5796.1
+  median: ...................................................................... 6439.7
+  p95: ......................................................................... 7709.8
+  p99: ......................................................................... 7709.8
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 0.3
+  max: ......................................................................... 3.2
+  mean: ........................................................................ 2.2
+  median: ...................................................................... 2.4
+  p95: ......................................................................... 2.9
+  p99: ......................................................................... 2.9
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 1192.6
+  max: ......................................................................... 7358.7
+  mean: ........................................................................ 4566.8
+  median: ...................................................................... 4965.3
+  p95: ......................................................................... 6976.1
+  p99: ......................................................................... 6976.1
+browser.page.TTFB.http://localhost:3000/:
+  min: ......................................................................... 53.7
+  max: ......................................................................... 586.3
+  mean: ........................................................................ 300.8
+  median: ...................................................................... 340.4
+  p95: ......................................................................... 572.6
+  p99: ......................................................................... 572.6
+browser.page.codes.200: ........................................................ 1530
+vusers.completed: .............................................................. 6
+vusers.created: ................................................................ 30
+vusers.created_by_name.0: ...................................................... 30
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 24723.3
+  max: ......................................................................... 24940.7
+  mean: ........................................................................ 24850.1
+  median: ...................................................................... 25091.6
+  p95: ......................................................................... 25091.6
+  p99: ......................................................................... 25091.6
+
+
+I20241125-17:14:44.803(1)? Exception from task Error: Removed called on document wJP6pi9GyZreeunpT that does not exist
+I20241125-17:14:44.803(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:44.803(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:44.803(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:44.803(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:44.803(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:44.803(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:44.803(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:44.803(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:44.803(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:44.803(1)?     at packages/meteor.js:878:24
+I20241125-17:14:44.803(1)?     at async Promise.all (index 0)
+I20241125-17:14:44.804(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:44.804(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:44.804(1)? Exception in queued task Error: Removed called on document wJP6pi9GyZreeunpT that does not exist
+I20241125-17:14:44.804(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:44.804(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:44.804(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:44.805(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:44.805(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:44.805(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:44.805(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:44.805(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:44.805(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:44.805(1)?     at packages/meteor.js:878:24
+I20241125-17:14:44.805(1)?     at async Promise.all (index 0)
+I20241125-17:14:44.805(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:44.805(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:46.572(1)? Exception from task Error: Removed called on document hABTYT7t9bYjbsZu2 that does not exist
+I20241125-17:14:46.572(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:46.572(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:46.572(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:46.572(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:46.572(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:46.572(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:46.572(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:46.572(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:46.572(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:46.572(1)?     at packages/meteor.js:878:24
+I20241125-17:14:46.572(1)?     at async Promise.all (index 0)
+I20241125-17:14:46.572(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:46.572(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:46.573(1)? Exception in queued task Error: Removed called on document hABTYT7t9bYjbsZu2 that does not exist
+I20241125-17:14:46.573(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:46.573(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:46.573(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:46.573(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:46.573(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:46.573(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:46.573(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:46.573(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:46.573(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:46.573(1)?     at packages/meteor.js:878:24
+I20241125-17:14:46.573(1)?     at async Promise.all (index 0)
+I20241125-17:14:46.573(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:46.573(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:47.680(1)? Exception from task Error: Removed called on document 7dcKzdsJoBB2g6mWy that does not exist
+I20241125-17:14:47.680(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:47.681(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:47.681(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:47.681(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:47.681(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:47.681(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:47.681(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:47.681(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:47.681(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:47.681(1)?     at packages/meteor.js:878:24
+I20241125-17:14:47.681(1)?     at async Promise.all (index 0)
+I20241125-17:14:47.681(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:47.681(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:47.681(1)? Exception in queued task Error: Removed called on document 7dcKzdsJoBB2g6mWy that does not exist
+I20241125-17:14:47.681(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:47.681(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:47.681(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:47.681(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:47.681(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:47.681(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:47.681(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:47.681(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:47.681(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:47.681(1)?     at packages/meteor.js:878:24
+I20241125-17:14:47.681(1)?     at async Promise.all (index 0)
+I20241125-17:14:47.681(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:47.681(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+APP | Cpu 96 Memory 428904448
+DB | Cpu 10 Memory 189517824
+--------------------------------------
+Metrics for period to: 17:14:50(+0100) (width: 9.996s)
+--------------------------------------
+
+browser.http_requests: ......................................................... 1520
+browser.page.FCP.http://localhost:3000/:
+  min: ......................................................................... 3341.3
+  max: ......................................................................... 7955
+  mean: ........................................................................ 5559.5
+  median: ...................................................................... 5487.5
+  p95: ......................................................................... 7117
+  p99: ......................................................................... 7709.8
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 1.8
+  max: ......................................................................... 10.2
+  mean: ........................................................................ 3.2
+  median: ...................................................................... 2.6
+  p95: ......................................................................... 6.8
+  p99: ......................................................................... 7.3
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 3341.3
+  max: ......................................................................... 7955
+  mean: ........................................................................ 5805.9
+  median: ...................................................................... 5598.4
+  p95: ......................................................................... 7709.8
+  p99: ......................................................................... 7865.6
+browser.page.TTFB.http://localhost:3000/:
+  min: ......................................................................... 61.7
+  max: ......................................................................... 1404.6
+  mean: ........................................................................ 738.4
+  median: ...................................................................... 757.6
+  p95: ......................................................................... 1380.5
+  p99: ......................................................................... 1380.5
+browser.page.codes.200: ........................................................ 1516
+vusers.completed: .............................................................. 25
+vusers.created: ................................................................ 30
+vusers.created_by_name.0: ...................................................... 30
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 25139.1
+  max: ......................................................................... 26430.7
+  mean: ........................................................................ 25695.5
+  median: ...................................................................... 25598.5
+  p95: ......................................................................... 26115.6
+  p99: ......................................................................... 26643.2
+
+
+I20241125-17:14:56.304(1)? Exception from task Error: Removed called on document ZYQF34mZwRtpqHswk that does not exist
+I20241125-17:14:56.304(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:56.304(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:56.304(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:56.304(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:56.304(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:56.304(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:56.304(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:56.304(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:56.304(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:56.304(1)?     at packages/meteor.js:878:24
+I20241125-17:14:56.304(1)?     at async Promise.all (index 0)
+I20241125-17:14:56.304(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:56.304(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:14:56.304(1)? Exception in queued task Error: Removed called on document ZYQF34mZwRtpqHswk that does not exist
+I20241125-17:14:56.304(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:14:56.304(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:14:56.304(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:14:56.304(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:14:56.304(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:14:56.304(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:14:56.304(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:14:56.304(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:14:56.304(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:14:56.304(1)?     at packages/meteor.js:878:24
+I20241125-17:14:56.304(1)?     at async Promise.all (index 0)
+I20241125-17:14:56.304(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:14:56.304(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:00.570(1)? Exception from task Error: Removed called on document Fq3ZfraXpWjAmFCpo that does not exist
+I20241125-17:15:00.570(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:00.570(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:00.570(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:00.570(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:00.570(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:00.570(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:00.570(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:00.570(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:00.571(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:00.571(1)?     at packages/meteor.js:878:24
+I20241125-17:15:00.571(1)?     at async Promise.all (index 0)
+I20241125-17:15:00.571(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:00.571(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:00.571(1)? Exception in queued task Error: Removed called on document Fq3ZfraXpWjAmFCpo that does not exist
+I20241125-17:15:00.571(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:00.571(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:00.571(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:00.571(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:00.571(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:00.571(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:00.571(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:00.571(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:00.571(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:00.571(1)?     at packages/meteor.js:878:24
+I20241125-17:15:00.571(1)?     at async Promise.all (index 0)
+I20241125-17:15:00.571(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:00.571(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:01.534(1)? Exception from task Error: Removed called on document fh4tdeZ8cPHRWzQ5S that does not exist
+I20241125-17:15:01.534(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:01.534(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:01.534(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:01.535(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:01.535(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:01.535(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:01.535(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:01.535(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:01.535(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:01.535(1)?     at packages/meteor.js:878:24
+I20241125-17:15:01.535(1)?     at async Promise.all (index 0)
+I20241125-17:15:01.535(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:01.535(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:01.535(1)? Exception in queued task Error: Removed called on document fh4tdeZ8cPHRWzQ5S that does not exist
+I20241125-17:15:01.535(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:01.535(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:01.535(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:01.535(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:01.535(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:01.535(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:01.535(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:01.535(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:01.535(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:01.535(1)?     at packages/meteor.js:878:24
+I20241125-17:15:01.535(1)?     at async Promise.all (index 0)
+I20241125-17:15:01.535(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:01.535(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:01.559(1)? Exception from task Error: Removed called on document qYuA97bWRbsTzD6rz that does not exist
+I20241125-17:15:01.559(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:01.559(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:01.559(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:01.559(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:01.559(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:01.559(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:01.559(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:01.560(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:01.560(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:01.560(1)?     at packages/meteor.js:878:24
+I20241125-17:15:01.560(1)?     at async Promise.all (index 0)
+I20241125-17:15:01.560(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:01.560(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:01.560(1)? Exception in queued task Error: Removed called on document qYuA97bWRbsTzD6rz that does not exist
+I20241125-17:15:01.560(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:01.560(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:01.560(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:01.560(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:01.560(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:01.561(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:01.561(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:01.561(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:01.561(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:01.561(1)?     at packages/meteor.js:878:24
+I20241125-17:15:01.561(1)?     at async Promise.all (index 0)
+I20241125-17:15:01.561(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:01.561(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:02.552(1)? Exception from task Error: Removed called on document NBvmx6JCDWJk7JwzX that does not exist
+I20241125-17:15:02.552(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:02.552(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:02.552(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:02.552(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:02.552(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:02.552(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:02.552(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:02.552(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:02.552(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:02.552(1)?     at packages/meteor.js:878:24
+I20241125-17:15:02.552(1)?     at async Promise.all (index 0)
+I20241125-17:15:02.552(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:02.552(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:02.553(1)? Exception in queued task Error: Removed called on document NBvmx6JCDWJk7JwzX that does not exist
+I20241125-17:15:02.553(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:02.553(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:02.553(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:02.553(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:02.553(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:02.553(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:02.553(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:02.553(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:02.553(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:02.553(1)?     at packages/meteor.js:878:24
+I20241125-17:15:02.553(1)?     at async Promise.all (index 0)
+I20241125-17:15:02.553(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:02.553(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+DB | Cpu 10 Memory 188506112
+APP | Cpu 90 Memory 594268160
+I20241125-17:15:03.725(1)? Exception from task Error: Removed called on document HwwcKKGvevhhKFnXE that does not exist
+I20241125-17:15:03.725(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:03.725(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:03.725(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:03.725(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:03.725(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:03.725(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:03.725(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:03.725(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:03.725(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:03.725(1)?     at packages/meteor.js:878:24
+I20241125-17:15:03.725(1)?     at async Promise.all (index 0)
+I20241125-17:15:03.725(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:03.725(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:03.725(1)? Exception in queued task Error: Removed called on document HwwcKKGvevhhKFnXE that does not exist
+I20241125-17:15:03.725(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:03.725(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:03.725(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:03.725(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:03.725(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:03.725(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:03.725(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:03.725(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:03.726(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:03.726(1)?     at packages/meteor.js:878:24
+I20241125-17:15:03.726(1)?     at async Promise.all (index 0)
+I20241125-17:15:03.726(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:03.726(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:03.761(1)? Exception from task Error: Removed called on document 4RaxGBPjFkEMXpnbK that does not exist
+I20241125-17:15:03.761(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:03.761(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:03.761(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:03.761(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:03.761(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:03.761(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:03.761(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:03.761(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:03.761(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:03.761(1)?     at packages/meteor.js:878:24
+I20241125-17:15:03.761(1)?     at async Promise.all (index 0)
+I20241125-17:15:03.761(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:03.761(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:03.761(1)? Exception in queued task Error: Removed called on document 4RaxGBPjFkEMXpnbK that does not exist
+I20241125-17:15:03.761(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:03.762(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:03.762(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:03.762(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:03.762(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:03.762(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:03.762(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:03.762(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:03.762(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:03.762(1)?     at packages/meteor.js:878:24
+I20241125-17:15:03.762(1)?     at async Promise.all (index 0)
+I20241125-17:15:03.762(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:03.762(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+--------------------------------------
+Metrics for period to: 17:15:00(+0100) (width: 9.986s)
+--------------------------------------
+
+browser.http_requests: ......................................................... 1730
+browser.page.FCP.http://localhost:3000/:
+  min: ......................................................................... 4147.2
+  max: ......................................................................... 8445.7
+  mean: ........................................................................ 6296.1
+  median: ...................................................................... 6439.7
+  p95: ......................................................................... 7865.6
+  p99: ......................................................................... 8024.5
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 1.8
+  max: ......................................................................... 3
+  mean: ........................................................................ 2.4
+  median: ...................................................................... 2.4
+  p95: ......................................................................... 2.8
+  p99: ......................................................................... 2.9
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 4147.2
+  max: ......................................................................... 8445.7
+  mean: ........................................................................ 6296.1
+  median: ...................................................................... 6439.7
+  p95: ......................................................................... 7865.6
+  p99: ......................................................................... 8024.5
+browser.page.TTFB.http://localhost:3000/:
+  min: ......................................................................... 58.6
+  max: ......................................................................... 1247.3
+  mean: ........................................................................ 761.7
+  median: ...................................................................... 788.5
+  p95: ......................................................................... 1107.9
+  p99: ......................................................................... 1249.1
+browser.page.codes.200: ........................................................ 1731
+vusers.completed: .............................................................. 11
+vusers.created: ................................................................ 30
+vusers.created_by_name.0: ...................................................... 30
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 26145.3
+  max: ......................................................................... 26929.5
+  mean: ........................................................................ 26434.2
+  median: ...................................................................... 26643.2
+  p95: ......................................................................... 26643.2
+  p99: ......................................................................... 26643.2
+
+
+I20241125-17:15:06.740(1)? Exception from task Error: Removed called on document qXznfLhM3iEocByCA that does not exist
+I20241125-17:15:06.740(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:06.740(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:06.740(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:06.740(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:06.740(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:06.740(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:06.740(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:06.740(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:06.740(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:06.740(1)?     at packages/meteor.js:878:24
+I20241125-17:15:06.740(1)?     at async Promise.all (index 0)
+I20241125-17:15:06.741(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:06.741(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:06.741(1)? Exception in queued task Error: Removed called on document qXznfLhM3iEocByCA that does not exist
+I20241125-17:15:06.741(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:06.741(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:06.741(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:06.741(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:06.741(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:06.741(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:06.741(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:06.741(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:06.741(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:06.741(1)?     at packages/meteor.js:878:24
+I20241125-17:15:06.741(1)?     at async Promise.all (index 0)
+I20241125-17:15:06.741(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:06.741(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:06.995(1)? Exception from task Error: Removed called on document 5bf9srjzukbRSXtya that does not exist
+I20241125-17:15:06.995(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:06.995(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:06.995(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:06.995(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:06.995(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:06.995(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:06.995(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:06.995(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:06.995(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:06.995(1)?     at packages/meteor.js:878:24
+I20241125-17:15:06.995(1)?     at async Promise.all (index 0)
+I20241125-17:15:06.996(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:06.996(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:06.996(1)? Exception in queued task Error: Removed called on document 5bf9srjzukbRSXtya that does not exist
+I20241125-17:15:06.996(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:06.996(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:06.996(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:06.996(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:06.996(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:06.996(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:06.996(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:06.996(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:06.996(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:06.996(1)?     at packages/meteor.js:878:24
+I20241125-17:15:06.996(1)?     at async Promise.all (index 0)
+I20241125-17:15:06.996(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:06.996(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:07.881(1)? Exception from task Error: Removed called on document GqiRw9rgMcfxoY2ZJ that does not exist
+I20241125-17:15:07.882(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:07.882(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:07.882(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:07.882(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:07.882(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:07.882(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:07.882(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:07.882(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:07.882(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:07.882(1)?     at packages/meteor.js:878:24
+I20241125-17:15:07.882(1)?     at async Promise.all (index 0)
+I20241125-17:15:07.882(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:07.882(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:07.882(1)? Exception in queued task Error: Removed called on document GqiRw9rgMcfxoY2ZJ that does not exist
+I20241125-17:15:07.882(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:07.882(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:07.882(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:07.882(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:07.882(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:07.882(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:07.882(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:07.882(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:07.882(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:07.882(1)?     at packages/meteor.js:878:24
+I20241125-17:15:07.882(1)?     at async Promise.all (index 0)
+I20241125-17:15:07.882(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:07.882(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:08.279(1)? Exception from task Error: Removed called on document WQwLi2ZpPqp9Gkrej that does not exist
+I20241125-17:15:08.279(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:08.279(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:08.279(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:08.279(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:08.279(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:08.279(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:08.279(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:08.279(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:08.279(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:08.279(1)?     at packages/meteor.js:878:24
+I20241125-17:15:08.279(1)?     at async Promise.all (index 0)
+I20241125-17:15:08.279(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:08.279(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:08.279(1)? Exception in queued task Error: Removed called on document WQwLi2ZpPqp9Gkrej that does not exist
+I20241125-17:15:08.279(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:08.280(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:08.280(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:08.280(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:08.280(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:08.280(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:08.280(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:08.280(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:08.280(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:08.280(1)?     at packages/meteor.js:878:24
+I20241125-17:15:08.280(1)?     at async Promise.all (index 0)
+I20241125-17:15:08.280(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:08.280(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:08.595(1)? Exception from task Error: Removed called on document 6n2qw2T6kCajpWN9e that does not exist
+I20241125-17:15:08.595(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:08.595(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:08.595(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:08.595(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:08.595(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:08.595(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:08.595(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:08.595(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:08.595(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:08.595(1)?     at packages/meteor.js:878:24
+I20241125-17:15:08.595(1)?     at async Promise.all (index 0)
+I20241125-17:15:08.595(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:08.595(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:08.595(1)? Exception in queued task Error: Removed called on document 6n2qw2T6kCajpWN9e that does not exist
+I20241125-17:15:08.595(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:08.595(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:08.595(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:08.595(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:08.595(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:08.595(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:08.595(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:08.595(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:08.595(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:08.595(1)?     at packages/meteor.js:878:24
+I20241125-17:15:08.595(1)?     at async Promise.all (index 0)
+I20241125-17:15:08.595(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:08.595(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:08.623(1)? Exception from task Error: Removed called on document 7w9qShmEudHoyC2Xz that does not exist
+I20241125-17:15:08.623(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:08.623(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:08.623(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:08.623(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:08.624(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:08.624(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:08.624(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:08.624(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:08.624(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:08.624(1)?     at packages/meteor.js:878:24
+I20241125-17:15:08.624(1)?     at async Promise.all (index 0)
+I20241125-17:15:08.624(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:08.624(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:08.624(1)? Exception in queued task Error: Removed called on document 7w9qShmEudHoyC2Xz that does not exist
+I20241125-17:15:08.624(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:08.624(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:08.624(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:08.624(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:08.624(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:08.624(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:08.624(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:08.624(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:08.624(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:08.624(1)?     at packages/meteor.js:878:24
+I20241125-17:15:08.624(1)?     at async Promise.all (index 0)
+I20241125-17:15:08.624(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:08.624(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.014(1)? Exception from task Error: Removed called on document wB9TQSLpTQnnct2qF that does not exist
+I20241125-17:15:09.014(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.014(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.014(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.014(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.014(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.014(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.014(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.014(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.014(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.014(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.014(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.014(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.014(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.014(1)? Exception in queued task Error: Removed called on document wB9TQSLpTQnnct2qF that does not exist
+I20241125-17:15:09.014(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.014(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.015(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.015(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.015(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.015(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.015(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.015(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.015(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.015(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.015(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.015(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.015(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.057(1)? Exception from task Error: Removed called on document ajJPiFzoPnMFtupjK that does not exist
+I20241125-17:15:09.057(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.057(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.057(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.057(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.057(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.058(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.058(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.058(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.058(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.058(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.058(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.058(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.058(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.058(1)? Exception in queued task Error: Removed called on document ajJPiFzoPnMFtupjK that does not exist
+I20241125-17:15:09.058(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.058(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.058(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.058(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.058(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.058(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.058(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.058(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.058(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.058(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.058(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.058(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.058(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.286(1)? Exception from task Error: Removed called on document pz6w8NHut3Ce9xkPk that does not exist
+I20241125-17:15:09.286(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.286(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.286(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.286(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.286(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.286(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.286(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.286(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.286(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.286(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.286(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.286(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.286(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.286(1)? Exception in queued task Error: Removed called on document pz6w8NHut3Ce9xkPk that does not exist
+I20241125-17:15:09.286(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.286(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.286(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.286(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.286(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.286(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.286(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.286(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.286(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.286(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.286(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.286(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.286(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.348(1)? Exception from task Error: Removed called on document rJcmQcXGZqSMZT2NA that does not exist
+I20241125-17:15:09.348(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.348(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.348(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.348(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.348(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.348(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.348(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.348(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.348(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.348(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.348(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.348(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.348(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.348(1)? Exception in queued task Error: Removed called on document rJcmQcXGZqSMZT2NA that does not exist
+I20241125-17:15:09.348(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.348(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.348(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.348(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.348(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.348(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.348(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.348(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.348(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.348(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.348(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.348(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.348(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.444(1)? Exception from task Error: Removed called on document t7BZcGtF6Jne7CMpY that does not exist
+I20241125-17:15:09.444(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.444(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.444(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.444(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.444(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.444(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.444(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.444(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.444(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.445(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.445(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.445(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.445(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.445(1)? Exception in queued task Error: Removed called on document t7BZcGtF6Jne7CMpY that does not exist
+I20241125-17:15:09.445(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.445(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.445(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.445(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.445(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.445(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.445(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.445(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.445(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.445(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.445(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.445(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.445(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.888(1)? Exception from task Error: Removed called on document ZnbZcfoKnKe7dfXYn that does not exist
+I20241125-17:15:09.888(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.888(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.888(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.888(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.888(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.888(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.888(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.888(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.888(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.888(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.888(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.888(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.888(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:09.888(1)? Exception in queued task Error: Removed called on document ZnbZcfoKnKe7dfXYn that does not exist
+I20241125-17:15:09.888(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:09.888(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:09.888(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:09.888(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:09.888(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:09.888(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:09.889(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:09.889(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:09.889(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:09.889(1)?     at packages/meteor.js:878:24
+I20241125-17:15:09.889(1)?     at async Promise.all (index 0)
+I20241125-17:15:09.889(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:09.889(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:12.567(1)? Exception from task Error: Removed called on document njT9WudWKBg7FybPu that does not exist
+I20241125-17:15:12.567(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:12.567(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:12.567(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:12.567(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:12.567(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:12.568(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:12.568(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:12.568(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:12.568(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:12.568(1)?     at packages/meteor.js:878:24
+I20241125-17:15:12.568(1)?     at async Promise.all (index 0)
+I20241125-17:15:12.568(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:12.568(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:12.568(1)? Exception in queued task Error: Removed called on document njT9WudWKBg7FybPu that does not exist
+I20241125-17:15:12.568(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:12.568(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:12.568(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:12.568(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:12.568(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:12.568(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:12.568(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:12.568(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:12.568(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:12.568(1)?     at packages/meteor.js:878:24
+I20241125-17:15:12.568(1)?     at async Promise.all (index 0)
+I20241125-17:15:12.568(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:12.568(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+DB | Cpu 8 Memory 188461056
+APP | Cpu 117 Memory 727695360
+Phase completed: Warm up (index: 0, duration: 60s) 17:15:12(+0100)
+
+I20241125-17:15:13.821(1)? Exception from task Error: Removed called on document Wx9ReKNu4qYMDci3P that does not exist
+I20241125-17:15:13.821(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:13.821(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:13.821(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:13.821(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:13.821(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:13.821(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:13.821(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:13.821(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:13.821(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:13.821(1)?     at packages/meteor.js:878:24
+I20241125-17:15:13.821(1)?     at async Promise.all (index 0)
+I20241125-17:15:13.821(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:13.821(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:13.821(1)? Exception in queued task Error: Removed called on document Wx9ReKNu4qYMDci3P that does not exist
+I20241125-17:15:13.821(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:13.821(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:13.821(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:13.821(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:13.822(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:13.822(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:13.822(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:13.822(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:13.822(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:13.822(1)?     at packages/meteor.js:878:24
+I20241125-17:15:13.822(1)?     at async Promise.all (index 0)
+I20241125-17:15:13.822(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:13.822(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+--------------------------------------
+Metrics for period to: 17:15:10(+0100) (width: 9.99s)
+--------------------------------------
+
+browser.http_requests: ......................................................... 2132
+browser.page.FCP.http://localhost:3000/:
+  min: ......................................................................... 3621.7
+  max: ......................................................................... 12252.1
+  mean: ........................................................................ 6640.5
+  median: ...................................................................... 6439.7
+  p95: ......................................................................... 9607.1
+  p99: ......................................................................... 11050.8
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 1.9
+  max: ......................................................................... 4.2
+  mean: ........................................................................ 2.9
+  median: ...................................................................... 2.6
+  p95: ......................................................................... 3.8
+  p99: ......................................................................... 3.9
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 3621.7
+  max: ......................................................................... 12252.1
+  mean: ........................................................................ 6898.6
+  median: ...................................................................... 6439.7
+  p95: ......................................................................... 9607.1
+  p99: ......................................................................... 11050.8
+browser.page.TTFB.http://localhost:3000/:
+  min: ......................................................................... 68.7
+  max: ......................................................................... 1557.1
+  mean: ........................................................................ 865.4
+  median: ...................................................................... 944
+  p95: ......................................................................... 1380.5
+  p99: ......................................................................... 1525.7
+browser.page.codes.200: ........................................................ 2135
+vusers.completed: .............................................................. 6
+vusers.created: ................................................................ 30
+vusers.created_by_name.0: ...................................................... 30
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 37599.1
+  max: ......................................................................... 40872.3
+  mean: ........................................................................ 39140.9
+  median: ...................................................................... 38189
+  p95: ......................................................................... 39747.5
+  p99: ......................................................................... 39747.5
+
+
+I20241125-17:15:16.191(1)? Exception from task Error: Removed called on document RERRmnTiouRbDKEFL that does not exist
+I20241125-17:15:16.191(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:16.191(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:16.192(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:16.192(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:16.192(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:16.192(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:16.192(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:16.192(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:16.192(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:16.192(1)?     at packages/meteor.js:878:24
+I20241125-17:15:16.192(1)?     at async Promise.all (index 0)
+I20241125-17:15:16.192(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:16.192(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:16.192(1)? Exception in queued task Error: Removed called on document RERRmnTiouRbDKEFL that does not exist
+I20241125-17:15:16.192(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:16.192(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:16.192(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:16.192(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:16.192(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:16.192(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:16.192(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:16.192(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:16.192(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:16.192(1)?     at packages/meteor.js:878:24
+I20241125-17:15:16.192(1)?     at async Promise.all (index 0)
+I20241125-17:15:16.192(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:16.192(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:18.647(1)? Exception from task Error: Removed called on document eihS4TrrD22QLJwye that does not exist
+I20241125-17:15:18.647(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:18.647(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:18.647(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:18.647(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:18.647(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:18.647(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:18.647(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:18.647(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:18.647(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:18.647(1)?     at packages/meteor.js:878:24
+I20241125-17:15:18.648(1)?     at async Promise.all (index 0)
+I20241125-17:15:18.648(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:18.648(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+I20241125-17:15:18.648(1)? Exception in queued task Error: Removed called on document eihS4TrrD22QLJwye that does not exist
+I20241125-17:15:18.648(1)?     at SessionCollectionView.removed (packages/ddp-server/session_collection_view.ts:121:13)
+I20241125-17:15:18.648(1)?     at Session.removed (packages/ddp-server/livedata_server.js:272:12)
+I20241125-17:15:18.648(1)?     at Subscription.removed (packages/ddp-server/livedata_server.js:1232:19)
+I20241125-17:15:18.648(1)?     at removed (packages/mongo/collection/collection.js:113:17)
+I20241125-17:15:18.648(1)?     at packages/mongo/observe_multiplex.ts:162:46
+I20241125-17:15:18.648(1)?     at runNextTicks (node:internal/process/task_queues:65:5)
+I20241125-17:15:18.648(1)?     at processImmediate (node:internal/timers:459:9)
+I20241125-17:15:18.648(1)?     at process.topLevelDomainCallback (node:domain:161:15)
+I20241125-17:15:18.648(1)?     at process.callbackTrampoline (node:internal/async_hooks:128:24)
+I20241125-17:15:18.648(1)?     at packages/meteor.js:878:24
+I20241125-17:15:18.648(1)?     at async Promise.all (index 0)
+I20241125-17:15:18.648(1)?     at AsynchronousQueue._processParallelBatch (packages/meteor.js:896:7)
+I20241125-17:15:18.648(1)?     at AsynchronousQueue._run (packages/meteor.js:863:7)
+APP | Cpu 68 Memory 731787264
+DB | Cpu 6 Memory 188956672
+--------------------------------------
+Metrics for period to: 17:15:20(+0100) (width: 9.903s)
+--------------------------------------
+
+browser.http_requests: ......................................................... 1098
+browser.page.FCP.http://localhost:3000/:
+  min: ......................................................................... 4308.9
+  max: ......................................................................... 11436.6
+  mean: ........................................................................ 7054.6
+  median: ...................................................................... 6569.8
+  p95: ......................................................................... 9416.8
+  p99: ......................................................................... 9999.2
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 1.5
+  max: ......................................................................... 5.4
+  mean: ........................................................................ 2.8
+  median: ...................................................................... 2.5
+  p95: ......................................................................... 4.8
+  p99: ......................................................................... 5
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 3914.3
+  max: ......................................................................... 11436.6
+  mean: ........................................................................ 6728
+  median: ...................................................................... 6439.7
+  p95: ......................................................................... 9416.8
+  p99: ......................................................................... 9999.2
+browser.page.TTFB.http://localhost:3000/:
+  min: ......................................................................... 63.7
+  max: ......................................................................... 1627.7
+  mean: ........................................................................ 960.6
+  median: ...................................................................... 1436.8
+  p95: ......................................................................... 1587.9
+  p99: ......................................................................... 1620
+browser.page.codes.200: ........................................................ 1093
+vusers.completed: .............................................................. 42
+vusers.created: ................................................................ 9
+vusers.created_by_name.0: ...................................................... 9
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 32875.8
+  max: ......................................................................... 42092
+  mean: ........................................................................ 36618.4
+  median: ...................................................................... 35252.8
+  p95: ......................................................................... 41369.7
+  p99: ......................................................................... 42205.5
+
+
+DB | Cpu 5 Memory 189988864
+APP | Cpu 38 Memory 739627008
+--------------------------------------
+Metrics for period to: 17:15:30(+0100) (width: 8.482s)
+--------------------------------------
+
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 4.7
+  max: ......................................................................... 4.7
+  mean: ........................................................................ 4.7
+  median: ...................................................................... 4.7
+  p95: ......................................................................... 4.7
+  p99: ......................................................................... 4.7
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 9146.3
+  max: ......................................................................... 9146.3
+  mean: ........................................................................ 9146.3
+  median: ...................................................................... 9230.4
+  p95: ......................................................................... 9230.4
+  p99: ......................................................................... 9230.4
+vusers.completed: .............................................................. 7
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 40833.7
+  max: ......................................................................... 45673
+  mean: ........................................................................ 42552.9
+  median: ...................................................................... 42205.5
+  p95: ......................................................................... 43928
+  p99: ......................................................................... 43928
+
+
+APP | Cpu 45 Memory 832081920
+DB | Cpu 7.000000000000001 Memory 189988864
+--------------------------------------
+Metrics for period to: 17:15:40(+0100) (width: 7.575s)
+--------------------------------------
+
+vusers.completed: .............................................................. 5
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 44805.7
+  max: ......................................................................... 52299.7
+  mean: ........................................................................ 49634.9
+  median: ...................................................................... 49528.8
+  p95: ......................................................................... 51550.2
+  p99: ......................................................................... 51550.2
+
+
+APP | Cpu 52 Memory 934408192
+DB | Cpu 8 Memory 192204800
+--------------------------------------
+Metrics for period to: 17:15:50(+0100) (width: 8.099s)
+--------------------------------------
+
+vusers.completed: .............................................................. 18
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 49469.2
+  max: ......................................................................... 58223.5
+  mean: ........................................................................ 54749
+  median: ...................................................................... 54738
+  p95: ......................................................................... 58122.9
+  p99: ......................................................................... 58122.9
+
+
+APP | Cpu 5 Memory 972840960
+DB | Cpu 1 Memory 191688704
+--------------------------------------
+Metrics for period to: 17:16:00(+0100) (width: 7.969s)
+--------------------------------------
+
+vusers.completed: .............................................................. 49
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 45211.7
+  max: ......................................................................... 63124.3
+  mean: ........................................................................ 53311.7
+  median: ...................................................................... 51550.2
+  p95: ......................................................................... 61717.2
+  p99: ......................................................................... 62964
+
+
+--------------------------------------
+Metrics for period to: 17:16:10(+0100) (width: 2.817s)
+--------------------------------------
+
+vusers.completed: .............................................................. 11
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 47658
+  max: ......................................................................... 53425.4
+  mean: ........................................................................ 50397.2
+  median: ...................................................................... 50529.4
+  p95: ......................................................................... 53654.1
+  p99: ......................................................................... 53654.1
+
+
+All VUs finished. Total time: 1 minute, 50 seconds
+
+--------------------------------
+Summary report @ 17:16:04(+0100)
+--------------------------------
+
+browser.http_requests: ......................................................... 10800
+browser.page.FCP.http://localhost:3000/:
+  min: ......................................................................... 151
+  max: ......................................................................... 12252.1
+  mean: ........................................................................ 4804.1
+  median: ...................................................................... 5598.4
+  p95: ......................................................................... 8868.4
+  p99: ......................................................................... 11050.8
+browser.page.FID.http://localhost:3000/:
+  min: ......................................................................... 0.3
+  max: ......................................................................... 13.2
+  mean: ........................................................................ 2.7
+  median: ...................................................................... 2.4
+  p95: ......................................................................... 4.8
+  p99: ......................................................................... 10.3
+browser.page.LCP.http://localhost:3000/:
+  min: ......................................................................... 161.4
+  max: ......................................................................... 12252.1
+  mean: ........................................................................ 4831.9
+  median: ...................................................................... 5598.4
+  p95: ......................................................................... 8868.4
+  p99: ......................................................................... 11050.8
+browser.page.TTFB.http://localhost:3000/:
+  min: ......................................................................... 2.1
+  max: ......................................................................... 1627.7
+  mean: ........................................................................ 582.7
+  median: ...................................................................... 572.6
+  p95: ......................................................................... 1495.5
+  p99: ......................................................................... 1587.9
+browser.page.codes.200: ........................................................ 10800
+vusers.completed: .............................................................. 180
+vusers.created: ................................................................ 180
+vusers.created_by_name.0: ...................................................... 180
+vusers.failed: ................................................................. 0
+vusers.session_length:
+  min: ......................................................................... 24723.3
+  max: ......................................................................... 63124.3
+  mean: ........................................................................ 41962.5
+  median: ...................................................................... 41369.7
+  p95: ......................................................................... 59297.1
+  p99: ......................................................................... 62964
+----------
+DB
+Average CPU usage (%): 6.35
+Average Memory usage (bytes): 189 MB
+----------
+----------
+APP
+Average CPU usage (%): 72.13
+Average Memory usage (bytes): 588 MB
+----------
+[0;32mOutput is suitable for comparisons (logs/one-180-tasks-3.x-reactive-stress.yml.log)[0m
+[0;32m Your machine managed the configuration correctly.[0m

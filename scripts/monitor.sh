@@ -32,6 +32,28 @@ function getPidByName() {
   ps aux | grep "${1}" | grep -v grep | awk '{print $2}'
 }
 
+function loadEnv() {
+  if [[ -f $1 ]]; then
+    # shellcheck disable=SC1090
+    source "${1}"
+    while read -r line; do
+      eval "export ${line}"
+    done <"$1"
+  fi
+}
+
+function formatToEnv() {
+  local str="${1}"
+  str=$(echo ${str} | sed -r -- 's/ /_/g')
+  str=$(echo ${str} | sed -r -- 's/\./_/g')
+  str=$(echo ${str} | sed -r -- 's/\-/_/g')
+  str=$(echo ${str} | tr -d "[@^\\\/<>\"'=]" | tr -d '*')
+  str=$(echo ${str} | sed -r -- 's/\//_/g')
+  str=$(echo ${str} | sed -r -- 's/,/_/g')
+  str=$(echo ${str} | sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
+  echo "${str}"
+}
+
 function isRunningUrl() {
   local url="${1}"
   local urlStatus="$(curl -Is "${url}" | head -1)"
@@ -48,18 +70,54 @@ function waitMeteorApp() {
   done
 }
 
+function getMontiAppId() {
+  echo "$(eval "echo \${MONTI_APP_ID_$(formatToEnv ${app})}")"
+}
+
+function getMontiAppSecret() {
+  echo "$(eval "echo \${MONTI_APP_SECRET_$(formatToEnv ${app})}")"
+}
+
+function logScriptConfig() {
+  echo -e "==============================="
+  echo -e " Artillery Configuration - $(date) "
+  echo -e "==============================="
+  cat "${baseDir}/artillery/${script}"
+  echo -e "==============================="
+}
+
+function logMeteorVersion() {
+  echo -e "==============================="
+  if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
+    local oldPath="${PWD}"
+    builtin cd "${METEOR_CHECKOUT_PATH}"
+    echo -e " Meteor checkout version - $(git rev-parse HEAD)"
+    builtin cd "${oldPath}"
+  else
+    echo -e " Meteor version - $(cat .meteor/release)"
+  fi
+  echo -e "==============================="
+}
+
 # Ensure proper cleanup on interrupt the process
 function cleanup() {
     verify="${1}"
+
+    if [[ -n "${ENABLE_APM}" ]]; then
+      METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor remove apm-agent
+    fi
+
     builtin cd ${baseDir};
     # Kill all background processes
     pkill -P ${artPid}
+    kill -s TERM ${cpuRamAppPid} || true
+    kill -s TERM ${cpuRamDbPid} || true
     pkill -P $$
-    sleep 6
 
     # Verify valid output
     if [[ "${verify}" == "true" ]]; then
-      if cat "${baseDir}/${logFile}" | grep -q "TimeoutError"; then
+      sleep 6
+      if cat "${baseDir}/${logFile}" | grep -q " Timeout "; then
         echo -e "${RED}*** !!! ERROR: SOMETHING WENT WRONG !!! ***${NC}"
         echo -e "${RED}Output triggered an unexpected timeout (${logFile})${NC}"
         echo -e "${RED} Your machine is overloaded and unable to provide accurate comparison results.${NC}"
@@ -73,13 +131,26 @@ function cleanup() {
         exit 0
       fi
     fi
+
     exit 0
 }
 trap cleanup SIGINT SIGTERM
 
+logScriptConfig
+
+loadEnv "${baseDir}/.env"
+
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
+
+if [[ -n "${ENABLE_APM}" ]]; then
+  export MONTI_APP_ID="$(getMontiAppId)"
+  export MONTI_APP_SECRET="$(getMontiAppSecret)"
+  METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor add apm-agent
+fi
+
 rm -rf "${appPath}/.meteor/local"
+logMeteorVersion
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
   METEOR_PACKAGE_DIRS="${baseDir}/packages" ${METEOR_CHECKOUT_PATH}/meteor run --port ${appPort} &
 else
@@ -99,6 +170,12 @@ artPid="$!"
 # Run CPU and RAM monitoring for meteor app and db
 node "${baseDir}/scripts/helpers/monitor-cpu-ram.js" "${appPid}" "APP" &
 node "${baseDir}/scripts/helpers/monitor-cpu-ram.js" "${dbPid}" "DB" &
+
+cpuRamAppPid="$(getPidByName "${baseDir}/scripts/helpers/monitor-cpu-ram.js ${appPid} APP")"
+cpuRamDbPid="$(getPidByName "${baseDir}/scripts/helpers/monitor-cpu-ram.js ${dbPid} DB")"
+
+echo "Monitor CpuRam APP Pid ${cpuRamAppPid}"
+echo "Monitor CpuRam DB Pid ${cpuRamDbPid}"
 
 # Wait for artillery script to finish the process
 wait "${artPid}"
