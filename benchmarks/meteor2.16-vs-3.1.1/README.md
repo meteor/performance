@@ -206,8 +206,8 @@ Performance is highly variable and depends on your use case coverage. Looking ah
 
 After reviewing the report, we can conclude that:
 
-Meteor **3.1.1** is in average **~28% faster**, uses **~51% less CPU** and **~17% less of RAM** in a **reactive scenario**.
+Meteor **3.1.1** is in average **~28% faster**, uses **~51% less CPU** and **~17% less of RAM** in a **reactive scenario**, compared with 2.16.
 
-Meteor **3.1.1** is in average **~19% faster**, uses **~28,82% more CPU** and **~27% more of RAM** in a **non-reactive scenario**.
+Meteor **3.1.1** is in average **~19% faster**, uses **~28,82% more CPU** and **~27% more of RAM** in a **non-reactive scenario**, compared with 2.16.
 
-Meteor **3.1** introduced more CPU and RAM usage in **non-reactive scenario** likely due to Mongo driver upgrade.
+Meteor **3.1** introduced more CPU and RAM usage in **non-reactive scenario** likely due to Mongo driver upgrade, compared with 3.0.2.
