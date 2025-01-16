@@ -172,15 +172,16 @@ In a non-reactive scenario, where we rely more on Meteor methods and continuousl
 
 RAM usage has also risen, though we don’t believe this is related to the optimization changes. Interestingly, we noticed that with the Meteor 3.1 upgrade, which included no performance optimizations but updated Meteor tooling, CPU and RAM usage worsened. We believe this is mainly due to the Mongo driver upgrade, as Meteor 3.1 included a two-major version update to the MongoDB driver.
 
-The data for Meteor 3.0.2 and Meteor 3.1 is as follows.
+The data for Meteor 3.0.1 and Meteor 3.1 is as follows.
 
-#####  Meteor 3.0.2
+#####  Meteor 3.0.1
 
 | # Run | Time                | CPU     | RAM    |
 | ----- | ------------------- | ------- | ------ |
 | 1     | 1 minute 56 seconds | 110.85% | 369 MB |
 | 2     | 2 minutes 2 seconds | 101.21% | 390 MB |
 | 3     | 2 minutes 6 seconds | 104.90% | 377 MB |
+
 ##### Meteor 3.1
 
 | # Run | Time                 | CPU     | RAM    |
@@ -189,7 +190,7 @@ The data for Meteor 3.0.2 and Meteor 3.1 is as follows.
 | 2     | 2 minutes 2 seconds  | 125.73% | 666 MB |
 | 3     | 2 minutes 14 seconds | 116.88% | 664 MB |
 
-- Meteor 3.1 increased CPU and RAM usage for the same process compared to 3.0.2.
+- Meteor 3.1 increased CPU and RAM usage for the same process compared to 3.0.1.
 - Meteor 3.1.1 improved RAM usage over 3.1, likely due to compression changes.
 
 > Note: While results may vary slightly between runs due to machine and process conditions, the values are approximate. Multiple runs show a clear trend, highlighting how the change significantly impacted performance metrics.
@@ -210,6 +211,6 @@ Meteor **3.1.1** is in average **~28% faster**, uses **~51% less CPU** and **~17
 
 Meteor **3.1.1** is in average **~19% faster**, uses **~28,82% more CPU** and **~27% more of RAM** in a **non-reactive scenario**, compared with 2.16.
 
-Meteor 3.1.1 **unlocks connection limits** thanks to async queue parallelization improvements, compared with 2.16 and 3.0.2.
+Meteor 3.1.1 **unlocks connection limits** thanks to async queue parallelization improvements, compared with 2.16 and 3.0.1.
 
-Meteor **3.1** introduced more CPU and RAM usage in **non-reactive scenario** likely due to Mongo driver upgrade, compared with 3.0.2.
+Meteor **3.1** introduced more CPU and RAM usage in **non-reactive scenario** likely due to Mongo driver upgrade, compared with 3.0.1.
