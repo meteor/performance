@@ -63,7 +63,7 @@ This test was run with the following artillery configuration:
 | 2     | 1 minute 52 seconds | 72.69% | 554 MB |
 | 3     | 1 minute 52 seconds | 69.43% | 556 MB |
 
-Benchmark data shows significant improvement in time, [especially compared to version 3.0.1](../meteor2.16-vs-3.0.1#meteor-3-1). However, this change resulted in a notable increase in CPU and RAM usage, surpassing even Meteor 2.
+Benchmark data shows improvement in time, [especially compared to version 3.0.1](../meteor2.16-vs-3.0.1#meteor-3-1). However, this change resulted in a notable increase in CPU and RAM usage, surpassing even Meteor 2.
 
 After this change, we unlocked the ability to fix the regression identified in Meteor 3, which couldn't handle 240 connections per minute compared to Meteor 2, given the same machine specs. Furthermore, Meteor 3 can now support even more connections than Meteor 2.
 
