@@ -210,4 +210,6 @@ Meteor **3.1.1** is in average **~28% faster**, uses **~51% less CPU** and **~17
 
 Meteor **3.1.1** is in average **~19% faster**, uses **~28,82% more CPU** and **~27% more of RAM** in a **non-reactive scenario**, compared with 2.16.
 
+Meteor 3.1.1 **unlocks connection limits** thanks to async queue parallelization improvements, compared with 2.16 and 3.0.2.
+
 Meteor **3.1** introduced more CPU and RAM usage in **non-reactive scenario** likely due to Mongo driver upgrade, compared with 3.0.2.
