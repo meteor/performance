@@ -2,7 +2,7 @@ config:
   target: http://localhost:3000
   phases:
     - duration: 60
-      arrivalRate: 2
+      arrivalRate: 4
       name: Warm up
   ensure:
     maxErrorRate: 1
@@ -14,7 +14,7 @@ config:
       launchOptions:
         slowMo: 500
   # Path to JavaScript file that defines Playwright test functions
-  processor: '../tests/test-helpers.js'
+  processor: '../../tests/basic/helpers.js'
 scenarios:
   - engine: playwright
-    testFunction: 'reactiveAddAndRemoveTasks'
+    testFunction: 'basicReactiveAddAndRemoveTasks'

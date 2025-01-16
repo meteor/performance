@@ -14,7 +14,7 @@ config:
       launchOptions:
         slowMo: 2000
   # Path to JavaScript file that defines Playwright test functions
-  processor: '../tests/test-helpers.js'
+  processor: '../../tests/basic/helpers.js'
 scenarios:
   - engine: playwright
-    testFunction: 'nonReactiveAddAndRemoveTasks'
+    testFunction: 'basicNonReactiveAddAndRemoveTasks'
