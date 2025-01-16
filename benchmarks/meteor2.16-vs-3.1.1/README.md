@@ -117,11 +117,97 @@ In our effort to identify the root causes of performance degradation, we explore
 
 ## Meteor 2.16 vs Meteor 3.1.1
 
-[TODO]
-- Revisit and compare the latest status of Meteor 3.1.1 with the connection limits of Meteor 2.16 (240 connections per minute). To return to the original purpose of this performance work.
+In earlier sections, we outlined the optimization changes implemented to address a performance regression in reactive scenarios and connection capacity using the benchmark processes described.
+
+This section summarizes the last status of Meteor 3.1.1 compared to Meteor 2.16 under a fixed number of connections.
+
+#### Reactive Results
+
+This test was run with the following artillery configuration:
+
+- 240 connections in 1 minute. Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a subscription (reactive).
+
+##### Meteor 2.16
+
+| # Run | Time                 | CPU    | RAM    |
+| ----- | -------------------- | ------ | ------ |
+| 1     | 2 minutes 58 seconds | 85.89% | 582 MB |
+| 2     | 2 minutes 56 seconds | 90.95% | 529 MB |
+| 3     | 2 minutes 58 seconds | 85.15% | 597 MB |
+
+#####  Meteor 3.1.1
+
+| # Run | Time                 | CPU    | RAM    | Comparison with 2                                |
+| ----- | -------------------- | ------ | ------ | ------------------------------------------------ |
+| 1     | 2 minutes 6 seconds  | 43.67% | 451 MB | 29.21% faster, 49.15% less cpu, 22.50% less ram  |
+| 2     | 2 minutes 4 seconds  | 42.94% | 495 MB | 29.54% faster, 52.79% less cpu, 6.42% less ram   |
+| 3     | 2 minutes 14 seconds | 41.62% | 463 MB | 24.71% faster, 51.12% less cpu, 22.44% less ram  |
+
+Async queues and compression provide significant improvements across all tasks involved in the benchmark process.
+
+#### Non-Reactive Results
+
+
+This test was run with the following artillery configuration:
+
+- 240 connections in 1 minute. Every second, 4 new connections are made. Over 1 minute, tasks are created, removed, and visualized via a method (non-reactive).
+
+##### Meteor 2.16
+
+| # Run | Time                 | CPU     | RAM    |
+| ----- | -------------------- | ------- | ------ |
+| 1     | 2 minutes 36 seconds | 110.78% | 421 MB |
+| 2     | 2 minutes 30 seconds | 109.39% | 423 MB |
+| 3     | 2 minutes 28 seconds | 111.79% | 437 MB |
+
+##### Meteor 3.1.1
+
+| # Run | Time                | CPU     | RAM    | Comparison with 2.16                            |
+| ----- | ------------------- | ------- | ------ | ----------------------------------------------- |
+| 1     | 2 minutes 6 seconds | 144.91% | 551 MB | 19.23% faster, 30.80% more cpu, 30.87% more ram |
+| 2     | 2 minutes 6 seconds | 139.99% | 552 MB | 16% faster, 27.97% more cpu,  30.49% more ram   |
+| 3     | 1 minute 56 seconds | 142.75% | 523 MB | 21.62% faster, 27.69% more cpu, 19.67% more ram |
+
+In a non-reactive scenario, where we rely more on Meteor methods and continuously resolve more Mongo queries and large objects to be transmitted, performance remains better 2.16. However, CPU usage has increased substantially, likely because parallelization demands more resources for larger operations without reducing execution time in this case.
+
+RAM usage has also risen, though we don’t believe this is related to the optimization changes. Interestingly, we noticed that with the Meteor 3.1 upgrade, which included no performance optimizations but updated Meteor tooling, CPU and RAM usage worsened. We believe this is mainly due to the Mongo driver upgrade, as Meteor 3.1 included a two-major version update to the MongoDB driver.
+
+The data for Meteor 3.0.2 and Meteor 3.1 is as follows.
+
+#####  Meteor 3.0.2
+
+| # Run | Time                | CPU     | RAM    |
+| ----- | ------------------- | ------- | ------ |
+| 1     | 1 minute 56 seconds | 110.85% | 369 MB |
+| 2     | 2 minutes 2 seconds | 101.21% | 390 MB |
+| 3     | 2 minutes 6 seconds | 104.90% | 377 MB |
+##### Meteor 3.1
+
+| # Run | Time                 | CPU     | RAM    |
+| ----- | -------------------- | ------- | ------ |
+| 1     | 2 minutes 4 seconds  | 119.91% | 666 MB |
+| 2     | 2 minutes 2 seconds  | 125.73% | 666 MB |
+| 3     | 2 minutes 14 seconds | 116.88% | 664 MB |
+
+- Meteor 3.1 increased CPU and RAM usage for the same process compared to 3.0.2.
+- Meteor 3.1.1 improved RAM usage over 3.1, likely due to compression changes.
+
+> Note: While results may vary slightly between runs due to machine and process conditions, the values are approximate. Multiple runs show a clear trend, highlighting how the change significantly impacted performance metrics.
 
 ## Conclusion
 
-[TODO]
-- Summarize how Meteor 3 outperforms Meteor 2 in speed for reactive and non-reactive scenarios
-- Briefly discuss future work efforts that will affect performance.
+Performance is an ongoing effort that requires continuous attention. The performance suite helps detect regressions and uncover improvements in future Meteor versions.
+
+With basic benchmark tests covering reactive and non-reactive scenarios, we identified a regression and fixed it.
+
+We also found that upgrading some tools in the Meteor ecosystem increased resource consumption on the machine. We observed that 3.1 introduced regressions in CPU and RAM usage after upgrading some Meteor tools. We need to assess what exactly caused it and whether it can be improved or if it's a trade-off we must accept with the new major version of those tools.
+
+Performance is highly variable and depends on your use case coverage. Looking ahead, we aim to develop a more real benchmarking process. This would test additional Meteor scenarios (like having more observers, collections and subscriptions) while incorporating widely used community packages from real-world applications (publish-composite, redis-oplog, apm, etc).
+
+After reviewing the report, we can conclude that:
+
+Meteor **3.1.1** is in average **~28% faster**, uses **~51% less CPU** and **~17% less of RAM** in a **reactive scenario**.
+
+Meteor **3.1.1** is in average **~19% faster**, uses **~28,82% more CPU** and **~27% more of RAM** in a **non-reactive scenario**.
+
+Meteor **3.1** introduced more CPU and RAM usage in **non-reactive scenario** likely due to Mongo driver upgrade.
