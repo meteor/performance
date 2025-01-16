@@ -108,7 +108,7 @@ Adjusting compression has not only improved CPU and RAM performance, comparing w
 
 In our effort to identify the root causes of performance degradation, we explored several changes that could impact performance. However, they did not produce significant results, and we’d like to mention them.
 
-- **Mongo driver and Node upgrade:** We considered that upgrading the Mongo driver or Node might affect performance, but benchmarking showed no change.
+- **Mongo driver and Node upgrade:** We considered that upgrading the Mongo driver or Node might affect performance, but reactive scenario benchmarking showed no change.
 - **Node new async context (`--experimental-async-context-frame`) for AsyncLocalStorage:** While this new implementation was expected to perform better than async hooks, our benchmarks did not confirm this.
 - **OPLOG vs pooling:** Switching from pooling to OPLOG in the benchmark did not yield any difference in results.
 - **Node configurations (`--max-old-space-size`, `--max-semi-space-size`, and others):** These configurations did not improve performance and, in some cases, even worsened it or had a minimal effect.
