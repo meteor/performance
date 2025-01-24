@@ -89,12 +89,42 @@ function logMeteorVersion() {
   echo -e "==============================="
 }
 
+function sedr() {
+  sed -r -- "$@"
+}
+
+function formatKebabCase() {
+  local str="${1}"
+  str=$(echo ${str} | sedr 's/([A-Z])/-\1/g')
+  str=$(echo ${str} | sedr 's/ /-/g')
+  str=$(echo ${str} | sedr 's/@/-/g')
+  str=$(echo ${str} | sedr 's/\//-/g')
+  str=$(echo ${str} | sedr 's/:/-/g')
+  str=$(echo ${str} | sedr 's/\./-/g')
+  str=$(echo ${str} | sedr 's/_/-/g')
+  str=$(echo ${str} | sedr 's/-+/-/g')
+  echo "${str}" | tr '[:upper:]' '[:lower:]'
+}
+
+function formatCamelCase() {
+  local str="${1}"
+  formatKebabCase "${str}" | sedr 's/(-)([a-z])/\U\2/g'
+}
+
 function findSecondPattern() {
   local file="${1}"
   local first_pattern="${2}"
   local second_pattern="${3}"
   # Search for the line containing the first pattern, then find the first occurrence of the second pattern after that line
   awk '/'"${first_pattern}"'/ {found=1; next} found && /'"${second_pattern}"'/ {print; exit}' "${file}"
+}
+
+function findSecondOccurrence() {
+  local file="${1}"
+  local first_pattern="${2}"
+  local second_pattern="${3}"
+  # Search for the line containing the first pattern, then find the second occurrence of the second pattern after that line
+  awk '/'"${first_pattern}"'/ {found=1; count=0; next} found && /'"${second_pattern}"'/ {count++; if (count == 2) {print; exit}}' "${file}"
 }
 
 function parseNumberAndUnit() {
@@ -113,16 +143,26 @@ function parseNumberAndUnit() {
 function findMetricStage() {
   local stage="${1}"
   local metric="${2}"
-  read num unit <<< $(parseNumberAndUnit "$(findSecondPattern "${baseDir}/${logFile}" "\[${stage}\]" "\(${metric}\)")")
-  echo -e " - ${metric}: ${num} ${unit}"
+  local label="${3:-${metric}}"
+  read num unit <<< $(parseNumberAndUnit "$(findSecondPattern "${baseDir}/${logFile}" "\[${stage}\]" "${metric}")")
+  echo -e " - ${label}: ${num} ${unit}"
+
+  if [[ "${metric}" == *"Rebuild"* ]]; then
+    read num unit <<< $(parseNumberAndUnit "$(findSecondOccurrence "${baseDir}/${logFile}" "\[${stage}\]" "${metric}")")
+    echo -e " - ${label}#2: ${num} ${unit}"
+  fi
 }
 
 function getMetricsStage() {
   local stage="${1}"
-  findMetricStage "${stage}" "ProjectContext resolveConstraints"
-  findMetricStage "${stage}" "ProjectContext prepareProjectForBuild"
-  findMetricStage "${stage}" "Build App"
-  findMetricStage "${stage}" "Server startup"
+  findMetricStage "${stage}" "\(ProjectContext resolveConstraints\)" "Meteor(resolveConstraints)"
+  findMetricStage "${stage}" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild)"
+  findMetricStage "${stage}" "\(Build App\)" "Meteor(Build App)"
+  findMetricStage "${stage}" "\(Server startup\)" "Meteor(Server startup)"
+
+  if [[ "${stage}" == *"Rebuild"* ]]; then
+    findMetricStage "${stage}" "\(Rebuild App\)" "Meteor(Rebuild App)"
+  fi
 }
 
 function reportStageMetrics() {
@@ -133,6 +173,7 @@ function reportStageMetrics() {
   echo -e "==============================="
 
   local metrics="$(getMetricsStage "${stage}")"
+
   echo -e "${metrics}"
 
   local totalNum=0
@@ -142,11 +183,14 @@ function reportStageMetrics() {
   done <<< "${metrics}"
 
   echo -e " * Total: ${totalNum} ${unit}"
+  echo -e " * Total Process: $(eval "echo \${$(formatCamelCase "${stage}ProcessTime")}") ms"
 }
 
 function reportMetrics() {
   reportStageMetrics "Cold start"
   reportStageMetrics "Cache start"
+  reportStageMetrics "Rebuild client"
+  reportStageMetrics "Rebuild server"
 }
 
 function killProcessByPort() {
@@ -168,6 +212,14 @@ function killProcessByPort() {
   done
 }
 
+function appendLine() {
+  echo "$1" >> "$2"
+}
+
+function removeLastLine() {
+    sed -i '$ d' "$1"
+}
+
 # Ensure proper cleanup on interrupt the process
 function cleanup() {
     builtin cd ${baseDir};
@@ -185,6 +237,9 @@ loadEnv "${baseDir}/.env"
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
 
+meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.json")"
+meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
+
 logMeteorVersion
 killProcessByPort "${appPort}"
 
@@ -192,16 +247,60 @@ echo -e "==============================="
 echo -e "[Cold start]"
 echo -e "==============================="
 rm -rf "${appPath}/.meteor/local"
+start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
+end_time_ms=$(date +%s%3N)
+total_sleep_ms=1000 # sleep leftovers
+ColdStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
 echo -e "==============================="
 echo -e "[Cache start]"
 echo -e "==============================="
+start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
+end_time_ms=$(date +%s%3N)
+total_sleep_ms=1000 # sleep leftovers
+CacheStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
+killProcessByPort "${appPort}"
+sleep 2
+
+echo -e "==============================="
+echo -e "[Rebuild client]"
+echo -e "==============================="
+start_time_ms=$(date +%s%3N)
+startMeteorApp
+waitMeteorApp
+appendLine "console.log('new line')" "${meteorClientEntrypoint}"
+sleep 4
+waitMeteorApp
+removeLastLine "${meteorClientEntrypoint}"
+sleep 4
+waitMeteorApp
+end_time_ms=$(date +%s%3N)
+total_sleep_ms=9000 # sleep leftovers
+RebuildClientProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
+killProcessByPort "${appPort}"
+sleep 2
+
+echo -e "==============================="
+echo -e "[Rebuild server]"
+echo -e "==============================="
+start_time_ms=$(date +%s%3N)
+startMeteorApp
+waitMeteorApp
+appendLine "console.log('new line')" "${meteorServerEntrypoint}"
+sleep 4
+waitMeteorApp
+removeLastLine "${meteorServerEntrypoint}"
+sleep 4
+waitMeteorApp
+end_time_ms=$(date +%s%3N)
+total_sleep_ms=9000 # sleep leftovers
+RebuildServerProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
