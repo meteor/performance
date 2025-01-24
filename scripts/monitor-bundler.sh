@@ -4,6 +4,7 @@
 # script. Artillery script name within ./artillery/*
 app="${1}"
 logName="${2}"
+meteorOptions="${@:3}"
 if [[ -z "$app" ]]; then
   echo "Usage: monitor-bundler.sh <app_name>"
   exit 1;
@@ -70,9 +71,9 @@ function waitMeteorApp() {
 
 function startMeteorApp() {
   if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
-    METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" ${METEOR_CHECKOUT_PATH}/meteor run --port ${appPort} &
+    METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" ${METEOR_CHECKOUT_PATH}/meteor run --port ${appPort} ${meteorOptions} &
   else
-    METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor run --port ${appPort} &
+    METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor run --port ${appPort} ${meteorOptions} &
   fi
 }
 
@@ -87,6 +88,10 @@ function logMeteorVersion() {
     echo -e " Meteor version - $(cat .meteor/release)"
   fi
   echo -e "==============================="
+  if [[ -n "${meteorOptions}" ]]; then
+    echo -e " Meteor options - ${meteorOptions}"
+    echo -e "==============================="
+  fi
 }
 
 function sedr() {
