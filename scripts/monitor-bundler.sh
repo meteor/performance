@@ -67,6 +67,46 @@ function waitMeteorApp() {
     sleep 1
     waitSecs=$((waitSecs + 1))
   done
+
+  echo ":: MeteorAppStarted"
+}
+
+function waitMeteorClientModified() {
+  local context="waitMeteorClientModified::${1}"
+  PROCESS_WAIT_TIMEOUT=3600000
+  processWaitTimeoutSecs=$((PROCESS_WAIT_TIMEOUT / 1000))
+  waitSecs=0
+
+  echo "${context}"
+  while ! awk -v context="${context}" '
+    /'"${context}"'/ {found=1; next}   # When context is found, set `found` and skip
+    found && /Client modified/ {exit 0}  # After context, check for "Client modified"
+    END { if (found && !/Client modified/) exit 1 }  # If found but "Client modified" is missing, exit 1
+  ' "${baseDir}/${logFile}"; do
+    sleep 1
+    waitSecs=$((waitSecs + 1))
+  done
+
+  echo ":: MeteorClientModified"
+}
+
+function waitMeteorServerModified() {
+  local context="waitMeteorServerModified::${1}"
+  PROCESS_WAIT_TIMEOUT=3600000
+  processWaitTimeoutSecs=$((PROCESS_WAIT_TIMEOUT / 1000))
+  waitSecs=0
+
+  echo "${context}"
+  while ! awk -v context="${context}" '
+    /'"${context}"'/ {found=1; next}   # When context is found, set `found` and skip
+    found && /Server modified/ {exit 0}  # After context, check for "Server modified"
+    END { if (found && !/Server modified/) exit 1 }  # If found but "Server modified" is missing, exit 1
+  ' "${baseDir}/${logFile}"; do
+    sleep 1
+    waitSecs=$((waitSecs + 1))
+  done
+
+  echo ":: MeteorServerModified"
 }
 
 function startMeteorApp() {
@@ -280,13 +320,13 @@ start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
 appendLine "console.log('new line')" "${meteorClientEntrypoint}"
-sleep 4
+waitMeteorClientModified "#1"
 waitMeteorApp
 removeLastLine "${meteorClientEntrypoint}"
-sleep 4
+waitMeteorClientModified "#2"
 waitMeteorApp
 end_time_ms=$(date +%s%3N)
-total_sleep_ms=9000 # sleep leftovers
+total_sleep_ms=5000 # sleep leftovers
 RebuildClientProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
@@ -298,13 +338,13 @@ start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
 appendLine "console.log('new line')" "${meteorServerEntrypoint}"
-sleep 4
+waitMeteorServerModified "#1"
 waitMeteorApp
 removeLastLine "${meteorServerEntrypoint}"
-sleep 4
+waitMeteorServerModified "#2"
 waitMeteorApp
 end_time_ms=$(date +%s%3N)
-total_sleep_ms=9000 # sleep leftovers
+total_sleep_ms=5000 # sleep leftovers
 RebuildServerProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
