@@ -119,19 +119,26 @@ function startMeteorApp() {
 
 function logMeteorVersion() {
   echo -e "==============================="
+  echo -e " Meteor version - $(cat "${appPath}/.meteor/release")"
   if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
     local oldPath="${PWD}"
     builtin cd "${METEOR_CHECKOUT_PATH}"
     echo -e " Meteor checkout version - $(git rev-parse HEAD)"
     builtin cd "${oldPath}"
-  else
-    echo -e " Meteor version - $(cat .meteor/release)"
   fi
   echo -e "==============================="
   if [[ -n "${meteorOptions}" ]]; then
     echo -e " Meteor options - ${meteorOptions}"
     echo -e "==============================="
   fi
+}
+
+function logMeteorPackages() {
+  echo -e "==============================="
+  echo -e " Meteor packages"
+  echo -e "==============================="
+  echo -e " $(formatFile "${appPath}/.meteor/versions")"
+  echo -e "==============================="
 }
 
 function sedr() {
@@ -265,15 +272,22 @@ function removeLastLine() {
     sed -i '$ d' "$1"
 }
 
+function formatFile() {
+   [[ -f "$1" ]] || { echo "File not found: $1"; return 1; }
+   awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }' "$1"
+}
+
 # Ensure proper cleanup on interrupt the process
 function cleanup() {
-    builtin cd ${baseDir};
-    pkill -P $$
+  builtin cd ${baseDir};
+  pkill -P $$
 
-    sleep 2
-    reportMetrics
+  sleep 2
+  logMeteorVersion
+  reportMetrics
+  logMeteorPackages
 
-    exit 0
+  exit 0
 }
 trap cleanup SIGINT SIGTERM
 
