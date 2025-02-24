@@ -10,16 +10,27 @@ if [[ -z "$app" ]]; then
   exit 1;
 fi
 
-# Redirect stdout (1) and stderr (2) to a file
-logFile="logs/${logName}-${app}-bundle.log"
-mkdir -p logs
-exec > "./${logFile}" 2>&1
-
 # Initialize script constants
 baseDir="${PWD}"
 appsDir="${baseDir}/apps"
 appPath="${appsDir}/${app}"
 appPort=3000
+if [[ -d "$app" ]]; then
+  if [[ "$app" == "$PWD/"* ]]; then
+    appsDir="$(dirname $app)"
+  else
+    appsDir="${baseDir}/$(dirname $app)"
+  fi
+  app="$(basename "$appPath")"
+  appPath="${appsDir}/${app}"
+fi
+meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.json")"
+meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
+
+# Redirect stdout (1) and stderr (2) to a file
+logFile="logs/${logName}-${app}-bundle.log"
+mkdir -p logs
+exec > "./${logFile}" 2>&1
 
 # Define color codes
 RED='\033[0;31m'
@@ -295,9 +306,6 @@ loadEnv "${baseDir}/.env"
 
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
-
-meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.json")"
-meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
 
 logMeteorVersion
 killProcessByPort "${appPort}"
