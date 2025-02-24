@@ -36,6 +36,7 @@ fi
 meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.json")"
 meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
 logFile="${logDir}/${logName}-${app}-bundle.log"
+monitorSize="${MONITOR_SIZE}"
 
 meteorCmd="meteor"
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
@@ -141,12 +142,27 @@ function startMeteorApp() {
   METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run ${meteorOptions} &
 }
 
+function visualizeMeteorAppBundle() {
+  METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} --extra-packages bundle-visualizer --production ${meteorOptions} &
+}
+
+function removeMeteorAppBundleVisualizer() {
+  METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} remove bundle-visualizer
+}
+
+function calculateMeteorAppBundleSize() {
+  MONITOR_SIZE_URL="http://localhost:${appPort}/__meteor__/bundle-visualizer/stats" ${meteorCmd} node ${baseDir}/scripts/helpers/print-bundle-size.js
+}
+
 function logScriptInfo() {
   echo -e "==============================="
   echo -e " Script"
   echo -e " - App path: ${appPath}"
   echo -e " - App port: ${appPort}"
   echo -e " - Logs file: ${logFile}"
+  if [[ "${monitorSize}" == "true" ]]; then
+  echo -e " - Monitor size: ${monitorSize}"
+  fi
   echo -e "==============================="
 }
 
@@ -180,6 +196,14 @@ function logMeteorPackages() {
   echo -e " Meteor packages"
   echo -e "==============================="
   echo -e " $(formatFile "${appPath}/.meteor/versions")"
+  echo -e "==============================="
+}
+
+function logMeteorBundleSize() {
+  echo -e "==============================="
+  echo -e " Bundle size"
+  echo -e "==============================="
+  echo -e " $(echo "${BundleSize}")"
   echo -e "==============================="
 }
 
@@ -285,6 +309,11 @@ function reportMetrics() {
   reportStageMetrics "Cache start"
   reportStageMetrics "Rebuild client"
   reportStageMetrics "Rebuild server"
+
+  if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+    reportStageMetrics "Visualize bundle"
+    logMeteorBundleSize
+  fi
 }
 
 function killProcessByPort() {
@@ -416,5 +445,21 @@ total_sleep_ms=5000 # sleep leftovers
 RebuildServerProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
+
+if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+  echo -e "==============================="
+  echo -e "[Visualize bundle]"
+  echo -e "==============================="
+  start_time_ms=$(date +%s%3N)
+  visualizeMeteorAppBundle
+  waitMeteorApp
+  BundleSize=$(calculateMeteorAppBundleSize)
+  end_time_ms=$(date +%s%3N)
+  total_sleep_ms=1000 # sleep leftovers
+  VisualizeBundleProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
+  removeMeteorAppBundleVisualizer
+fi
 
 cleanup
