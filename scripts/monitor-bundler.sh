@@ -32,6 +32,11 @@ meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.js
 meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
 logFile="${logDir}/${logName}-${app}-bundle.log"
 
+meteorCmd="meteor"
+if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
+  meteorCmd="${METEOR_CHECKOUT_PATH}/meteor"
+fi
+
 # Redirect stdout (1) and stderr (2) to a file
 mkdir -p "${logDir}"
 # Save original stdout and stderr
@@ -128,11 +133,7 @@ function waitMeteorServerModified() {
 }
 
 function startMeteorApp() {
-  if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
-    METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" ${METEOR_CHECKOUT_PATH}/meteor run --port ${appPort} ${meteorOptions} &
-  else
-    METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor run --port ${appPort} ${meteorOptions} &
-  fi
+  METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" ${meteorCmd} run --port ${appPort} ${meteorOptions} &
 }
 
 function logScriptInfo() {
@@ -164,13 +165,8 @@ function logNpmPackages() {
   echo -e "==============================="
   echo -e " Npm packages"
   echo -e "==============================="
-  if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
-    ${METEOR_CHECKOUT_PATH}/meteor node -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
-      | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
-  else
-    meteor node -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
-      | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
-  fi
+  $meteorCmd node -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
+    | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
   echo -e "==============================="
 }
 
