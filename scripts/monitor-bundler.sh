@@ -15,22 +15,29 @@ baseDir="${PWD}"
 appsDir="${baseDir}/apps"
 appPath="${appsDir}/${app}"
 appPort=3000
-if [[ -d "$app" ]]; then
-  if [[ "$app" == "$PWD/"* ]]; then
-    appsDir="$(dirname $app)"
+appResolved="$(echo $app)"
+logDir="${baseDir}/logs"
+if [[ -d "$appResolved" ]]; then
+  if [[ "$appResolved" == "$(echo ~)/"* ]]; then
+    appsDir="$(dirname $appResolved)"
   else
-    appsDir="${baseDir}/$(dirname $app)"
+    appsDir="${baseDir}/$(dirname $appResolved)"
   fi
   app="$(basename "$appPath")"
   appPath="${appsDir}/${app}"
+  logDir="${appPath}/logs"
+  logFile="${logDir}/${logName}-${app}-bundle.log"
 fi
 meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.json")"
 meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
+logFile="${logDir}/${logName}-${app}-bundle.log"
 
 # Redirect stdout (1) and stderr (2) to a file
-logFile="logs/${logName}-${app}-bundle.log"
-mkdir -p logs
-exec > "./${logFile}" 2>&1
+mkdir -p "${logDir}"
+# Save original stdout and stderr
+exec 3>&1 4>&2
+# Redirect stdout and stderr to logFile
+exec > "${logFile}" 2>&1
 
 # Define color codes
 RED='\033[0;31m'
@@ -93,7 +100,7 @@ function waitMeteorClientModified() {
     /'"${context}"'/ {found=1; next}   # When context is found, set `found` and skip
     found && /Client modified/ {exit 0}  # After context, check for "Client modified"
     END { if (found && !/Client modified/) exit 1 }  # If found but "Client modified" is missing, exit 1
-  ' "${baseDir}/${logFile}"; do
+  ' "${logFile}"; do
     sleep 1
     waitSecs=$((waitSecs + 1))
   done
@@ -112,7 +119,7 @@ function waitMeteorServerModified() {
     /'"${context}"'/ {found=1; next}   # When context is found, set `found` and skip
     found && /Server modified/ {exit 0}  # After context, check for "Server modified"
     END { if (found && !/Server modified/) exit 1 }  # If found but "Server modified" is missing, exit 1
-  ' "${baseDir}/${logFile}"; do
+  ' "${logFile}"; do
     sleep 1
     waitSecs=$((waitSecs + 1))
   done
@@ -126,6 +133,15 @@ function startMeteorApp() {
   else
     METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" meteor run --port ${appPort} ${meteorOptions} &
   fi
+}
+
+function logScriptInfo() {
+  echo -e "==============================="
+  echo -e " Script"
+  echo -e " - App path: ${appPath}"
+  echo -e " - App port: ${appPort}"
+  echo -e " - Logs file: ${logFile}"
+  echo -e "==============================="
 }
 
 function logMeteorVersion() {
@@ -142,6 +158,20 @@ function logMeteorVersion() {
     echo -e " Meteor options - ${meteorOptions}"
     echo -e "==============================="
   fi
+}
+
+function logNpmPackages() {
+  echo -e "==============================="
+  echo -e " Npm packages"
+  echo -e "==============================="
+  if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
+    ${METEOR_CHECKOUT_PATH}/meteor node -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
+      | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
+  else
+    meteor node -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
+      | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
+  fi
+  echo -e "==============================="
 }
 
 function logMeteorPackages() {
@@ -207,11 +237,11 @@ function findMetricStage() {
   local stage="${1}"
   local metric="${2}"
   local label="${3:-${metric}}"
-  read num unit <<< $(parseNumberAndUnit "$(findSecondPattern "${baseDir}/${logFile}" "\[${stage}\]" "${metric}")")
+  read num unit <<< $(parseNumberAndUnit "$(findSecondPattern "${logFile}" "\[${stage}\]" "${metric}")")
   echo -e " - ${label}: ${num} ${unit}"
 
   if [[ "${metric}" == *"Rebuild"* ]]; then
-    read num unit <<< $(parseNumberAndUnit "$(findSecondOccurrence "${baseDir}/${logFile}" "\[${stage}\]" "${metric}")")
+    read num unit <<< $(parseNumberAndUnit "$(findSecondOccurrence "${logFile}" "\[${stage}\]" "${metric}")")
     echo -e " - ${label}#2: ${num} ${unit}"
   fi
 }
@@ -294,9 +324,23 @@ function cleanup() {
   pkill -P $$
 
   sleep 2
+  logScriptInfo
+  logNpmPackages
+  logMeteorPackages
   logMeteorVersion
   reportMetrics
+
+  # Restore original stdout and stderr
+  exec 1>&3 2>&4
+
+  logScriptInfo
+  logNpmPackages
   logMeteorPackages
+  logMeteorVersion
+  reportMetrics
+
+  # Close the saved file descriptors
+  exec 3>&- 4>&-
 
   exit 0
 }
@@ -307,6 +351,7 @@ loadEnv "${baseDir}/.env"
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
 
+logScriptInfo
 logMeteorVersion
 killProcessByPort "${appPort}"
 
