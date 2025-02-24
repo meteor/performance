@@ -30,6 +30,8 @@ if [[ -d "$appResolved" ]]; then
   appPath="${appsDir}/${app}"
   logDir="${appPath}/logs"
   logFile="${logDir}/${logName}-${app}-bundle.log"
+else
+  METEOR_PACKAGE_DIRS="${baseDir}/packages"
 fi
 meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.json")"
 meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
@@ -136,9 +138,6 @@ function waitMeteorServerModified() {
 }
 
 function startMeteorApp() {
-  if [[ -z "${METEOR_PACKAGE_DIRS}" ]]; then
-    METEOR_PACKAGE_DIRS="${baseDir}/packages"
-  fi
   METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run ${meteorOptions} &
 }
 
