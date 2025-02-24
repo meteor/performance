@@ -133,7 +133,10 @@ function waitMeteorServerModified() {
 }
 
 function startMeteorApp() {
-  METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${baseDir}/packages" ${meteorCmd} run --port ${appPort} ${meteorOptions} &
+  if [[ -z "${METEOR_PACKAGE_DIRS}" ]]; then
+    METEOR_PACKAGE_DIRS="${baseDir}/packages"
+  fi
+  METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run --port ${appPort} ${meteorOptions} &
 }
 
 function logScriptInfo() {
