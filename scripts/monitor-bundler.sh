@@ -14,7 +14,10 @@ fi
 baseDir="${PWD}"
 appsDir="${baseDir}/apps"
 appPath="${appsDir}/${app}"
-appPort=3000
+appPort="$(echo "$meteorOptions" | sed -n 's/.*--port[ =]\?\([0-9]\+\).*/\1/p')"
+if [[ -z "$appPort" ]]; then
+  appPort=3000
+fi
 appResolved="$(echo $app)"
 logDir="${baseDir}/logs"
 if [[ -d "$appResolved" ]]; then
@@ -136,7 +139,7 @@ function startMeteorApp() {
   if [[ -z "${METEOR_PACKAGE_DIRS}" ]]; then
     METEOR_PACKAGE_DIRS="${baseDir}/packages"
   fi
-  METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run --port ${appPort} ${meteorOptions} &
+  METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run ${meteorOptions} &
 }
 
 function logScriptInfo() {
