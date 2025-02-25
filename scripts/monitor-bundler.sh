@@ -43,6 +43,14 @@ if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
   meteorCmd="${METEOR_CHECKOUT_PATH}/meteor"
 fi
 
+function logFullLogDetails() {
+  echo -e "==============================="
+  echo -e " Full log details at ${logFile}"
+  echo -e "==============================="
+}
+
+logFullLogDetails
+
 # Redirect stdout (1) and stderr (2) to a file
 mkdir -p "${logDir}"
 # Save original stdout and stderr
@@ -368,6 +376,7 @@ function cleanup() {
   logMeteorPackages
   logMeteorVersion
   reportMetrics
+  logFullLogDetails
 
   # Close the saved file descriptors
   exec 3>&- 4>&-
