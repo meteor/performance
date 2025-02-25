@@ -36,7 +36,7 @@ fi
 meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.json")"
 meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
 logFile="${logDir}/${logName}-${app}-bundle.log"
-monitorSize="${MONITOR_SIZE}"
+monitorSize="${METEOR_BUNDLE_SIZE}"
 
 meteorCmd="meteor"
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
