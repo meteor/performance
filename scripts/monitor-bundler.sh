@@ -43,12 +43,25 @@ if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
   meteorCmd="${METEOR_CHECKOUT_PATH}/meteor"
 fi
 
+function logScriptInfo() {
+  echo -e "==============================="
+  echo -e " Script"
+  echo -e " - App path: ${appPath}"
+  echo -e " - App port: ${appPort}"
+  echo -e " - Logs file: ${logFile}"
+  if [[ "${monitorSize}" == "true" ]]; then
+  echo -e " - Monitor size: ${monitorSize}"
+  fi
+  echo -e "==============================="
+}
+
 function logFullLogDetails() {
   echo -e "==============================="
   echo -e " Full log details at ${logFile}"
   echo -e "==============================="
 }
 
+logScriptInfo
 logFullLogDetails
 
 # Redirect stdout (1) and stderr (2) to a file
@@ -160,18 +173,6 @@ function removeMeteorAppBundleVisualizer() {
 
 function calculateMeteorAppBundleSize() {
   MONITOR_SIZE_URL="http://localhost:${appPort}/__meteor__/bundle-visualizer/stats" ${meteorCmd} node $(dirname $0)/helpers/print-bundle-size.js
-}
-
-function logScriptInfo() {
-  echo -e "==============================="
-  echo -e " Script"
-  echo -e " - App path: ${appPath}"
-  echo -e " - App port: ${appPort}"
-  echo -e " - Logs file: ${logFile}"
-  if [[ "${monitorSize}" == "true" ]]; then
-  echo -e " - Monitor size: ${monitorSize}"
-  fi
-  echo -e "==============================="
 }
 
 function logMeteorVersion() {
