@@ -372,7 +372,6 @@ function cleanup() {
   # Restore original stdout and stderr
   exec 1>&3 2>&4
 
-  logScriptInfo
   logNpmPackages
   logMeteorPackages
   logMeteorVersion
