@@ -151,7 +151,7 @@ function removeMeteorAppBundleVisualizer() {
 }
 
 function calculateMeteorAppBundleSize() {
-  MONITOR_SIZE_URL="http://localhost:${appPort}/__meteor__/bundle-visualizer/stats" ${meteorCmd} node ${baseDir}/scripts/helpers/print-bundle-size.js
+  MONITOR_SIZE_URL="http://localhost:${appPort}/__meteor__/bundle-visualizer/stats" ${meteorCmd} node $(dirname $0)/helpers/print-bundle-size.js
 }
 
 function logScriptInfo() {
