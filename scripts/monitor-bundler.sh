@@ -66,39 +66,47 @@ function logProgress() {
   exec >> "${logFile}" 2>&1
 }
 
-function logInfo() {
-  logMessage "${BLUE}${1}${NC}" ${@:2}
-}
-
-function logValue() {
-  logMessage "${CYAN}${1}${NC}" ${@:2}
-}
-
-function logVerbose() {
+function logBanner() {
+  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+    logMessage "${1}"
+    return
+  fi
   logMessage "${PURPLE}${1}${NC}" ${@:2}
 }
 
+function logSpecial() {
+  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+    logMessage "${1}"
+    return
+  fi
+  logMessage "${CYAN}${1}${NC}" ${@:2}
+}
+
 function logError() {
+  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+    logMessage "${1}"
+    return
+  fi
   logMessage "${RED}${1}${NC}" ${@:2}
 }
 
 function logScriptInfo() {
-  logMessage "==============================="
-  logMessage " Script"
-  logMessage "==============================="
+  logBanner "==============================="
+  logBanner " Profile script"
+  logBanner "==============================="
   logMessage " - App path: $(logMessage "${appPath}")"
   logMessage " - App port: $(logMessage "${appPort}")"
   logMessage " - Logs file: $(logMessage "${logFile}")"
   if [[ "${monitorSize}" == "true" ]]; then
   logMessage " - Monitor size: $(logMessage "${monitorSize}")"
   fi
-  logMessage "==============================="
+  logBanner "==============================="
 }
 
 function logFullLogDetails() {
-  logMessage "==============================="
-  logMessage " Full log details at ${logFile}"
-  logMessage "==============================="
+  logSpecial "==============================="
+  logSpecial " Full log details at ${logFile}"
+  logSpecial "==============================="
 }
 
 logScriptInfo
@@ -221,44 +229,44 @@ function calculateMeteorAppBundleSize() {
 }
 
 function logMeteorVersion() {
-  logMessage "==============================="
-  logMessage " Meteor version - $(cat "${appPath}/.meteor/release")"
+  logBanner "==============================="
+  logBanner " Meteor version - $(cat "${appPath}/.meteor/release")"
   if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
     local oldPath="${PWD}"
     builtin cd "${METEOR_CHECKOUT_PATH}"
-    logMessage " Meteor checkout version - $(git rev-parse HEAD)"
+    logBanner " Meteor checkout version - $(git rev-parse HEAD)"
     builtin cd "${oldPath}"
   fi
-  logMessage "==============================="
+  logBanner "==============================="
   if [[ -n "${meteorOptions}" ]]; then
-    logMessage " Meteor options - ${meteorOptions}"
-    logMessage "==============================="
+    logBanner " Meteor options - ${meteorOptions}"
+    logBanner "==============================="
   fi
 }
 
 function logNpmPackages() {
-  logMessage "==============================="
-  logMessage " Npm packages"
-  logMessage "==============================="
+  logBanner "==============================="
+  logBanner " Npm packages"
+  logBanner "==============================="
   $meteorCmd node -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
     | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
-  logMessage "==============================="
+  logBanner "==============================="
 }
 
 function logMeteorPackages() {
-  logMessage "==============================="
-  logMessage " Meteor packages"
-  logMessage "==============================="
+  logBanner "==============================="
+  logBanner " Meteor packages"
+  logBanner "==============================="
   logMessage " $(formatFile "${appPath}/.meteor/versions")"
-  logMessage "==============================="
+  logBanner "==============================="
 }
 
 function logMeteorBundleSize() {
-  logMessage "==============================="
-  logMessage " Bundle size"
-  logMessage "==============================="
+  logBanner "==============================="
+  logBanner " Bundle size"
+  logBanner "==============================="
   logMessage " $(echo "${BundleSize}")"
-  logMessage "==============================="
+  logBanner "==============================="
 }
 
 function sedr() {
@@ -340,9 +348,9 @@ function getMetricsStage() {
 function reportStageMetrics() {
   local stage="${1}"
 
-  logMessage "==============================="
-  logMessage "Metrics - ${stage}"
-  logMessage "==============================="
+  logBanner "==============================="
+  logBanner "Metrics - ${stage}"
+  logBanner "==============================="
 
   local metrics="$(getMetricsStage "${stage}")"
 
@@ -465,11 +473,12 @@ function cleanup() {
   pkill -P $$
 
   sleep 2
-  logScriptInfo
-  logNpmPackages
-  logMeteorPackages
-  logMeteorVersion
-  reportMetrics
+
+  DISABLE_COLORS=true logScriptInfo
+  DISABLE_COLORS=true logNpmPackages
+  DISABLE_COLORS=true logMeteorPackages
+  DISABLE_COLORS=true logMeteorVersion
+  DISABLE_COLORS=true reportMetrics
 
   # Restore original stdout and stderr
   exec 1>&3 2>&4
@@ -501,9 +510,9 @@ killProcessByPort "${appPort}"
 
 logProgress "Profiling \"Cold start\"..."
 
-echo -e "==============================="
-echo -e "[Cold start]"
-echo -e "==============================="
+logMessage "==============================="
+logMessage "[Cold start]"
+logMessage "==============================="
 rm -rf "${appPath}/.meteor/local"
 start_time_ms=$(date +%s%3N)
 startMeteorApp
@@ -516,9 +525,9 @@ sleep 2
 
 logProgress "Profiling \"Cache start\"..."
 
-echo -e "==============================="
-echo -e "[Cache start]"
-echo -e "==============================="
+logMessage "==============================="
+logMessage "[Cache start]"
+logMessage "==============================="
 start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
@@ -530,9 +539,9 @@ sleep 2
 
 logProgress "Profiling \"Rebuild client\"..."
 
-echo -e "==============================="
-echo -e "[Rebuild client]"
-echo -e "==============================="
+logMessage "==============================="
+logMessage "[Rebuild client]"
+logMessage "==============================="
 start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
@@ -550,9 +559,9 @@ sleep 2
 
 logProgress "Profiling \"Rebuild server\"..."
 
-echo -e "==============================="
-echo -e "[Rebuild server]"
-echo -e "==============================="
+logMessage "==============================="
+logMessage "[Rebuild server]"
+logMessage "==============================="
 start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
@@ -571,9 +580,9 @@ sleep 2
 if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
   logProgress "Profiling \"Visualize bundle\"..."
 
-  echo -e "==============================="
-  echo -e "[Visualize bundle]"
-  echo -e "==============================="
+  logMessage "==============================="
+  logMessage "[Visualize bundle]"
+  logMessage "==============================="
   start_time_ms=$(date +%s%3N)
   visualizeMeteorAppBundle
   waitMeteorApp
