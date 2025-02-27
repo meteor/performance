@@ -508,7 +508,7 @@ logScriptInfo
 logMeteorVersion
 killProcessByPort "${appPort}"
 
-logProgress "Profiling \"Cold start\"..."
+logProgress " * Profiling \"Cold start\"..."
 
 logMessage "==============================="
 logMessage "[Cold start]"
@@ -523,7 +523,7 @@ ColdStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
-logProgress "Profiling \"Cache start\"..."
+logProgress " * Profiling \"Cache start\"..."
 
 logMessage "==============================="
 logMessage "[Cache start]"
@@ -537,7 +537,7 @@ CacheStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
-logProgress "Profiling \"Rebuild client\"..."
+logProgress " * Profiling \"Rebuild client\"..."
 
 logMessage "==============================="
 logMessage "[Rebuild client]"
@@ -557,7 +557,7 @@ RebuildClientProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
-logProgress "Profiling \"Rebuild server\"..."
+logProgress " * Profiling \"Rebuild server\"..."
 
 logMessage "==============================="
 logMessage "[Rebuild server]"
@@ -578,7 +578,7 @@ killProcessByPort "${appPort}"
 sleep 2
 
 if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
-  logProgress "Profiling \"Visualize bundle\"..."
+  logProgress " * Profiling \"Visualize bundle\"..."
 
   logMessage "==============================="
   logMessage "[Visualize bundle]"
