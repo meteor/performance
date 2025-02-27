@@ -94,11 +94,11 @@ function logScriptInfo() {
   logBanner "==============================="
   logBanner " Profile script"
   logBanner "==============================="
-  logMessage " - App path: $(logMessage "${appPath}")"
-  logMessage " - App port: $(logMessage "${appPort}")"
-  logMessage " - Logs file: $(logMessage "${logFile}")"
+  logBanner " - App path: $(logMessage "${appPath}")"
+  logBanner " - App port: $(logMessage "${appPort}")"
+  logBanner " - Logs file: $(logMessage "${logFile}")"
   if [[ "${monitorSize}" == "true" ]]; then
-  logMessage " - Monitor size: $(logMessage "${monitorSize}")"
+  logBanner " - Monitor size: $(logMessage "${monitorSize}")"
   fi
   logBanner "==============================="
 }
