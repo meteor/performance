@@ -43,22 +43,62 @@ if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
   meteorCmd="${METEOR_CHECKOUT_PATH}/meteor"
 fi
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+YELLOW='\033[0;33m'
+GREY='\033[0;37m'
+NC='\033[0m'
+
+function logMessage() {
+  echo -e "${1}"
+}
+
+function logProgress() {
+  # Restore original stdout and stderr
+  exec 1>&3 2>&4
+
+  logMessage "${BLUE}${1}${NC}"
+
+  # Redirect stdout and stderr to logFile
+  exec >> "${logFile}" 2>&1
+}
+
+function logInfo() {
+  logMessage "${BLUE}${1}${NC}" ${@:2}
+}
+
+function logValue() {
+  logMessage "${CYAN}${1}${NC}" ${@:2}
+}
+
+function logVerbose() {
+  logMessage "${PURPLE}${1}${NC}" ${@:2}
+}
+
+function logError() {
+  logMessage "${RED}${1}${NC}" ${@:2}
+}
+
 function logScriptInfo() {
-  echo -e "==============================="
-  echo -e " Script"
-  echo -e " - App path: ${appPath}"
-  echo -e " - App port: ${appPort}"
-  echo -e " - Logs file: ${logFile}"
+  logMessage "==============================="
+  logMessage " Script"
+  logMessage "==============================="
+  logMessage " - App path: $(logMessage "${appPath}")"
+  logMessage " - App port: $(logMessage "${appPort}")"
+  logMessage " - Logs file: $(logMessage "${logFile}")"
   if [[ "${monitorSize}" == "true" ]]; then
-  echo -e " - Monitor size: ${monitorSize}"
+  logMessage " - Monitor size: $(logMessage "${monitorSize}")"
   fi
-  echo -e "==============================="
+  logMessage "==============================="
 }
 
 function logFullLogDetails() {
-  echo -e "==============================="
-  echo -e " Full log details at ${logFile}"
-  echo -e "==============================="
+  logMessage "==============================="
+  logMessage " Full log details at ${logFile}"
+  logMessage "==============================="
 }
 
 logScriptInfo
@@ -169,51 +209,56 @@ function visualizeMeteorAppBundle() {
 
 function removeMeteorAppBundleVisualizer() {
   METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} remove bundle-visualizer
+  sed -i '/bundle-visualizer/d' "${appPath}/.meteor/versions"
 }
 
 function calculateMeteorAppBundleSize() {
-  MONITOR_SIZE_URL="http://localhost:${appPort}/__meteor__/bundle-visualizer/stats" ${meteorCmd} node $(dirname $0)/helpers/print-bundle-size.js
+  local scriptContext="$(dirname $0)"
+  if [[ "${scriptContext}" =~ "./" ]]; then
+    scriptContext="${baseDir}/${scriptContext}"
+  fi
+  MONITOR_SIZE_URL="http://localhost:${appPort}/__meteor__/bundle-visualizer/stats" ${meteorCmd} node "${scriptContext}/helpers/print-bundle-size.js"
 }
 
 function logMeteorVersion() {
-  echo -e "==============================="
-  echo -e " Meteor version - $(cat "${appPath}/.meteor/release")"
+  logMessage "==============================="
+  logMessage " Meteor version - $(cat "${appPath}/.meteor/release")"
   if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
     local oldPath="${PWD}"
     builtin cd "${METEOR_CHECKOUT_PATH}"
-    echo -e " Meteor checkout version - $(git rev-parse HEAD)"
+    logMessage " Meteor checkout version - $(git rev-parse HEAD)"
     builtin cd "${oldPath}"
   fi
-  echo -e "==============================="
+  logMessage "==============================="
   if [[ -n "${meteorOptions}" ]]; then
-    echo -e " Meteor options - ${meteorOptions}"
-    echo -e "==============================="
+    logMessage " Meteor options - ${meteorOptions}"
+    logMessage "==============================="
   fi
 }
 
 function logNpmPackages() {
-  echo -e "==============================="
-  echo -e " Npm packages"
-  echo -e "==============================="
+  logMessage "==============================="
+  logMessage " Npm packages"
+  logMessage "==============================="
   $meteorCmd node -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
     | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
-  echo -e "==============================="
+  logMessage "==============================="
 }
 
 function logMeteorPackages() {
-  echo -e "==============================="
-  echo -e " Meteor packages"
-  echo -e "==============================="
-  echo -e " $(formatFile "${appPath}/.meteor/versions")"
-  echo -e "==============================="
+  logMessage "==============================="
+  logMessage " Meteor packages"
+  logMessage "==============================="
+  logMessage " $(formatFile "${appPath}/.meteor/versions")"
+  logMessage "==============================="
 }
 
 function logMeteorBundleSize() {
-  echo -e "==============================="
-  echo -e " Bundle size"
-  echo -e "==============================="
-  echo -e " $(echo "${BundleSize}")"
-  echo -e "==============================="
+  logMessage "==============================="
+  logMessage " Bundle size"
+  logMessage "==============================="
+  logMessage " $(echo "${BundleSize}")"
+  logMessage "==============================="
 }
 
 function sedr() {
@@ -272,11 +317,11 @@ function findMetricStage() {
   local metric="${2}"
   local label="${3:-${metric}}"
   read num unit <<< $(parseNumberAndUnit "$(findSecondPattern "${logFile}" "\[${stage}\]" "${metric}")")
-  echo -e " - ${label}: ${num} ${unit}"
+  logMessage " - ${label}: ${num} ${unit}"
 
   if [[ "${metric}" == *"Rebuild"* ]]; then
     read num unit <<< $(parseNumberAndUnit "$(findSecondOccurrence "${logFile}" "\[${stage}\]" "${metric}")")
-    echo -e " - ${label}#2: ${num} ${unit}"
+    logMessage " - ${label}#2: ${num} ${unit}"
   fi
 }
 
@@ -295,13 +340,13 @@ function getMetricsStage() {
 function reportStageMetrics() {
   local stage="${1}"
 
-  echo -e "==============================="
-  echo -e "Metrics - ${stage}"
-  echo -e "==============================="
+  logMessage "==============================="
+  logMessage "Metrics - ${stage}"
+  logMessage "==============================="
 
   local metrics="$(getMetricsStage "${stage}")"
 
-  echo -e "${metrics}"
+  logMessage "${metrics}"
 
   local totalNum=0
   while IFS= read -r line; do
@@ -309,8 +354,8 @@ function reportStageMetrics() {
     ((totalNum += num))
   done <<< "${metrics}"
 
-  echo -e " * Total: ${totalNum} ${unit}"
-  echo -e " * Total Process: $(eval "echo \${$(formatCamelCase "${stage}ProcessTime")}") ms"
+  logMessage " * Total: ${totalNum} ${unit}"
+  logMessage " * Total Process: $(eval "echo \${$(formatCamelCase "${stage}ProcessTime")}") ms"
 }
 
 function reportMetrics() {
@@ -357,6 +402,63 @@ function formatFile() {
    awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }' "$1"
 }
 
+function monitorErrorsAndTimeout() {
+    local file="$1"
+    local interval="$2"
+    local timeout="$3"
+    local unchanged_time=0
+    local last_line=""
+
+    while true; do
+        if [[ ! -f "$file" ]]; then
+            echo "File $file not found!"
+            sleep "$interval"
+            continue
+        fi
+
+        new_line=$(tail -n 1 "$file")
+
+        if [[ "$new_line" == "$last_line" ]]; then
+            ((unchanged_time+=interval))
+        else
+            unchanged_time=0
+        fi
+
+        last_line="$new_line"
+
+        if [[ "$unchanged_time" -ge "$timeout" ]]; then
+            triggerExit
+            break
+        fi
+
+        if grep -q "Your application is crashing" "$file" || grep -q "Exited with code" "$file"; then
+            triggerExit
+            break
+        fi
+
+        sleep "$interval"
+    done
+}
+
+function triggerExit() {
+  # Restore original stdout and stderr
+  exec 1>&3 2>&4
+
+  logError "==============================="
+  logError " An error occurred when profiling. For more details, check at ${logFile}"
+  logError "==============================="
+
+  # Close the saved file descriptors
+  exec 3>&- 4>&-
+
+  builtin cd ${baseDir};
+
+  killProcessByPort "${appPort}"
+  kill -KILL -- -$$ >/dev/null
+
+  exit 1
+}
+
 # Ensure proper cleanup on interrupt the process
 function cleanup() {
   builtin cd ${baseDir};
@@ -385,7 +487,10 @@ function cleanup() {
 }
 trap cleanup SIGINT SIGTERM
 
+
 loadEnv "${baseDir}/.env"
+
+monitorErrorsAndTimeout "${logFile}" 2 60 &
 
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
@@ -393,6 +498,8 @@ builtin cd "${appPath}"
 logScriptInfo
 logMeteorVersion
 killProcessByPort "${appPort}"
+
+logProgress "Profiling \"Cold start\"..."
 
 echo -e "==============================="
 echo -e "[Cold start]"
@@ -407,6 +514,8 @@ ColdStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
+logProgress "Profiling \"Cache start\"..."
+
 echo -e "==============================="
 echo -e "[Cache start]"
 echo -e "==============================="
@@ -418,6 +527,8 @@ total_sleep_ms=1000 # sleep leftovers
 CacheStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
+
+logProgress "Profiling \"Rebuild client\"..."
 
 echo -e "==============================="
 echo -e "[Rebuild client]"
@@ -436,6 +547,8 @@ total_sleep_ms=5000 # sleep leftovers
 RebuildClientProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
 sleep 2
+
+logProgress "Profiling \"Rebuild server\"..."
 
 echo -e "==============================="
 echo -e "[Rebuild server]"
@@ -456,6 +569,8 @@ killProcessByPort "${appPort}"
 sleep 2
 
 if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+  logProgress "Profiling \"Visualize bundle\"..."
+
   echo -e "==============================="
   echo -e "[Visualize bundle]"
   echo -e "==============================="
