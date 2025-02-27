@@ -33,8 +33,8 @@ if [[ -d "$appResolved" ]]; then
 else
   METEOR_PACKAGE_DIRS="${baseDir}/packages"
 fi
-meteorClientEntrypoint="$(grep -oP '"client":\s*"\K[^"]+' "${appPath}/package.json")"
-meteorServerEntrypoint="$(grep -oP '"server":\s*"\K[^"]+' "${appPath}/package.json")"
+meteorClientEntrypoint="$(sed -n 's/.*"client":\s*"\([^"]*\)".*/\1/p' "${appPath}/package.json")"
+meteorServerEntrypoint="$(sed -n 's/.*"server":\s*"\([^"]*\)".*/\1/p' "${appPath}/package.json")"
 logFile="${logDir}/${logName}-${app}-bundle.log"
 monitorSize="${METEOR_BUNDLE_SIZE}"
 
@@ -462,7 +462,7 @@ function triggerExit() {
   builtin cd ${baseDir};
 
   killProcessByPort "${appPort}"
-  kill -KILL -- -$$ >/dev/null
+  kill -KILL $(ps -o pgid= -p $$ | grep -o '[0-9]*') >/dev/null
 
   exit 1
 }
