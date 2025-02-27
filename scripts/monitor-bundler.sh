@@ -474,6 +474,8 @@ function cleanup() {
 
   sleep 2
 
+  logMessage
+
   DISABLE_COLORS=true logScriptInfo
   DISABLE_COLORS=true logNpmPackages
   DISABLE_COLORS=true logMeteorPackages
