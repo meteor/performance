@@ -150,6 +150,10 @@ function formatToEnv() {
   echo "${str}"
 }
 
+function sedi() {
+  sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
+}
+
 function isRunningUrl() {
   local url="${1}"
   local urlStatus="$(curl -Is "${url}" | head -1)"
@@ -216,7 +220,7 @@ function visualizeMeteorAppBundle() {
 
 function removeMeteorAppBundleVisualizer() {
   METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} remove bundle-visualizer
-  sed -i '/bundle-visualizer/d' "${appPath}/.meteor/versions"
+  sedi '/bundle-visualizer/d' "${appPath}/.meteor/versions"
 }
 
 function runScriptHelper() {
@@ -406,7 +410,7 @@ function appendLine() {
 }
 
 function removeLastLine() {
-    sed -i '$ d' "$1"
+    sedi '$ d' "$1"
 }
 
 function formatFile() {
