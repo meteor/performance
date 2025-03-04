@@ -281,22 +281,8 @@ function sedr() {
   sed -r -- "$@"
 }
 
-function formatKebabCase() {
-  local str="${1}"
-  str=$(echo ${str} | sedr 's/([A-Z])/-\1/g')
-  str=$(echo ${str} | sedr 's/ /-/g')
-  str=$(echo ${str} | sedr 's/@/-/g')
-  str=$(echo ${str} | sedr 's/\//-/g')
-  str=$(echo ${str} | sedr 's/:/-/g')
-  str=$(echo ${str} | sedr 's/\./-/g')
-  str=$(echo ${str} | sedr 's/_/-/g')
-  str=$(echo ${str} | sedr 's/-+/-/g')
-  echo "${str}" | tr '[:upper:]' '[:lower:]'
-}
-
-function formatCamelCase() {
-  local str="${1}"
-  formatKebabCase "${str}" | sedr 's/(-)([a-z])/\U\2/g'
+function formatEnvCase() {
+  ${meteorCmd} node -e "console.log(\"${1}\".replace(/\s+(.)/g, (match, group1) => group1.toUpperCase()).replace(/\s+/g, ''))"
 }
 
 function isOSX() {
@@ -383,7 +369,7 @@ function reportStageMetrics() {
   done <<< "${metrics}"
 
   logMessage " * Total: ${totalNum} ${unit}"
-  logMessage " * Total Process: $(eval "echo \${$(formatCamelCase "${stage}ProcessTime")}") ms"
+  logMessage " * Total Process: $(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}") ms"
 }
 
 function reportMetrics() {
