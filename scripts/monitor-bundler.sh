@@ -51,6 +51,21 @@ YELLOW='\033[0;33m'
 GREY='\033[0;37m'
 NC='\033[0m'
 
+function getMeteorNodeCmd() {
+  local meteorNodeCmd
+  if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
+    meteorNodeCmd="${METEOR_CHECKOUT_PATH}/dev_bundle/bin/node"
+  else
+    meteorNodeCmd="${meteorCmd} node"
+    local meteorPath="$(dirname $(readlink -f "$(which meteor)"))"
+    # Try use node built-in directly to avoid delay on running "meteor node"
+    if [[ -f "${meteorPath}/dev_bundle/bin/node" ]]; then
+      meteorNodeCmd="${meteorPath}/dev_bundle/bin/node"
+    fi
+  fi
+  echo "${meteorNodeCmd}"
+}
+
 function logMessage() {
   echo -e "${1}"
 }
@@ -229,7 +244,7 @@ function runScriptHelper() {
   if [[ "${scriptContext}" =~ "./" ]]; then
     scriptContext="${baseDir}/${scriptContext}"
   fi
-  ${meteorCmd} node "${scriptContext}/helpers/${script}" ${@:2}
+  $(getMeteorNodeCmd) "${scriptContext}/helpers/${script}" ${@:2}
 }
 
 function calculateMeteorAppBundleSize() {
@@ -256,7 +271,7 @@ function logNpmPackages() {
   logBanner "==============================="
   logBanner " Npm packages"
   logBanner "==============================="
-  $meteorCmd node -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
+  $(getMeteorNodeCmd) -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
     | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
   logBanner "==============================="
 }
@@ -282,7 +297,7 @@ function sedr() {
 }
 
 function formatEnvCase() {
-  ${meteorCmd} node -e "console.log(\"${1}\".replace(/\s+(.)/g, (match, group1) => group1.toUpperCase()).replace(/\s+/g, ''))"
+  $(getMeteorNodeCmd) -e "console.log(\"${1}\".replace(/\s+(.)/g, (match, group1) => group1.toUpperCase()).replace(/\s+/g, ''))"
 }
 
 function isOSX() {
@@ -290,11 +305,7 @@ function isOSX() {
 }
 
 function getTime() {
-  if isOSX; then
-    echo $(date +%s)000
-  else
-    date +%s%3N
-  fi
+  $(getMeteorNodeCmd) -e "console.log(new Date().getTime())"
 }
 
 function findSecondPattern() {
@@ -516,6 +527,8 @@ builtin cd "${appPath}"
 
 logScriptInfo
 logMeteorVersion
+logMessage "Node cmd: $(getMeteorNodeCmd)"
+
 killProcessByPort "${appPort}"
 
 logProgress " * Profiling \"Cold start\"..."
