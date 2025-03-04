@@ -33,8 +33,7 @@ if [[ -d "$appResolved" ]]; then
 else
   METEOR_PACKAGE_DIRS="${baseDir}/packages"
 fi
-meteorClientEntrypoint="$(sed -n 's/.*"client":\s*"\([^"]*\)".*/\1/p' "${appPath}/package.json")"
-meteorServerEntrypoint="$(sed -n 's/.*"server":\s*"\([^"]*\)".*/\1/p' "${appPath}/package.json")"
+
 logFile="${logDir}/${logName}-${app}-bundle.log"
 monitorSize="${METEOR_BUNDLE_SIZE}"
 
@@ -220,12 +219,17 @@ function removeMeteorAppBundleVisualizer() {
   sed -i '/bundle-visualizer/d' "${appPath}/.meteor/versions"
 }
 
-function calculateMeteorAppBundleSize() {
+function runScriptHelper() {
+  local script="${1}"
   local scriptContext="$(dirname $0)"
   if [[ "${scriptContext}" =~ "./" ]]; then
     scriptContext="${baseDir}/${scriptContext}"
   fi
-  MONITOR_SIZE_URL="http://localhost:${appPort}/__meteor__/bundle-visualizer/stats" ${meteorCmd} node "${scriptContext}/helpers/print-bundle-size.js"
+  ${meteorCmd} node "${scriptContext}/helpers/${script}" ${@:2}
+}
+
+function calculateMeteorAppBundleSize() {
+  MONITOR_SIZE_URL="http://localhost:${appPort}/__meteor__/bundle-visualizer/stats" runScriptHelper "print-bundle-size.js"
 }
 
 function logMeteorVersion() {
@@ -498,6 +502,8 @@ function cleanup() {
 }
 trap cleanup SIGINT SIGTERM
 
+meteorClientEntrypoint="$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")"
+meteorServerEntrypoint="$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")"
 
 loadEnv "${baseDir}/.env"
 
@@ -544,6 +550,7 @@ logProgress " * Profiling \"Rebuild client\"..."
 logMessage "==============================="
 logMessage "[Rebuild client]"
 logMessage "==============================="
+logMessage "Client entrypoint: ${meteorClientEntrypoint}"
 start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
@@ -564,6 +571,7 @@ logProgress " * Profiling \"Rebuild server\"..."
 logMessage "==============================="
 logMessage "[Rebuild server]"
 logMessage "==============================="
+logMessage "Server entrypoint: ${meteorServerEntrypoint}"
 start_time_ms=$(date +%s%3N)
 startMeteorApp
 waitMeteorApp
