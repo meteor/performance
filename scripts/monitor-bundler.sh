@@ -299,6 +299,18 @@ function formatCamelCase() {
   formatKebabCase "${str}" | sedr 's/(-)([a-z])/\U\2/g'
 }
 
+function isOSX() {
+  [[ "$OSTYPE" == "darwin"* ]]
+}
+
+function getTime() {
+  if isOSX; then
+    date +%s
+  else
+    date +%s%3N
+  fi
+}
+
 function findSecondPattern() {
   local file="${1}"
   local first_pattern="${2}"
@@ -526,10 +538,10 @@ logMessage "==============================="
 logMessage "[Cold start]"
 logMessage "==============================="
 rm -rf "${appPath}/.meteor/local"
-start_time_ms=$(date +%s%3N)
+start_time_ms=$(getTime)
 startMeteorApp
 waitMeteorApp
-end_time_ms=$(date +%s%3N)
+end_time_ms=$(getTime)
 total_sleep_ms=1000 # sleep leftovers
 ColdStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
@@ -540,10 +552,10 @@ logProgress " * Profiling \"Cache start\"..."
 logMessage "==============================="
 logMessage "[Cache start]"
 logMessage "==============================="
-start_time_ms=$(date +%s%3N)
+start_time_ms=$(getTime)
 startMeteorApp
 waitMeteorApp
-end_time_ms=$(date +%s%3N)
+end_time_ms=$(getTime)
 total_sleep_ms=1000 # sleep leftovers
 CacheStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
@@ -555,7 +567,7 @@ logMessage "==============================="
 logMessage "[Rebuild client]"
 logMessage "==============================="
 logMessage "Client entrypoint: ${meteorClientEntrypoint}"
-start_time_ms=$(date +%s%3N)
+start_time_ms=$(getTime)
 startMeteorApp
 waitMeteorApp
 appendLine "console.log('new line')" "${meteorClientEntrypoint}"
@@ -564,7 +576,7 @@ waitMeteorApp
 removeLastLine "${meteorClientEntrypoint}"
 waitMeteorClientModified "#2"
 waitMeteorApp
-end_time_ms=$(date +%s%3N)
+end_time_ms=$(getTime)
 total_sleep_ms=5000 # sleep leftovers
 RebuildClientProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
@@ -576,7 +588,7 @@ logMessage "==============================="
 logMessage "[Rebuild server]"
 logMessage "==============================="
 logMessage "Server entrypoint: ${meteorServerEntrypoint}"
-start_time_ms=$(date +%s%3N)
+start_time_ms=$(getTime)
 startMeteorApp
 waitMeteorApp
 appendLine "console.log('new line')" "${meteorServerEntrypoint}"
@@ -585,7 +597,7 @@ waitMeteorApp
 removeLastLine "${meteorServerEntrypoint}"
 waitMeteorServerModified "#2"
 waitMeteorApp
-end_time_ms=$(date +%s%3N)
+end_time_ms=$(getTime)
 total_sleep_ms=5000 # sleep leftovers
 RebuildServerProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
 killProcessByPort "${appPort}"
@@ -597,11 +609,11 @@ if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep 
   logMessage "==============================="
   logMessage "[Visualize bundle]"
   logMessage "==============================="
-  start_time_ms=$(date +%s%3N)
+  start_time_ms=$(getTime)
   visualizeMeteorAppBundle
   waitMeteorApp
   BundleSize=$(calculateMeteorAppBundleSize)
-  end_time_ms=$(date +%s%3N)
+  end_time_ms=$(getTime)
   total_sleep_ms=1000 # sleep leftovers
   VisualizeBundleProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
   killProcessByPort "${appPort}"
