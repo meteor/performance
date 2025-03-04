@@ -379,8 +379,8 @@ function reportStageMetrics() {
     ((totalNum += num))
   done <<< "${metrics}"
 
-  logMessage " * Total: ${totalNum} ${unit}"
-  logMessage " * Total Process: $(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}") ms"
+  logMessage " * Total(Meteor): ${totalNum} ${unit}"
+  # logMessage " * Total Process: $(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}") ms"
 }
 
 function reportMetrics() {
@@ -541,8 +541,7 @@ start_time_ms=$(getTime)
 startMeteorApp
 waitMeteorApp
 end_time_ms=$(getTime)
-total_sleep_ms=1000 # sleep leftovers
-ColdStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
+ColdStartProcessTime=$((end_time_ms - start_time_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
@@ -555,8 +554,7 @@ start_time_ms=$(getTime)
 startMeteorApp
 waitMeteorApp
 end_time_ms=$(getTime)
-total_sleep_ms=1000 # sleep leftovers
-CacheStartProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
+CacheStartProcessTime=$((end_time_ms - start_time_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
@@ -576,8 +574,7 @@ removeLastLine "${meteorClientEntrypoint}"
 waitMeteorClientModified "#2"
 waitMeteorApp
 end_time_ms=$(getTime)
-total_sleep_ms=5000 # sleep leftovers
-RebuildClientProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
+RebuildClientProcessTime=$((end_time_ms - start_time_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
@@ -597,8 +594,7 @@ removeLastLine "${meteorServerEntrypoint}"
 waitMeteorServerModified "#2"
 waitMeteorApp
 end_time_ms=$(getTime)
-total_sleep_ms=5000 # sleep leftovers
-RebuildServerProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
+RebuildServerProcessTime=$((end_time_ms - start_time_ms))
 killProcessByPort "${appPort}"
 sleep 2
 
@@ -613,8 +609,7 @@ if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep 
   waitMeteorApp
   BundleSize=$(calculateMeteorAppBundleSize)
   end_time_ms=$(getTime)
-  total_sleep_ms=1000 # sleep leftovers
-  VisualizeBundleProcessTime=$((end_time_ms - start_time_ms - total_sleep_ms))
+  VisualizeBundleProcessTime=$((end_time_ms - start_time_ms))
   killProcessByPort "${appPort}"
   sleep 2
   removeMeteorAppBundleVisualizer
