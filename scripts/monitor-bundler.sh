@@ -305,7 +305,7 @@ function isOSX() {
 }
 
 function getTime() {
-  $(getMeteorNodeCmd) -e "console.log(new Date().getTime())"
+  $(getMeteorNodeCmd) -e "console.log(String(Date.now()).trim())"
 }
 
 function findSecondPattern() {
