@@ -291,7 +291,7 @@ function isOSX() {
 
 function getTime() {
   if isOSX; then
-    date +%s
+    echo $(date +%s)000
   else
     date +%s%3N
   fi
