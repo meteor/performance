@@ -520,7 +520,7 @@ meteorServerEntrypoint="$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}
 
 loadEnv "${baseDir}/.env"
 
-monitorErrorsAndTimeout "${logFile}" 2 60 &
+monitorErrorsAndTimeout "${logFile}" 2 ${METEOR_IDLE_TIMEOUT:-90} &
 
 # Prepare, run and wait meteor app
 builtin cd "${appPath}"
