@@ -42,6 +42,41 @@ The process will take some time, and the logs are updated live at `./logs`.
 
 Your machine might struggle with the default artillery configuration, but it should still reveal performance differences between the tests. Adjust the configuration as needed by learning from [artillery.io options](https://www.artillery.io/docs).
 
+### Visualizing Results
+
+After running the monitoring script, you get several outputs to analyze the benchmark results:
+
+1. **Log Files**: Plain text logs are generated in the `./logs/<log-context>-<app>-<script>.log` directory.
+
+2. **JSON Reports**: Performance data is saved as JSON in `./reports/<log-context>-<app>-<script>.json`.
+
+3. **HTML Reports**: Interactive visual reports are automatically generated at `./reports/<log-context>-<app>-<script>.html`. These reports include:
+   - Visual graphs of response times
+   - Request rates
+   - HTTP codes
+   - Latency distributions
+   - Other Artillery metrics
+
+   <img src="./assets/local-html.png" alt="HTML Report Example" width="800">
+
+To view the HTML report, simply open it in any web browser:
+
+```shell
+open ./reports/<log-context>-<app>-<script>.html
+```
+
+4. **Artillery Cloud Integration**: If you provide an Artillery Cloud API key as a fourth parameter, results are also sent to Artillery's cloud dashboard:
+
+```shell
+./scripts/monitor.sh <app> <artillery-script> <log-context> <artillery-key>
+```
+
+Artillery Cloud offers a free tier that allows you to compare multiple test executions side by side, making it easier to track performance changes over time or between different Meteor versions.
+
+<img src="./assets/cloud-artillery-compare.png" alt="Artillery Cloud Comparison" width="800">
+
+These visualization options make it easier to identify performance bottlenecks and compare different Meteor versions.
+
 You can analyze performance using a Meteor checkout. This allows you to quickly measure the impact of ongoing changes and ensure consistent or improved performance.
 
 ```shell
