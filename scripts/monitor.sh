@@ -6,9 +6,19 @@
 app="${1}"
 script="${2}"
 logName="${3:-''}"
+artilleryKey="${4:-''}"
+
 if [[ -z "$app" ]] || [[ -z "$script" ]]; then
-  echo "Usage: monitor.sh <app_name> <script_name>"
+  echo "Usage: monitor.sh <app_name> <script_name> [log_name] [artillery_key]"
+  echo "  artillery_key: Optional - Your Artillery Cloud API key to send results to Artillery Cloud"
   exit 1;
+fi
+
+# Determine if we should use Artillery Cloud
+useCloud="false"
+if [[ -n "${artilleryKey}" ]]; then
+  useCloud="true"
+  echo "Artillery Cloud key provided - results will be sent to Artillery Cloud"
 fi
 
 # Redirect stdout (1) and stderr (2) to a file
@@ -21,6 +31,12 @@ baseDir="${PWD}"
 appsDir="${baseDir}/apps"
 appPath="${appsDir}/${app}"
 appPort=3000
+reportDir="${baseDir}/reports"
+jsonReport="${reportDir}/${logName}-${app}-${script}.json"
+htmlReport="${reportDir}/${logName}-${app}-${script}.html"
+
+# Create reports directory if it doesn't exist
+mkdir -p "${reportDir}"
 
 # Define color codes
 RED='\033[0;31m'
@@ -82,7 +98,7 @@ function logScriptConfig() {
   echo -e "==============================="
   echo -e " Artillery Configuration - $(date) "
   echo -e "==============================="
-  cat "${baseDir}/artillery/${script}"
+  cat "${baseDir}/artillery/${script}.yml"
   echo -e "==============================="
 }
 
@@ -127,6 +143,16 @@ function cleanup() {
       else
         echo -e "${GREEN}Output is suitable for comparisons (${logFile})${NC}"
         echo -e "${GREEN} Your machine managed the configuration correctly.${NC}"
+        
+        if [[ -f "${htmlReport}" ]]; then
+          echo -e "${GREEN}HTML report was generated successfully at: ${htmlReport}${NC}"
+        else
+          echo -e "${RED}Warning: HTML report was not generated${NC}"
+        fi
+
+        if [[ "${useCloud}" == "true" ]]; then
+          echo -e "${GREEN}Results were sent to Artillery Cloud. Check your dashboard at https://artillery.io/cloud${NC}"
+        fi
 
         exit 0
       fi
@@ -164,7 +190,13 @@ echo "APP PID: ${appPid}"
 echo "DB PID: ${dbPid}"
 
 # Run artillery script
-npx artillery run "${baseDir}/artillery/${script}" &
+if [[ "${useCloud}" == "true" ]]; then
+  echo "Running Artillery with Cloud integration..."
+  npx artillery run "${baseDir}/artillery/${script}.yml" --record --key "${artilleryKey}" --output "${jsonReport}" &
+else
+  echo "Running Artillery locally..."
+  npx artillery run "${baseDir}/artillery/${script}.yml" --output "${jsonReport}" &
+fi
 artPid="$!"
 
 # Run CPU and RAM monitoring for meteor app and db
@@ -179,5 +211,10 @@ echo "Monitor CpuRam DB Pid ${cpuRamDbPid}"
 
 # Wait for artillery script to finish the process
 wait "${artPid}"
+
+# Generate HTML report
+echo "Generating HTML report..."
+npx artillery report "${jsonReport}" --output "${htmlReport}"
+echo "HTML report generated at: ${htmlReport}"
 
 cleanup "true"
