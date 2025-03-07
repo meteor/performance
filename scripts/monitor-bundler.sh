@@ -226,11 +226,11 @@ function waitMeteorServerModified() {
 }
 
 function startMeteorApp() {
-  METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run ${meteorOptions} &
+  METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run ${meteorOptions} &
 }
 
 function visualizeMeteorAppBundle() {
-  METEOR_PROFILE=1 METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} --extra-packages bundle-visualizer --production ${meteorOptions} &
+  METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} --extra-packages bundle-visualizer --production ${meteorOptions} &
 }
 
 function removeMeteorAppBundleVisualizer() {
