@@ -536,7 +536,7 @@ logProgress " * Profiling \"Cold start\"..."
 logMessage "==============================="
 logMessage "[Cold start]"
 logMessage "==============================="
-rm -rf "${appPath}/.meteor/local"
+${meteorCmd} reset
 start_time_ms=$(getTime)
 startMeteorApp
 waitMeteorApp
