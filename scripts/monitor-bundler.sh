@@ -564,7 +564,7 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   logMessage "==============================="
   logMessage "[Cold start]"
   logMessage "==============================="
-  ${meteorCmd} reset
+  ${meteorCmd} reset --skip-cache
   start_time_ms=$(getTime)
   startMeteorApp
   waitMeteorApp
