@@ -531,7 +531,6 @@ meteorClientEntrypoint="${METEOR_CLIENT_ENTRYPOINT:-$(runScriptHelper "get-meteo
 meteorServerEntrypoint="${METEOR_SERVER_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")}"
 
 if [[ "${monitorSizeOnly}" != "true" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
-
   # Restore original stdout and stderr
   exec 1>&3 2>&4
 
