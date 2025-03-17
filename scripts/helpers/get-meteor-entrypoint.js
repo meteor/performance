@@ -3,7 +3,9 @@ const fs = require('fs');
 function getMeteorEntrypoint(appPath, clientOrServer = 'client') {
   const rawData = fs.readFileSync(`${appPath}/package.json`);
   const jsonData = JSON.parse(rawData);
-  return `${appPath}/${jsonData?.meteor?.mainModule?.[clientOrServer]}`;
+  const entrypoint = jsonData?.meteor?.mainModule?.[clientOrServer];
+  if (!entrypoint) return '';
+  return `${appPath}/${entrypoint}`;
 }
 
 // Check if script is run directly

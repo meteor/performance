@@ -34,8 +34,19 @@ else
   METEOR_PACKAGE_DIRS="${baseDir}/packages"
 fi
 
+if [[ -n "${METEOR_LOG_DIR}" ]] && [[ "${METEOR_LOG_DIR}" == "/"* ]]; then
+  logDir="${METEOR_LOG_DIR}"
+elif [[ -n "${METEOR_LOG_DIR}" ]] && [[ "${METEOR_LOG_DIR}" == "~"* ]]; then
+  logDir="${METEOR_LOG_DIR}"
+elif [[ -n "${METEOR_LOG_DIR}" ]] && [[ -d "$appResolved" ]]; then
+  logDir="${appPath}/${METEOR_LOG_DIR}"
+elif [[ -n "${METEOR_LOG_DIR}" ]]; then
+  logDir="${baseDir}/${METEOR_LOG_DIR}"
+fi
+
 logFile="${logDir}/${logName}-${app}-bundle.log"
-monitorSize="${METEOR_BUNDLE_SIZE}"
+monitorSize="${METEOR_BUNDLE_SIZE:-${METEOR_BUNDLE_SIZE_ONLY}}"
+monitorSizeOnly="${METEOR_BUNDLE_SIZE_ONLY}"
 
 meteorCmd="meteor"
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
@@ -271,8 +282,7 @@ function logNpmPackages() {
   logBanner "==============================="
   logBanner " Npm packages"
   logBanner "==============================="
-  $(getMeteorNodeCmd) -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
-    | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
+  runScriptHelper "print-meteor-packages.js" "${appPath}" "npm"
   logBanner "==============================="
 }
 
@@ -280,7 +290,7 @@ function logMeteorPackages() {
   logBanner "==============================="
   logBanner " Meteor packages"
   logBanner "==============================="
-  logMessage " $(formatFile "${appPath}/.meteor/versions")"
+  runScriptHelper "print-meteor-packages.js" "${appPath}" "atmosphere"
   logBanner "==============================="
 }
 
@@ -384,10 +394,12 @@ function reportStageMetrics() {
 }
 
 function reportMetrics() {
-  reportStageMetrics "Cold start"
-  reportStageMetrics "Cache start"
-  reportStageMetrics "Rebuild client"
-  reportStageMetrics "Rebuild server"
+  if [[ "${monitorSizeOnly}" != "true" ]]; then
+    reportStageMetrics "Cold start"
+    reportStageMetrics "Cache start"
+    reportStageMetrics "Rebuild client"
+    reportStageMetrics "Rebuild server"
+  fi
 
   if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
     reportStageMetrics "Visualize bundle"
@@ -515,8 +527,23 @@ function cleanup() {
 }
 trap cleanup SIGINT SIGTERM
 
-meteorClientEntrypoint="$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")"
-meteorServerEntrypoint="$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")"
+meteorClientEntrypoint="${METEOR_CLIENT_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")}"
+meteorServerEntrypoint="${METEOR_SERVER_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")}"
+
+if [[ "${monitorSizeOnly}" != "true" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
+  # Restore original stdout and stderr
+  exec 1>&3 2>&4
+
+  logError "==============================="
+  logError " Not detected entrypoint files"
+  logError " Please set the environment variables METEOR_CLIENT_ENTRYPOINT and METEOR_SERVER_ENTRYPOINT"
+  logError "==============================="
+
+  # Close the saved file descriptors
+  exec 3>&- 4>&-
+
+  exit 1
+fi
 
 loadEnv "${baseDir}/.env"
 
@@ -531,72 +558,74 @@ logMessage "Node cmd: $(getMeteorNodeCmd)"
 
 killProcessByPort "${appPort}"
 
-logProgress " * Profiling \"Cold start\"..."
+if [[ "${monitorSizeOnly}" != "true" ]]; then
+  logProgress " * Profiling \"Cold start\"..."
 
-logMessage "==============================="
-logMessage "[Cold start]"
-logMessage "==============================="
-${meteorCmd} reset
-start_time_ms=$(getTime)
-startMeteorApp
-waitMeteorApp
-end_time_ms=$(getTime)
-ColdStartProcessTime=$((end_time_ms - start_time_ms))
-killProcessByPort "${appPort}"
-sleep 2
+  logMessage "==============================="
+  logMessage "[Cold start]"
+  logMessage "==============================="
+  ${meteorCmd} reset --skip-cache
+  start_time_ms=$(getTime)
+  startMeteorApp
+  waitMeteorApp
+  end_time_ms=$(getTime)
+  ColdStartProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
 
-logProgress " * Profiling \"Cache start\"..."
+  logProgress " * Profiling \"Cache start\"..."
 
-logMessage "==============================="
-logMessage "[Cache start]"
-logMessage "==============================="
-start_time_ms=$(getTime)
-startMeteorApp
-waitMeteorApp
-end_time_ms=$(getTime)
-CacheStartProcessTime=$((end_time_ms - start_time_ms))
-killProcessByPort "${appPort}"
-sleep 2
+  logMessage "==============================="
+  logMessage "[Cache start]"
+  logMessage "==============================="
+  start_time_ms=$(getTime)
+  startMeteorApp
+  waitMeteorApp
+  end_time_ms=$(getTime)
+  CacheStartProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
 
-logProgress " * Profiling \"Rebuild client\"..."
+  logProgress " * Profiling \"Rebuild client\"..."
 
-logMessage "==============================="
-logMessage "[Rebuild client]"
-logMessage "==============================="
-logMessage "Client entrypoint: ${meteorClientEntrypoint}"
-start_time_ms=$(getTime)
-startMeteorApp
-waitMeteorApp
-appendLine "console.log('new line')" "${meteorClientEntrypoint}"
-waitMeteorClientModified "#1"
-waitMeteorApp
-removeLastLine "${meteorClientEntrypoint}"
-waitMeteorClientModified "#2"
-waitMeteorApp
-end_time_ms=$(getTime)
-RebuildClientProcessTime=$((end_time_ms - start_time_ms))
-killProcessByPort "${appPort}"
-sleep 2
+  logMessage "==============================="
+  logMessage "[Rebuild client]"
+  logMessage "==============================="
+  logMessage "Client entrypoint: ${meteorClientEntrypoint}"
+  start_time_ms=$(getTime)
+  startMeteorApp
+  waitMeteorApp
+  appendLine "console.log('new line')" "${meteorClientEntrypoint}"
+  waitMeteorClientModified "#1"
+  waitMeteorApp
+  removeLastLine "${meteorClientEntrypoint}"
+  waitMeteorClientModified "#2"
+  waitMeteorApp
+  end_time_ms=$(getTime)
+  RebuildClientProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
 
-logProgress " * Profiling \"Rebuild server\"..."
+  logProgress " * Profiling \"Rebuild server\"..."
 
-logMessage "==============================="
-logMessage "[Rebuild server]"
-logMessage "==============================="
-logMessage "Server entrypoint: ${meteorServerEntrypoint}"
-start_time_ms=$(getTime)
-startMeteorApp
-waitMeteorApp
-appendLine "console.log('new line')" "${meteorServerEntrypoint}"
-waitMeteorServerModified "#1"
-waitMeteorApp
-removeLastLine "${meteorServerEntrypoint}"
-waitMeteorServerModified "#2"
-waitMeteorApp
-end_time_ms=$(getTime)
-RebuildServerProcessTime=$((end_time_ms - start_time_ms))
-killProcessByPort "${appPort}"
-sleep 2
+  logMessage "==============================="
+  logMessage "[Rebuild server]"
+  logMessage "==============================="
+  logMessage "Server entrypoint: ${meteorServerEntrypoint}"
+  start_time_ms=$(getTime)
+  startMeteorApp
+  waitMeteorApp
+  appendLine "console.log('new line')" "${meteorServerEntrypoint}"
+  waitMeteorServerModified "#1"
+  waitMeteorApp
+  removeLastLine "${meteorServerEntrypoint}"
+  waitMeteorServerModified "#2"
+  waitMeteorApp
+  end_time_ms=$(getTime)
+  RebuildServerProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
+fi
 
 if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
   logProgress " * Profiling \"Visualize bundle\"..."

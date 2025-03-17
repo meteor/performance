@@ -21,26 +21,38 @@ function calculateSize(node) {
   }
 
   if (node.type === 'package') {
-    packageSizes.push(`- Total ${node.name} size: ${totalSize}`);
+    packageSizes.push([node.name, totalSize]);
   }
 
   return { totalSize, packageSizes };
 }
 
 function processRoot(node) {
+  let sizeSummary = {};
   if (node.children && node.children.length > 0) {
     for (let child of node.children) {
       if (child.type === 'bundle') {
+
         // Calculate the size of each "bundle" and print its total size
         const { totalSize: childSize, packageSizes } = calculateSize(child);
 
-        console.log(`Total ${child.name} size: ${childSize} (${(childSize / 1000 / 1000).toFixed(2)} MB)`);
+        sizeSummary['Total Size'] = {
+          ...(sizeSummary['Total Size'] || {}),
+          [child.name]: `${childSize} (${(childSize / 1000 / 1000).toFixed(2)} MB)`
+        };
 
         // Print the breakdown of package sizes under this bundle
-        packageSizes.forEach(size => console.log(size));
+        packageSizes.forEach(([packageName, size]) => {
+          sizeSummary[packageName] = {
+            ...(sizeSummary[packageName] || {}),
+            [child.name]: size != null ? `${size} (${(size / 1000).toFixed(2)} KB)` : '-',
+          };
+        });
       }
     }
   }
+
+  return sizeSummary;
 }
 
 const https = require('https');
@@ -82,7 +94,8 @@ function fetchData() {
 async function main() {
   try {
     const data = await fetchData();
-    processRoot(data);
+    const sizeSummary = processRoot(data);
+    console.table(sizeSummary);
   } catch (error) {
     console.error('Error fetching data:', error);
   }
