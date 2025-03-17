@@ -530,6 +530,22 @@ trap cleanup SIGINT SIGTERM
 meteorClientEntrypoint="${METEOR_CLIENT_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")}"
 meteorServerEntrypoint="${METEOR_SERVER_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")}"
 
+if [[ "${monitorSizeOnly}" != "true" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
+
+  # Restore original stdout and stderr
+  exec 1>&3 2>&4
+
+  logError "==============================="
+  logError " Not detected entrypoint files"
+  logError " Please set the environment variables METEOR_CLIENT_ENTRYPOINT and METEOR_SERVER_ENTRYPOINT"
+  logError "==============================="
+
+  # Close the saved file descriptors
+  exec 3>&- 4>&-
+
+  exit 1
+fi
+
 loadEnv "${baseDir}/.env"
 
 monitorErrorsAndTimeout "${logFile}" 2 ${METEOR_IDLE_TIMEOUT:-90} &
