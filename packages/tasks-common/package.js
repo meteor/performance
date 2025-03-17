@@ -13,7 +13,7 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('2.16');
   api.use('ecmascript');
-  api.mainModule('tasks-common.client.js', ['client']);
+  api.mainModule('tasks-common.client.jsx', ['client']);
   api.mainModule('tasks-common.server.js', ['server']);
 });
 
