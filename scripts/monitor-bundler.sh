@@ -45,7 +45,8 @@ elif [[ -n "${METEOR_LOG_DIR}" ]]; then
 fi
 
 logFile="${logDir}/${logName}-${app}-bundle.log"
-monitorSize="${METEOR_BUNDLE_SIZE}"
+monitorSize="${METEOR_BUNDLE_SIZE:-${METEOR_BUNDLE_SIZE_ONLY}}"
+monitorSizeOnly="${METEOR_BUNDLE_SIZE_ONLY}"
 
 meteorCmd="meteor"
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
@@ -393,10 +394,12 @@ function reportStageMetrics() {
 }
 
 function reportMetrics() {
-  reportStageMetrics "Cold start"
-  reportStageMetrics "Cache start"
-  reportStageMetrics "Rebuild client"
-  reportStageMetrics "Rebuild server"
+  if [[ "${monitorSizeOnly}" != "true" ]]; then
+    reportStageMetrics "Cold start"
+    reportStageMetrics "Cache start"
+    reportStageMetrics "Rebuild client"
+    reportStageMetrics "Rebuild server"
+  fi
 
   if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
     reportStageMetrics "Visualize bundle"
@@ -540,72 +543,74 @@ logMessage "Node cmd: $(getMeteorNodeCmd)"
 
 killProcessByPort "${appPort}"
 
-logProgress " * Profiling \"Cold start\"..."
+if [[ "${monitorSizeOnly}" != "true" ]]; then
+  logProgress " * Profiling \"Cold start\"..."
 
-logMessage "==============================="
-logMessage "[Cold start]"
-logMessage "==============================="
-${meteorCmd} reset
-start_time_ms=$(getTime)
-startMeteorApp
-waitMeteorApp
-end_time_ms=$(getTime)
-ColdStartProcessTime=$((end_time_ms - start_time_ms))
-killProcessByPort "${appPort}"
-sleep 2
+  logMessage "==============================="
+  logMessage "[Cold start]"
+  logMessage "==============================="
+  ${meteorCmd} reset
+  start_time_ms=$(getTime)
+  startMeteorApp
+  waitMeteorApp
+  end_time_ms=$(getTime)
+  ColdStartProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
 
-logProgress " * Profiling \"Cache start\"..."
+  logProgress " * Profiling \"Cache start\"..."
 
-logMessage "==============================="
-logMessage "[Cache start]"
-logMessage "==============================="
-start_time_ms=$(getTime)
-startMeteorApp
-waitMeteorApp
-end_time_ms=$(getTime)
-CacheStartProcessTime=$((end_time_ms - start_time_ms))
-killProcessByPort "${appPort}"
-sleep 2
+  logMessage "==============================="
+  logMessage "[Cache start]"
+  logMessage "==============================="
+  start_time_ms=$(getTime)
+  startMeteorApp
+  waitMeteorApp
+  end_time_ms=$(getTime)
+  CacheStartProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
 
-logProgress " * Profiling \"Rebuild client\"..."
+  logProgress " * Profiling \"Rebuild client\"..."
 
-logMessage "==============================="
-logMessage "[Rebuild client]"
-logMessage "==============================="
-logMessage "Client entrypoint: ${meteorClientEntrypoint}"
-start_time_ms=$(getTime)
-startMeteorApp
-waitMeteorApp
-appendLine "console.log('new line')" "${meteorClientEntrypoint}"
-waitMeteorClientModified "#1"
-waitMeteorApp
-removeLastLine "${meteorClientEntrypoint}"
-waitMeteorClientModified "#2"
-waitMeteorApp
-end_time_ms=$(getTime)
-RebuildClientProcessTime=$((end_time_ms - start_time_ms))
-killProcessByPort "${appPort}"
-sleep 2
+  logMessage "==============================="
+  logMessage "[Rebuild client]"
+  logMessage "==============================="
+  logMessage "Client entrypoint: ${meteorClientEntrypoint}"
+  start_time_ms=$(getTime)
+  startMeteorApp
+  waitMeteorApp
+  appendLine "console.log('new line')" "${meteorClientEntrypoint}"
+  waitMeteorClientModified "#1"
+  waitMeteorApp
+  removeLastLine "${meteorClientEntrypoint}"
+  waitMeteorClientModified "#2"
+  waitMeteorApp
+  end_time_ms=$(getTime)
+  RebuildClientProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
 
-logProgress " * Profiling \"Rebuild server\"..."
+  logProgress " * Profiling \"Rebuild server\"..."
 
-logMessage "==============================="
-logMessage "[Rebuild server]"
-logMessage "==============================="
-logMessage "Server entrypoint: ${meteorServerEntrypoint}"
-start_time_ms=$(getTime)
-startMeteorApp
-waitMeteorApp
-appendLine "console.log('new line')" "${meteorServerEntrypoint}"
-waitMeteorServerModified "#1"
-waitMeteorApp
-removeLastLine "${meteorServerEntrypoint}"
-waitMeteorServerModified "#2"
-waitMeteorApp
-end_time_ms=$(getTime)
-RebuildServerProcessTime=$((end_time_ms - start_time_ms))
-killProcessByPort "${appPort}"
-sleep 2
+  logMessage "==============================="
+  logMessage "[Rebuild server]"
+  logMessage "==============================="
+  logMessage "Server entrypoint: ${meteorServerEntrypoint}"
+  start_time_ms=$(getTime)
+  startMeteorApp
+  waitMeteorApp
+  appendLine "console.log('new line')" "${meteorServerEntrypoint}"
+  waitMeteorServerModified "#1"
+  waitMeteorApp
+  removeLastLine "${meteorServerEntrypoint}"
+  waitMeteorServerModified "#2"
+  waitMeteorApp
+  end_time_ms=$(getTime)
+  RebuildServerProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
+fi
 
 if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
   logProgress " * Profiling \"Visualize bundle\"..."
