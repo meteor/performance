@@ -34,6 +34,16 @@ else
   METEOR_PACKAGE_DIRS="${baseDir}/packages"
 fi
 
+if [[ -n "${METEOR_LOG_DIR}" ]] && [[ "${METEOR_LOG_DIR}" == "/"* ]]; then
+  logDir="${METEOR_LOG_DIR}"
+elif [[ -n "${METEOR_LOG_DIR}" ]] && [[ "${METEOR_LOG_DIR}" == "~"* ]]; then
+  logDir="${METEOR_LOG_DIR}"
+elif [[ -n "${METEOR_LOG_DIR}" ]] && [[ -d "$appResolved" ]]; then
+  logDir="${appPath}/${METEOR_LOG_DIR}"
+elif [[ -n "${METEOR_LOG_DIR}" ]]; then
+  logDir="${baseDir}/${METEOR_LOG_DIR}"
+fi
+
 logFile="${logDir}/${logName}-${app}-bundle.log"
 monitorSize="${METEOR_BUNDLE_SIZE}"
 
