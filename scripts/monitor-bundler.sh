@@ -271,8 +271,7 @@ function logNpmPackages() {
   logBanner "==============================="
   logBanner " Npm packages"
   logBanner "==============================="
-  $(getMeteorNodeCmd) -p "Object.entries(Object.assign({}, require('${appPath}/package.json').dependencies, require('${appPath}/package.json').devDependencies)).map(([k,v]) => \`\${k}@\${v}\`).join('\n')" \
-    | awk '{ printf (NR%5 ? $0 " │ " : $0 "\n") } END { if (NR%5) print "" }'
+  runScriptHelper "print-meteor-packages.js" "${appPath}" "npm"
   logBanner "==============================="
 }
 
@@ -280,7 +279,7 @@ function logMeteorPackages() {
   logBanner "==============================="
   logBanner " Meteor packages"
   logBanner "==============================="
-  logMessage " $(formatFile "${appPath}/.meteor/versions")"
+  runScriptHelper "print-meteor-packages.js" "${appPath}" "atmosphere"
   logBanner "==============================="
 }
 
