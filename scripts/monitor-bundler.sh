@@ -515,8 +515,8 @@ function cleanup() {
 }
 trap cleanup SIGINT SIGTERM
 
-meteorClientEntrypoint="$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")"
-meteorServerEntrypoint="$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")"
+meteorClientEntrypoint="${METEOR_CLIENT_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")}"
+meteorServerEntrypoint="${METEOR_SERVER_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")}"
 
 loadEnv "${baseDir}/.env"
 
