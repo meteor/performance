@@ -395,8 +395,10 @@ function reportStageMetrics() {
   done <<< "${metrics}"
 
   logMessage " * Total(Meteor): ${totalNum} ${unit}"
-  local totalProcess="$(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}")"
-  logMessage " * Total(Process): ${totalProcess} ms (+$((totalProcess - totalNum)) ms)"
+  if [[ -n "${METEOR_MONITOR_PROCESS}" ]] && [[ "${METEOR_MONITOR_PROCESS}" == "true" ]]; then
+    local totalProcess="$(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}")"
+    logMessage " * Total(Process): ${totalProcess} ms (+$((totalProcess - totalNum)) ms)"
+  fi
 }
 
 function reportMetrics() {
