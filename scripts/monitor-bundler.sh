@@ -199,7 +199,7 @@ function waitMeteorApp() {
 }
 
 function waitMeteorClientModified() {
-  local context="waitMeteorClientModified::${1}"
+  local context="${1}"
   PROCESS_WAIT_TIMEOUT=3600000
   processWaitTimeoutSecs=$((PROCESS_WAIT_TIMEOUT / 1000))
   waitSecs=0
@@ -218,7 +218,7 @@ function waitMeteorClientModified() {
 }
 
 function waitMeteorServerModified() {
-  local context="waitMeteorServerModified::${1}"
+  local context="${1}"
   PROCESS_WAIT_TIMEOUT=3600000
   processWaitTimeoutSecs=$((PROCESS_WAIT_TIMEOUT / 1000))
   waitSecs=0
@@ -351,24 +351,29 @@ function findMetricStage() {
   local stage="${1}"
   local metric="${2}"
   local label="${3:-${metric}}"
-  read num unit <<< $(parseNumberAndUnit "$(findSecondPattern "${logFile}" "\[${stage}\]" "${metric}")")
+  read num unit <<< $(parseNumberAndUnit "$(findSecondPattern "${logFile}" "${stage}" "${metric}")")
   logMessage " - ${label}: ${num} ${unit}"
-
-  if [[ "${metric}" == *"Rebuild"* ]]; then
-    read num unit <<< $(parseNumberAndUnit "$(findSecondOccurrence "${logFile}" "\[${stage}\]" "${metric}")")
-    logMessage " - ${label}#2: ${num} ${unit}"
-  fi
 }
 
 function getMetricsStage() {
   local stage="${1}"
-  findMetricStage "${stage}" "\(ProjectContext resolveConstraints\)" "Meteor(resolveConstraints)"
-  findMetricStage "${stage}" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild)"
-  findMetricStage "${stage}" "\(Build App\)" "Meteor(Build App)"
-  findMetricStage "${stage}" "\(Server startup\)" "Meteor(Server startup)"
+  findMetricStage "\[${stage}\]" "\(ProjectContext resolveConstraints\)" "Meteor(resolveConstraints)"
+  findMetricStage "\[${stage}\]" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild)"
+  findMetricStage "\[${stage}\]" "\(Build App\)" "Meteor(Build App)"
+  findMetricStage "\[${stage}\]" "\(Server startup\)" "Meteor(Server startup)"
 
   if [[ "${stage}" == *"Rebuild"* ]]; then
-    findMetricStage "${stage}" "\(Rebuild App\)" "Meteor(Rebuild App)"
+    findMetricStage "${stage}#1" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild #1)"
+    findMetricStage "${stage}#1" "\(Rebuild App\)" "Meteor(Rebuild App #1)"
+    if [[ "${stage}" == *"server"* ]]; then
+      findMetricStage "${stage}#1" "\(Server startup\)" "Meteor(Server startup #1)"
+    fi
+
+    findMetricStage "${stage}#2" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild #2)"
+    findMetricStage "${stage}#2" "\(Rebuild App\)" "Meteor(Rebuild App #2)"
+    if [[ "${stage}" == *"server"* ]]; then
+      findMetricStage "${stage}#2" "\(Server startup\)" "Meteor(Server startup #2)"
+    fi
   fi
 }
 
@@ -390,7 +395,10 @@ function reportStageMetrics() {
   done <<< "${metrics}"
 
   logMessage " * Total(Meteor): ${totalNum} ${unit}"
-  # logMessage " * Total Process: $(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}") ms"
+  if [[ -n "${METEOR_MONITOR_PROCESS}" ]] && [[ "${METEOR_MONITOR_PROCESS}" == "true" ]]; then
+    local totalProcess="$(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}")"
+    logMessage " * Total(Process): ${totalProcess} ms (+$((totalProcess - totalNum)) ms)"
+  fi
 }
 
 function reportMetrics() {
@@ -599,10 +607,10 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   startMeteorApp
   waitMeteorApp
   appendLine "console.log('new line')" "${meteorClientEntrypoint}"
-  waitMeteorClientModified "#1"
+  waitMeteorClientModified "Rebuild client#1"
   waitMeteorApp
   removeLastLine "${meteorClientEntrypoint}"
-  waitMeteorClientModified "#2"
+  waitMeteorClientModified "Rebuild client#2"
   waitMeteorApp
   end_time_ms=$(getTime)
   RebuildClientProcessTime=$((end_time_ms - start_time_ms))
@@ -620,10 +628,10 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   startMeteorApp
   waitMeteorApp
   appendLine "console.log('new line')" "${meteorServerEntrypoint}"
-  waitMeteorServerModified "#1"
+  waitMeteorServerModified "Rebuild server#1"
   waitMeteorApp
   removeLastLine "${meteorServerEntrypoint}"
-  waitMeteorServerModified "#2"
+  waitMeteorServerModified "Rebuild server#2"
   waitMeteorApp
   end_time_ms=$(getTime)
   RebuildServerProcessTime=$((end_time_ms - start_time_ms))
