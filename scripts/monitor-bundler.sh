@@ -566,6 +566,7 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   logMessage "==============================="
   ${meteorCmd} reset --skip-cache
   start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="cold-start"
   startMeteorApp
   waitMeteorApp
   end_time_ms=$(getTime)
@@ -579,6 +580,7 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   logMessage "[Cache start]"
   logMessage "==============================="
   start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="cache-start"
   startMeteorApp
   waitMeteorApp
   end_time_ms=$(getTime)
@@ -593,6 +595,7 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   logMessage "==============================="
   logMessage "Client entrypoint: ${meteorClientEntrypoint}"
   start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="rebuild-client"
   startMeteorApp
   waitMeteorApp
   appendLine "console.log('new line')" "${meteorClientEntrypoint}"
@@ -613,6 +616,7 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   logMessage "==============================="
   logMessage "Server entrypoint: ${meteorServerEntrypoint}"
   start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="rebuild-server"
   startMeteorApp
   waitMeteorApp
   appendLine "console.log('new line')" "${meteorServerEntrypoint}"
@@ -634,6 +638,7 @@ if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep 
   logMessage "[Visualize bundle]"
   logMessage "==============================="
   start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="visualize-bundle"
   visualizeMeteorAppBundle
   waitMeteorApp
   BundleSize=$(calculateMeteorAppBundleSize)
@@ -644,4 +649,4 @@ if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep 
   removeMeteorAppBundleVisualizer
 fi
 
-cleanup
+cleanup 
