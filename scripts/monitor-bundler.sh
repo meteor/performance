@@ -92,7 +92,7 @@ function logProgress() {
 }
 
 function logBanner() {
-  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+  if [[ -n "${DISABLE_COLORS}" ]]; then
     logMessage "${1}"
     return
   fi
@@ -100,7 +100,7 @@ function logBanner() {
 }
 
 function logSpecial() {
-  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+  if [[ -n "${DISABLE_COLORS}" ]]; then
     logMessage "${1}"
     return
   fi
@@ -108,7 +108,7 @@ function logSpecial() {
 }
 
 function logError() {
-  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+  if [[ -n "${DISABLE_COLORS}" ]]; then
     logMessage "${1}"
     return
   fi
@@ -122,7 +122,7 @@ function logScriptInfo() {
   logBanner " - App path: $(logMessage "${appPath}")"
   logBanner " - App port: $(logMessage "${appPort}")"
   logBanner " - Logs file: $(logMessage "${logFile}")"
-  if [[ "${monitorSize}" == "true" ]]; then
+  if [[ -n "${monitorSize}" ]]; then
   logBanner " - Monitor size: $(logMessage "${monitorSize}")"
   fi
   logBanner "==============================="
@@ -395,21 +395,21 @@ function reportStageMetrics() {
   done <<< "${metrics}"
 
   logMessage " * Total(Meteor): ${totalNum} ${unit}"
-  if [[ -n "${METEOR_MONITOR_PROCESS}" ]] && [[ "${METEOR_MONITOR_PROCESS}" == "true" ]]; then
+  if [[ -n "${METEOR_MONITOR_PROCESS}" ]]; then
     local totalProcess="$(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}")"
     logMessage " * Total(Process): ${totalProcess} ms (+$((totalProcess - totalNum)) ms)"
   fi
 }
 
 function reportMetrics() {
-  if [[ "${monitorSizeOnly}" != "true" ]]; then
+  if [[ -z "${monitorSizeOnly}" ]]; then
     reportStageMetrics "Cold start"
     reportStageMetrics "Cache start"
     reportStageMetrics "Rebuild client"
     reportStageMetrics "Rebuild server"
   fi
 
-  if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+  if [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
     reportStageMetrics "Visualize bundle"
     logMeteorBundleSize
   fi
@@ -538,7 +538,7 @@ trap cleanup SIGINT SIGTERM
 meteorClientEntrypoint="${METEOR_CLIENT_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")}"
 meteorServerEntrypoint="${METEOR_SERVER_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")}"
 
-if [[ "${monitorSizeOnly}" != "true" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
+if [[ -z "${monitorSizeOnly}" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
   # Restore original stdout and stderr
   exec 1>&3 2>&4
 
@@ -566,7 +566,7 @@ logMessage "Node cmd: $(getMeteorNodeCmd)"
 
 killProcessByPort "${appPort}"
 
-if [[ "${monitorSizeOnly}" != "true" ]]; then
+if [[ -z "${monitorSizeOnly}" ]]; then
   logProgress " * Profiling \"Cold start\"..."
 
   logMessage "==============================="
@@ -639,7 +639,7 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   sleep 2
 fi
 
-if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+if [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
   logProgress " * Profiling \"Visualize bundle\"..."
 
   logMessage "==============================="
