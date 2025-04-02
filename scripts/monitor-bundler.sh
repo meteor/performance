@@ -49,6 +49,7 @@ monitorSize="${METEOR_BUNDLE_SIZE:-${METEOR_BUNDLE_SIZE_ONLY}}"
 monitorSizeOnly="${METEOR_BUNDLE_SIZE_ONLY}"
 
 monitorBuild="${METEOR_BUNDLE_BUILD}"
+buildDirectory="/tmp/${logName}-${app}-dist"
 
 meteorCmd="meteor"
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
@@ -243,7 +244,7 @@ function startMeteorApp() {
 }
 
 function buildMeteorApp() {
-  METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} build --directory /tmp/build ${meteorOptions}
+  METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} build --directory "${buildDirectory}" ${meteorOptions}
 }
 
 function visualizeMeteorAppBundle() {
@@ -674,8 +675,8 @@ if [[ -n "${monitorBuild}" ]]; then
   buildMeteorApp
   end_time_ms=$(getTime)
   ColdBuildProcessTime=$((end_time_ms - start_time_ms))
-  killProcessByPort "${appPort}"
-  sleep 2
+  rm -rf "${buildDirectory}"
+  sleep 1
 
   logProgress " * Profiling \"Cache build\"..."
 
@@ -687,8 +688,8 @@ if [[ -n "${monitorBuild}" ]]; then
   buildMeteorApp
   end_time_ms=$(getTime)
   CacheBuildProcessTime=$((end_time_ms - start_time_ms))
-  killProcessByPort "${appPort}"
-  sleep 2
+  rm -rf "${buildDirectory}"
+  sleep 1
 
  logProgress " * Profiling \"Final build\"..."
 
@@ -700,8 +701,8 @@ if [[ -n "${monitorBuild}" ]]; then
   buildMeteorApp
   end_time_ms=$(getTime)
   FinalBuildProcessTime=$((end_time_ms - start_time_ms))
-  killProcessByPort "${appPort}"
-  sleep 2
+  rm -rf "${buildDirectory}"
+  sleep 1
 fi
 
 if [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
