@@ -48,6 +48,8 @@ logFile="${logDir}/${logName}-${app}-bundle.log"
 monitorSize="${METEOR_BUNDLE_SIZE:-${METEOR_BUNDLE_SIZE_ONLY}}"
 monitorSizeOnly="${METEOR_BUNDLE_SIZE_ONLY}"
 
+monitorBuild="${METEOR_BUNDLE_BUILD}"
+
 meteorCmd="meteor"
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
   meteorCmd="${METEOR_CHECKOUT_PATH}/meteor"
@@ -240,6 +242,10 @@ function startMeteorApp() {
   METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run ${meteorOptions} &
 }
 
+function buildMeteorApp() {
+  METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} build --directory /tmp/build ${meteorOptions}
+}
+
 function visualizeMeteorAppBundle() {
   METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} --extra-packages bundle-visualizer --production ${meteorOptions} &
 }
@@ -357,6 +363,7 @@ function findMetricStage() {
 
 function getMetricsStage() {
   local stage="${1}"
+
   findMetricStage "\[${stage}\]" "\(ProjectContext resolveConstraints\)" "Meteor(resolveConstraints)"
   findMetricStage "\[${stage}\]" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild)"
   findMetricStage "\[${stage}\]" "\(Build App\)" "Meteor(Build App)"
@@ -401,12 +408,28 @@ function reportStageMetrics() {
   fi
 }
 
+function reportBuildMetrics() {
+  local stage="${1}"
+
+  logBanner "==============================="
+  logBanner "Metrics - ${stage}"
+  logBanner "==============================="
+
+  findMetricStage "\[${stage}\]" "\(meteor build\)" "Meteor(Total)"
+}
+
 function reportMetrics() {
-  if [[ -z "${monitorSizeOnly}" ]]; then
+  if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
     reportStageMetrics "Cold start"
     reportStageMetrics "Cache start"
     reportStageMetrics "Rebuild client"
     reportStageMetrics "Rebuild server"
+  fi
+
+  if [[ -n "${monitorBuild}" ]]; then
+    reportBuildMetrics "Cold build"
+    reportBuildMetrics "Cache build"
+    reportBuildMetrics "Final build"
   fi
 
   if [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
@@ -538,7 +561,7 @@ trap cleanup SIGINT SIGTERM
 meteorClientEntrypoint="${METEOR_CLIENT_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")}"
 meteorServerEntrypoint="${METEOR_SERVER_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")}"
 
-if [[ -z "${monitorSizeOnly}" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
+if [[ -z "${monitorSizeOnly}" ]]  && [[ -z "${monitorBuild}" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
   # Restore original stdout and stderr
   exec 1>&3 2>&4
 
@@ -566,7 +589,7 @@ logMessage "Node cmd: $(getMeteorNodeCmd)"
 
 killProcessByPort "${appPort}"
 
-if [[ -z "${monitorSizeOnly}" ]]; then
+if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   logProgress " * Profiling \"Cold start\"..."
 
   logMessage "==============================="
@@ -635,6 +658,48 @@ if [[ -z "${monitorSizeOnly}" ]]; then
   waitMeteorApp
   end_time_ms=$(getTime)
   RebuildServerProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
+fi
+
+if [[ -n "${monitorBuild}" ]]; then
+  logProgress " * Profiling \"Cold build\"..."
+
+  logMessage "==============================="
+  logMessage "[Cold build]"
+  logMessage "==============================="
+  ${meteorCmd} reset --skip-cache
+  start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="cold-build"
+  buildMeteorApp
+  end_time_ms=$(getTime)
+  ColdBuildProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
+
+  logProgress " * Profiling \"Cache build\"..."
+
+  logMessage "==============================="
+  logMessage "[Cache build]"
+  logMessage "==============================="
+  start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="cache-build"
+  buildMeteorApp
+  end_time_ms=$(getTime)
+  CacheBuildProcessTime=$((end_time_ms - start_time_ms))
+  killProcessByPort "${appPort}"
+  sleep 2
+
+ logProgress " * Profiling \"Final build\"..."
+
+  logMessage "==============================="
+  logMessage "[Final build]"
+  logMessage "==============================="
+  start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="final-build"
+  buildMeteorApp
+  end_time_ms=$(getTime)
+  FinalBuildProcessTime=$((end_time_ms - start_time_ms))
   killProcessByPort "${appPort}"
   sleep 2
 fi
