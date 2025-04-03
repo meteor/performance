@@ -48,6 +48,9 @@ logFile="${logDir}/${logName}-${app}-bundle.log"
 monitorSize="${METEOR_BUNDLE_SIZE:-${METEOR_BUNDLE_SIZE_ONLY}}"
 monitorSizeOnly="${METEOR_BUNDLE_SIZE_ONLY}"
 
+monitorBuild="${METEOR_BUNDLE_BUILD}"
+buildDirectory="/tmp/${logName}-${app}-dist"
+
 meteorCmd="meteor"
 if [[ -n "${METEOR_CHECKOUT_PATH}" ]]; then
   meteorCmd="${METEOR_CHECKOUT_PATH}/meteor"
@@ -92,7 +95,7 @@ function logProgress() {
 }
 
 function logBanner() {
-  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+  if [[ -n "${DISABLE_COLORS}" ]]; then
     logMessage "${1}"
     return
   fi
@@ -100,7 +103,7 @@ function logBanner() {
 }
 
 function logSpecial() {
-  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+  if [[ -n "${DISABLE_COLORS}" ]]; then
     logMessage "${1}"
     return
   fi
@@ -108,7 +111,7 @@ function logSpecial() {
 }
 
 function logError() {
-  if [[ "${DISABLE_COLORS}" == "true" ]]; then
+  if [[ -n "${DISABLE_COLORS}" ]]; then
     logMessage "${1}"
     return
   fi
@@ -122,7 +125,7 @@ function logScriptInfo() {
   logBanner " - App path: $(logMessage "${appPath}")"
   logBanner " - App port: $(logMessage "${appPort}")"
   logBanner " - Logs file: $(logMessage "${logFile}")"
-  if [[ "${monitorSize}" == "true" ]]; then
+  if [[ -n "${monitorSize}" ]]; then
   logBanner " - Monitor size: $(logMessage "${monitorSize}")"
   fi
   logBanner "==============================="
@@ -238,6 +241,10 @@ function waitMeteorServerModified() {
 
 function startMeteorApp() {
   METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} run ${meteorOptions} &
+}
+
+function buildMeteorApp() {
+  METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} build --directory "${buildDirectory}" ${meteorOptions}
 }
 
 function visualizeMeteorAppBundle() {
@@ -357,6 +364,7 @@ function findMetricStage() {
 
 function getMetricsStage() {
   local stage="${1}"
+
   findMetricStage "\[${stage}\]" "\(ProjectContext resolveConstraints\)" "Meteor(resolveConstraints)"
   findMetricStage "\[${stage}\]" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild)"
   findMetricStage "\[${stage}\]" "\(Build App\)" "Meteor(Build App)"
@@ -395,21 +403,37 @@ function reportStageMetrics() {
   done <<< "${metrics}"
 
   logMessage " * Total(Meteor): ${totalNum} ${unit}"
-  if [[ -n "${METEOR_MONITOR_PROCESS}" ]] && [[ "${METEOR_MONITOR_PROCESS}" == "true" ]]; then
+  if [[ -n "${METEOR_MONITOR_PROCESS}" ]]; then
     local totalProcess="$(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}")"
     logMessage " * Total(Process): ${totalProcess} ms (+$((totalProcess - totalNum)) ms)"
   fi
 }
 
+function reportBuildMetrics() {
+  local stage="${1}"
+
+  logBanner "==============================="
+  logBanner "Metrics - ${stage}"
+  logBanner "==============================="
+
+  findMetricStage "\[${stage}\]" "\(meteor build\)" "Meteor(Total)"
+}
+
 function reportMetrics() {
-  if [[ "${monitorSizeOnly}" != "true" ]]; then
+  if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
     reportStageMetrics "Cold start"
     reportStageMetrics "Cache start"
     reportStageMetrics "Rebuild client"
     reportStageMetrics "Rebuild server"
   fi
 
-  if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+  if [[ -n "${monitorBuild}" ]]; then
+    reportBuildMetrics "Cold build"
+    reportBuildMetrics "Cache build"
+    reportBuildMetrics "Final build"
+  fi
+
+  if [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
     reportStageMetrics "Visualize bundle"
     logMeteorBundleSize
   fi
@@ -538,7 +562,7 @@ trap cleanup SIGINT SIGTERM
 meteorClientEntrypoint="${METEOR_CLIENT_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "client")}"
 meteorServerEntrypoint="${METEOR_SERVER_ENTRYPOINT:-$(runScriptHelper "get-meteor-entrypoint.js" "${appPath}" "server")}"
 
-if [[ "${monitorSizeOnly}" != "true" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
+if [[ -z "${monitorSizeOnly}" ]]  && [[ -z "${monitorBuild}" ]] && ([[ -z "${meteorClientEntrypoint}" ]] || [[ -z "${meteorServerEntrypoint}" ]]); then
   # Restore original stdout and stderr
   exec 1>&3 2>&4
 
@@ -566,7 +590,7 @@ logMessage "Node cmd: $(getMeteorNodeCmd)"
 
 killProcessByPort "${appPort}"
 
-if [[ "${monitorSizeOnly}" != "true" ]]; then
+if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   logProgress " * Profiling \"Cold start\"..."
 
   logMessage "==============================="
@@ -639,7 +663,49 @@ if [[ "${monitorSizeOnly}" != "true" ]]; then
   sleep 2
 fi
 
-if [[ "${monitorSize}" == "true" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+if [[ -n "${monitorBuild}" ]]; then
+  logProgress " * Profiling \"Cold build\"..."
+
+  logMessage "==============================="
+  logMessage "[Cold build]"
+  logMessage "==============================="
+  ${meteorCmd} reset --skip-cache
+  start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="cold-build"
+  buildMeteorApp
+  end_time_ms=$(getTime)
+  ColdBuildProcessTime=$((end_time_ms - start_time_ms))
+  rm -rf "${buildDirectory}"
+  sleep 1
+
+  logProgress " * Profiling \"Cache build\"..."
+
+  logMessage "==============================="
+  logMessage "[Cache build]"
+  logMessage "==============================="
+  start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="cache-build"
+  buildMeteorApp
+  end_time_ms=$(getTime)
+  CacheBuildProcessTime=$((end_time_ms - start_time_ms))
+  rm -rf "${buildDirectory}"
+  sleep 1
+
+ logProgress " * Profiling \"Final build\"..."
+
+  logMessage "==============================="
+  logMessage "[Final build]"
+  logMessage "==============================="
+  start_time_ms=$(getTime)
+  export METEOR_INSPECT_CONTEXT="final-build"
+  buildMeteorApp
+  end_time_ms=$(getTime)
+  FinalBuildProcessTime=$((end_time_ms - start_time_ms))
+  rm -rf "${buildDirectory}"
+  sleep 1
+fi
+
+if [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
   logProgress " * Profiling \"Visualize bundle\"..."
 
   logMessage "==============================="
