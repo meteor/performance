@@ -630,7 +630,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   export METEOR_INSPECT_CONTEXT="rebuild-client"
   startMeteorApp
   waitMeteorApp
-  appendLine "console.log('new line')" "${meteorClientEntrypoint}"
+  appendLine "console.log('trigger rebuild client')" "${meteorClientEntrypoint}"
   waitMeteorClientModified "Rebuild client#1"
   waitMeteorApp
   removeLastLine "${meteorClientEntrypoint}"
@@ -651,7 +651,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   export METEOR_INSPECT_CONTEXT="rebuild-server"
   startMeteorApp
   waitMeteorApp
-  appendLine "console.log('new line')" "${meteorServerEntrypoint}"
+  appendLine "console.log('trigger rebuild server')" "${meteorServerEntrypoint}"
   waitMeteorServerModified "Rebuild server#1"
   waitMeteorApp
   removeLastLine "${meteorServerEntrypoint}"
