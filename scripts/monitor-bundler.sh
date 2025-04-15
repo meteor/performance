@@ -301,6 +301,14 @@ function logMeteorPackages() {
   logBanner "==============================="
 }
 
+function logMeteorConfig() {
+  logBanner "==============================="
+  logBanner " Meteor config"
+  logBanner "==============================="
+  runScriptHelper "print-meteor-config.js" "${appPath}"
+  logBanner "==============================="
+}
+
 function logMeteorBundleSize() {
   logBanner "==============================="
   logBanner " Bundle size"
@@ -540,6 +548,7 @@ function cleanup() {
   DISABLE_COLORS=true logScriptInfo
   DISABLE_COLORS=true logNpmPackages
   DISABLE_COLORS=true logMeteorPackages
+  DISABLE_COLORS=true logMeteorConfig
   DISABLE_COLORS=true logMeteorVersion
   DISABLE_COLORS=true reportMetrics
 
@@ -548,6 +557,7 @@ function cleanup() {
 
   logNpmPackages
   logMeteorPackages
+  logMeteorConfig
   logMeteorVersion
   reportMetrics
   logFullLogDetails
