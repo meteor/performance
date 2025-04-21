@@ -415,6 +415,26 @@ function reportStageMetrics() {
     local totalProcess="$(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}")"
     logMessage " * Total(Process): ${totalProcess} ms (+$((totalProcess - totalNum)) ms)"
   fi
+
+  if [[ "${stage}" == *"Rebuild"* ]]; then
+    local totalRebuildOne=0
+    while IFS= read -r line; do
+      if [[ "${line}" == *"#1"* ]]; then
+        read num unit <<< $(parseNumberAndUnit "${line}")
+        ((totalRebuildOne += num))
+      fi
+    done <<< "${metrics}"
+    logMessage " * Total(Rebuild #1): ${totalRebuildOne} ${unit}"
+
+    local totalRebuildTwo=0
+    while IFS= read -r line; do
+      if [[ "${line}" == *"#2"* ]]; then
+        read num unit <<< $(parseNumberAndUnit "${line}")
+        ((totalRebuildTwo += num))
+      fi
+    done <<< "${metrics}"
+    logMessage " * Total(Rebuild #2): ${totalRebuildTwo} ${unit}"
+  fi
 }
 
 function reportBuildMetrics() {
