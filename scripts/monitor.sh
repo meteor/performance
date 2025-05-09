@@ -12,7 +12,7 @@ if [[ -z "$app" ]] || [[ -z "$script" ]]; then
 fi
 
 # Redirect stdout (1) and stderr (2) to a file
-logFile="logs/${logName}-${app}-${script}.log"
+logFile="logs/${logName}-${app}-${script////-}.log"
 mkdir -p logs
 exec > "./${logFile}" 2>&1
 
