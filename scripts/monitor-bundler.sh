@@ -504,20 +504,27 @@ function appendLine() {
     touch "$backupFile"
   fi
 
-  # Ensure the file ends with a newline before appending
-  if [[ -f "$file" && -s "$file" ]]; then
-    local lastChar
-    # Check if the file ends with a newline by reading the last character
-    lastChar=$(tail -c1 "$file")
-
-    # If the last character is not a newline (or the command returns nothing), add one
-    if [[ "$lastChar" != $'\n' && "$lastChar" != "" ]]; then
-      printf "\n" >> "$file"
-    fi
+  # Ensure the file exists
+  if [[ ! -f "$file" ]]; then
+    touch "$file"
   fi
 
-  # Now append the content with a newline
-  printf "%s\n" "$content" >> "$file"
+  # Check if the file is empty
+  if [[ ! -s "$file" ]]; then
+    # If the file is empty, just write the content with a newline
+    printf "%s\n$content" > "$file"
+  else
+    # Check if the file ends with a newline
+    local lastChar
+    lastChar=$(tail -c1 "$file")
+
+    # Append the content with a newline, adding an extra newline if needed
+    if [[ "$lastChar" != $'\n' && "$lastChar" != "" ]]; then
+      printf "\n%s\n$content" >> "$file"
+    else
+      printf "%s\n$content" >> "$file"
+    fi
+  fi
 }
 
 function removeLastLine() {
@@ -534,19 +541,12 @@ function removeLastLine() {
     # Remove the backup file
     rm -f "$backupFile"
   else
-    local tempFile
-    tempFile=$(mktemp)
-
-    # Copy all lines except the last one to a temporary file
+    # Use sed to remove the last line in-place
     if [[ "$OSTYPE" == "darwin"* ]]; then
-      sed -e '$d' "$file" > "$tempFile"
+      sed -i '' -e '$d' "$file"
     else
-      sed -e '$d' "$file" > "$tempFile"
+      sed -i -e '$d' "$file"
     fi
-
-    # Replace the original file with the temporary file
-    cat "$tempFile" > "$file"
-    rm "$tempFile"
   fi
 }
 
