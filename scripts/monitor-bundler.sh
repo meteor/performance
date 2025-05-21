@@ -541,12 +541,8 @@ function removeLastLine() {
     # Remove the backup file
     rm -f "$backupFile"
   else
-    # Use sed to remove the last line in-place
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-      sed -i '' -e '$d' "$file"
-    else
-      sed -i -e '$d' "$file"
-    fi
+    # Use sedi helper to remove the last line in-place
+    sedi -e '$d' "$file"
   fi
 }
 
@@ -716,7 +712,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   export METEOR_INSPECT_CONTEXT="rebuild-client"
   startMeteorApp
   waitMeteorApp
-  appendLine "console.log('trigger rebuild client')" "${meteorClientEntrypoint}"
+  appendLine "console.log('trigger rebuild client');" "${meteorClientEntrypoint}"
   waitMeteorClientModified "Rebuild client#1"
   waitMeteorApp
   removeLastLine "${meteorClientEntrypoint}"
@@ -737,7 +733,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   export METEOR_INSPECT_CONTEXT="rebuild-server"
   startMeteorApp
   waitMeteorApp
-  appendLine "console.log('trigger rebuild server')" "${meteorServerEntrypoint}"
+  appendLine "console.log('trigger rebuild server');" "${meteorServerEntrypoint}"
   waitMeteorServerModified "Rebuild server#1"
   waitMeteorApp
   removeLastLine "${meteorServerEntrypoint}"
