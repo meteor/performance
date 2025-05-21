@@ -486,12 +486,68 @@ function killProcessByPort() {
   done
 }
 
+function sanitizeFilePath() {
+  local file="$1"
+  echo "$file" | sed 's/[^a-zA-Z0-9._-]/_/g' | sed 's/^\///'
+}
+
 function appendLine() {
-  echo "$1" >> "$2"
+  local file="$2"
+  local content="$1"
+  local sanitizedPath=$(sanitizeFilePath "$file")
+  local backupFile="/tmp/appendLine_backup_${sanitizedPath}"
+
+  # Create a backup of the original file
+  if [[ -f "$file" ]]; then
+    cp -p "$file" "$backupFile"
+  else
+    touch "$backupFile"
+  fi
+
+  # Ensure the file ends with a newline before appending
+  if [[ -f "$file" && -s "$file" ]]; then
+    local lastChar
+    # Check if the file ends with a newline by reading the last character
+    lastChar=$(tail -c1 "$file")
+
+    # If the last character is not a newline (or the command returns nothing), add one
+    if [[ "$lastChar" != $'\n' && "$lastChar" != "" ]]; then
+      printf "\n" >> "$file"
+    fi
+  fi
+
+  # Now append the content with a newline
+  printf "%s\n" "$content" >> "$file"
 }
 
 function removeLastLine() {
-    sedi '$ d' "$1"
+  local file="$1"
+  # Use the same sanitized path as in appendLine to find the backup file
+  local sanitizedPath=$(sanitizeFilePath "$file")
+  local backupFile="/tmp/appendLine_backup_${sanitizedPath}"
+
+  # Check if we have a backup file
+  if [[ -f "$backupFile" ]]; then
+    # Restore the original file from the backup
+    cp -p "$backupFile" "$file"
+
+    # Remove the backup file
+    rm -f "$backupFile"
+  else
+    local tempFile
+    tempFile=$(mktemp)
+
+    # Copy all lines except the last one to a temporary file
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      sed -e '$d' "$file" > "$tempFile"
+    else
+      sed -e '$d' "$file" > "$tempFile"
+    fi
+
+    # Replace the original file with the temporary file
+    cat "$tempFile" > "$file"
+    rm "$tempFile"
+  fi
 }
 
 function formatFile() {
