@@ -529,6 +529,7 @@ function appendLine() {
 
 function removeLastLine() {
   local file="$1"
+  local backupOnly="$2"
   # Use the same sanitized path as in appendLine to find the backup file
   local sanitizedPath=$(sanitizeFilePath "$file")
   local backupFile="/tmp/appendLine_backup_${sanitizedPath}"
@@ -540,8 +541,8 @@ function removeLastLine() {
 
     # Remove the backup file
     rm -f "$backupFile"
-  else
-    # Use sedi helper to remove the last line in-place
+  elif [[ -z "$backupOnly" || "$backupOnly" != "true" ]]; then
+    # Use sedi helper to remove the last line in-place if not in backup-only mode
     sedi -e '$d' "$file"
   fi
 }
@@ -614,6 +615,14 @@ function cleanup() {
   pkill -P $$
 
   sleep 2
+
+  # Revert any files that were modified by appendLine
+  if [[ -n "${meteorClientEntrypoint}" ]] && [[ -f "${meteorClientEntrypoint}" ]]; then
+    removeLastLine "${meteorClientEntrypoint}" "true"
+  fi
+  if [[ -n "${meteorServerEntrypoint}" ]] && [[ -f "${meteorServerEntrypoint}" ]]; then
+    removeLastLine "${meteorServerEntrypoint}" "true"
+  fi
 
   logMessage
 
