@@ -486,12 +486,65 @@ function killProcessByPort() {
   done
 }
 
+function sanitizeFilePath() {
+  local file="$1"
+  echo "$file" | sed 's/[^a-zA-Z0-9._-]/_/g' | sed 's/^\///'
+}
+
 function appendLine() {
-  echo "$1" >> "$2"
+  local file="$2"
+  local content="$1"
+  local sanitizedPath=$(sanitizeFilePath "$file")
+  local backupFile="/tmp/appendLine_backup_${sanitizedPath}"
+
+  # Create a backup of the original file
+  if [[ -f "$file" ]]; then
+    cp -p "$file" "$backupFile"
+  else
+    touch "$backupFile"
+  fi
+
+  # Ensure the file exists
+  if [[ ! -f "$file" ]]; then
+    touch "$file"
+  fi
+
+  # Check if the file is empty
+  if [[ ! -s "$file" ]]; then
+    # If the file is empty, just write the content with a newline
+    printf "%s\n$content" > "$file"
+  else
+    # Check if the file ends with a newline
+    local lastChar
+    lastChar=$(tail -c1 "$file")
+
+    # Append the content with a newline, adding an extra newline if needed
+    if [[ "$lastChar" != $'\n' && "$lastChar" != "" ]]; then
+      printf "\n%s\n$content" >> "$file"
+    else
+      printf "%s\n$content" >> "$file"
+    fi
+  fi
 }
 
 function removeLastLine() {
-    sedi '$ d' "$1"
+  local file="$1"
+  local backupOnly="$2"
+  # Use the same sanitized path as in appendLine to find the backup file
+  local sanitizedPath=$(sanitizeFilePath "$file")
+  local backupFile="/tmp/appendLine_backup_${sanitizedPath}"
+
+  # Check if we have a backup file
+  if [[ -f "$backupFile" ]]; then
+    # Restore the original file from the backup
+    cp -p "$backupFile" "$file"
+
+    # Remove the backup file
+    rm -f "$backupFile"
+  elif [[ -z "$backupOnly" || "$backupOnly" != "true" ]]; then
+    # Use sedi helper to remove the last line in-place if not in backup-only mode
+    sedi -e '$d' "$file"
+  fi
 }
 
 function formatFile() {
@@ -562,6 +615,14 @@ function cleanup() {
   pkill -P $$
 
   sleep 2
+
+  # Revert any files that were modified by appendLine
+  if [[ -n "${meteorClientEntrypoint}" ]] && [[ -f "${meteorClientEntrypoint}" ]]; then
+    removeLastLine "${meteorClientEntrypoint}" "true"
+  fi
+  if [[ -n "${meteorServerEntrypoint}" ]] && [[ -f "${meteorServerEntrypoint}" ]]; then
+    removeLastLine "${meteorServerEntrypoint}" "true"
+  fi
 
   logMessage
 
@@ -660,7 +721,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   export METEOR_INSPECT_CONTEXT="rebuild-client"
   startMeteorApp
   waitMeteorApp
-  appendLine "console.log('trigger rebuild client')" "${meteorClientEntrypoint}"
+  appendLine "console.log('trigger rebuild client');" "${meteorClientEntrypoint}"
   waitMeteorClientModified "Rebuild client#1"
   waitMeteorApp
   removeLastLine "${meteorClientEntrypoint}"
@@ -681,7 +742,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   export METEOR_INSPECT_CONTEXT="rebuild-server"
   startMeteorApp
   waitMeteorApp
-  appendLine "console.log('trigger rebuild server')" "${meteorServerEntrypoint}"
+  appendLine "console.log('trigger rebuild server');" "${meteorServerEntrypoint}"
   waitMeteorServerModified "Rebuild server#1"
   waitMeteorApp
   removeLastLine "${meteorServerEntrypoint}"
