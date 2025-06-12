@@ -18,6 +18,7 @@ appPort="$(echo "$meteorOptions" | sed -n 's/.*--port[ =]\?\([0-9]\+\).*/\1/p')"
 if [[ -z "$appPort" ]]; then
   appPort=3000
 fi
+modernDevPort="${MODERN_DEV_PORT:-3005}"
 appResolved="$(echo $app)"
 logDir="${baseDir}/logs"
 if [[ -d "$appResolved" ]]; then
@@ -33,6 +34,8 @@ if [[ -d "$appResolved" ]]; then
 else
   METEOR_PACKAGE_DIRS="${baseDir}/packages"
 fi
+
+useRspack="$(cat "${appPath}/.meteor/packages" | grep "rspack" | wc -l)"
 
 if [[ -n "${METEOR_LOG_DIR}" ]] && [[ "${METEOR_LOG_DIR}" == "/"* ]]; then
   logDir="${METEOR_LOG_DIR}"
@@ -210,8 +213,8 @@ function waitMeteorClientModified() {
   echo "${context}"
   while ! awk -v context="${context}" '
     /'"${context}"'/ {found=1; next}   # When context is found, set `found` and skip
-    found && /Client modified/ {exit 0}  # After context, check for "Client modified"
-    END { if (found && !/Client modified/) exit 1 }  # If found but "Client modified" is missing, exit 1
+    found && (/Client modified/ || /\[RSPack Client\] meteor-client:/) {exit 0}  # After context, check for "Client modified" or "[RSPack Client] meteor-client:"
+    END { if (found && !/Client modified/ && !/\[RSPack Client\] meteor-client:/) exit 1 }  # If found but neither string is present, exit 1
   ' "${logFile}"; do
     sleep 1
     waitSecs=$((waitSecs + 1))
@@ -375,20 +378,43 @@ function getMetricsStage() {
 
   findMetricStage "\[${stage}\]" "\(ProjectContext resolveConstraints\)" "Meteor(resolveConstraints)"
   findMetricStage "\[${stage}\]" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild)"
+  if [[ -n "${useRspack}" ]]; then
+    findMetricStage "\[${stage}\]" "\(RSPack Build App\)" "RSPack(Build App)"
+  fi
   findMetricStage "\[${stage}\]" "\(Build App\)" "Meteor(Build App)"
   findMetricStage "\[${stage}\]" "\(Server startup\)" "Meteor(Server startup)"
 
   if [[ "${stage}" == *"Rebuild"* ]]; then
-    findMetricStage "${stage}#1" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild #1)"
-    findMetricStage "${stage}#1" "\(Rebuild App\)" "Meteor(Rebuild App #1)"
-    if [[ "${stage}" == *"server"* ]]; then
-      findMetricStage "${stage}#1" "\(Server startup\)" "Meteor(Server startup #1)"
-    fi
+    if [[ -n "${useRspack}" ]]; then
+      if [[ "${stage}" == *"server"* ]]; then
+        findMetricStage "${stage}#1" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild #1)"
+      fi
+      findMetricStage "${stage}#1" "\(RSPack Rebuild App\)" "RSPack(Rebuild App #1)"
+      if [[ "${stage}" == *"server"* ]]; then
+        findMetricStage "${stage}#1" "\(Rebuild App\)" "Meteor(Rebuild App #1)"
+        findMetricStage "${stage}#1" "\(Server startup\)" "Meteor(Server startup #1)"
+      fi
 
-    findMetricStage "${stage}#2" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild #2)"
-    findMetricStage "${stage}#2" "\(Rebuild App\)" "Meteor(Rebuild App #2)"
-    if [[ "${stage}" == *"server"* ]]; then
-      findMetricStage "${stage}#2" "\(Server startup\)" "Meteor(Server startup #2)"
+      if [[ "${stage}" == *"server"* ]]; then
+        findMetricStage "${stage}#2" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild #2)"
+      fi
+      findMetricStage "${stage}#2" "\(RSPack Rebuild App\)" "RSPack(Rebuild App #2)"
+      if [[ "${stage}" == *"server"* ]]; then
+        findMetricStage "${stage}#2" "\(Rebuild App\)" "Meteor(Rebuild App #2)"
+        findMetricStage "${stage}#2" "\(Server startup\)" "Meteor(Server startup #2)"
+      fi
+    else
+      findMetricStage "${stage}#1" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild #1)"
+      findMetricStage "${stage}#1" "\(Rebuild App\)" "Meteor(Rebuild App #1)"
+      if [[ "${stage}" == *"server"* ]]; then
+        findMetricStage "${stage}#1" "\(Server startup\)" "Meteor(Server startup #1)"
+      fi
+
+      findMetricStage "${stage}#2" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild #2)"
+      findMetricStage "${stage}#2" "\(Rebuild App\)" "Meteor(Rebuild App #2)"
+      if [[ "${stage}" == *"server"* ]]; then
+        findMetricStage "${stage}#2" "\(Server startup\)" "Meteor(Server startup #2)"
+      fi
     fi
   fi
 }
@@ -414,6 +440,17 @@ function reportStageMetrics() {
   if [[ -n "${METEOR_MONITOR_PROCESS}" ]]; then
     local totalProcess="$(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}")"
     logMessage " * Total(Process): ${totalProcess} ms (+$((totalProcess - totalNum)) ms)"
+  fi
+
+  if [[ -n "${useRspack}" ]]; then
+    local totalBuildApp=0
+    while IFS= read -r line; do
+      if [[ "${line}" == *"Build App"* ]]; then
+        read num unit <<< $(parseNumberAndUnit "${line}")
+        ((totalBuildApp += num))
+      fi
+    done <<< "${metrics}"
+    logMessage " * Total(Build App): ${totalBuildApp} ${unit}"
   fi
 
   if [[ "${stage}" == *"Rebuild"* ]]; then
@@ -634,6 +671,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   end_time_ms=$(getTime)
   ColdStartProcessTime=$((end_time_ms - start_time_ms))
   killProcessByPort "${appPort}"
+  killProcessByPort "${modernDevPort}"
   sleep 2
 
   logProgress " * Profiling \"Cache start\"..."
@@ -648,6 +686,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   end_time_ms=$(getTime)
   CacheStartProcessTime=$((end_time_ms - start_time_ms))
   killProcessByPort "${appPort}"
+  killProcessByPort "${modernDevPort}"
   sleep 2
 
   logProgress " * Profiling \"Rebuild client\"..."
@@ -669,6 +708,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   end_time_ms=$(getTime)
   RebuildClientProcessTime=$((end_time_ms - start_time_ms))
   killProcessByPort "${appPort}"
+  killProcessByPort "${modernDevPort}"
   sleep 2
 
   logProgress " * Profiling \"Rebuild server\"..."
@@ -690,6 +730,7 @@ if [[ -z "${monitorSizeOnly}" ]] && [[ -z "${monitorBuild}" ]]; then
   end_time_ms=$(getTime)
   RebuildServerProcessTime=$((end_time_ms - start_time_ms))
   killProcessByPort "${appPort}"
+  killProcessByPort "${modernDevPort}"
   sleep 2
 fi
 
