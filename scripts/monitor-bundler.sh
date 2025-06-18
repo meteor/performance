@@ -247,6 +247,12 @@ function buildMeteorApp() {
   METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} build --directory "${buildDirectory}" ${meteorOptions}
 }
 
+function measureMeteorAppSize() {
+  local oldPwd="${PWD}"
+  cd "${buildDirectory}/bundle/programs/server"
+  ${meteorCmd} npm install
+}
+
 function visualizeMeteorAppBundle() {
   METEOR_PROFILE="${METEOR_PROFILE:-1}}" METEOR_PACKAGE_DIRS="${METEOR_PACKAGE_DIRS}" ${meteorCmd} --extra-packages bundle-visualizer --production ${meteorOptions} &
 }
@@ -362,6 +368,18 @@ function parseNumberAndUnit() {
   }'
 }
 
+function getSize() {
+  du -sh "$1" 2>/dev/null | sed -E 's/^([0-9.]+)([KMGTPE]?)[[:space:]]+.*$/\1 \2B/'
+}
+
+function measureMeteorAppSize() {
+  local oldPwd="${PWD}"
+  cd "${buildDirectory}/bundle/programs/server"
+  ${meteorCmd} npm install
+  cd "${oldPwd}"
+  BundleSize="$(getSize "${buildDirectory}/bundle")"
+}
+
 function findMetricStage() {
   local stage="${1}"
   local metric="${2}"
@@ -461,8 +479,12 @@ function reportMetrics() {
     reportBuildMetrics "Final build"
   fi
 
-  if [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+  if [[ -z "${monitorBuild}" ]] && [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
     reportStageMetrics "Visualize bundle"
+    logMeteorBundleSize
+  fi
+
+  if [[ -n "${monitorBuild}" ]] && [[ -n "${monitorSize}" ]]; then
     logMeteorBundleSize
   fi
 }
@@ -731,11 +753,14 @@ if [[ -n "${monitorBuild}" ]]; then
   buildMeteorApp
   end_time_ms=$(getTime)
   FinalBuildProcessTime=$((end_time_ms - start_time_ms))
+  if [[ -n "${monitorSize}" ]]; then
+    measureMeteorAppSize
+  fi
   rm -rf "${buildDirectory}"
   sleep 1
 fi
 
-if [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
+if [[ -z "${monitorBuild}" ]] && [[ -n "${monitorSize}" ]] && cat "${appPath}/.meteor/versions" | grep -q "standard-minifier-js@"; then
   logProgress " * Profiling \"Visualize bundle\"..."
 
   logMessage "==============================="
