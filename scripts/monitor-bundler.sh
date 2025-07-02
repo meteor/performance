@@ -21,7 +21,7 @@ fi
 appResolved="$(echo $app)"
 logDir="${baseDir}/logs"
 if [[ -d "$appResolved" ]]; then
-  if [[ "$appResolved" == "$(echo ~)/"* ]]; then
+  if [[ "$appResolved" == "$(echo ~)/"* ]] || [[ "$appResolved" == "/"* ]]; then
     appsDir="$(dirname $appResolved)"
   else
     appsDir="${baseDir}/$(dirname $appResolved)"
