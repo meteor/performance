@@ -788,6 +788,9 @@ if [[ -n "${monitorBuild}" ]]; then
   buildMeteorApp
   end_time_ms=$(getTime)
   ColdBuildProcessTime=$((end_time_ms - start_time_ms))
+  if [[ ! -d "${buildDirectory}" ]]; then
+    triggerExit
+  fi
   rm -rf "${buildDirectory}"
   sleep 1
 
@@ -801,6 +804,9 @@ if [[ -n "${monitorBuild}" ]]; then
   buildMeteorApp
   end_time_ms=$(getTime)
   CacheBuildProcessTime=$((end_time_ms - start_time_ms))
+  if [[ ! -d "${buildDirectory}" ]]; then
+    triggerExit
+  fi
   rm -rf "${buildDirectory}"
   sleep 1
 
@@ -814,6 +820,9 @@ if [[ -n "${monitorBuild}" ]]; then
   buildMeteorApp
   end_time_ms=$(getTime)
   FinalBuildProcessTime=$((end_time_ms - start_time_ms))
+  if [[ ! -d "${buildDirectory}" ]]; then
+    triggerExit
+  fi
   if [[ -n "${monitorSize}" ]]; then
     measureMeteorAppSize
   fi
