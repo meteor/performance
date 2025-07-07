@@ -20,5 +20,9 @@
   },
   "volta": {
     "node": "20.16.0"
+  },
+  "dependencies": {
+    "mongodb": "^6.17.0",
+    "playwright": "^1.53.1"
   }
 }

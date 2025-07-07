@@ -13,6 +13,7 @@ config:
       globalTimeout: 240000
       launchOptions:
         slowMo: 500
+        headless: true
   # Path to JavaScript file that defines Playwright test functions
   processor: '../tests/test-helpers.js'
 scenarios:

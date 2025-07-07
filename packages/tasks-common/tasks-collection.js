@@ -1,3 +1,4 @@
+export const TasksHistoryCollection = new Meteor.Collection('tasksHistory');
 import { Meteor } from "meteor/meteor";
 
 export const TasksCollection = new Meteor.Collection('taskCollection');
