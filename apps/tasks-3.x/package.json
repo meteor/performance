@@ -13,6 +13,11 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
+  "packages": {
+    "mongo": {
+      "useChangeStreams": true
+    }
+  },
   "meteor": {
     "mainModule": {
       "client": "client/main.jsx",

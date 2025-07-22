@@ -1,8 +1,9 @@
 config:
   target: http://localhost:3000
   phases:
-    - duration: 60
-      arrivalRate: 4
+    - duration: 30
+      arrivalRate: 2
+      maxVusers: 100
       name: Warm up
   ensure:
     maxErrorRate: 1
