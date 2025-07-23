@@ -213,8 +213,8 @@ function waitMeteorClientModified() {
   echo "${context}"
   while ! awk -v context="${context}" '
     /'"${context}"'/ {found=1; next}   # When context is found, set `found` and skip
-    found && (/Client modified/ || /\[RSPack Client\] meteor-client:/) {exit 0}  # After context, check for "Client modified" or "[RSPack Client] meteor-client:"
-    END { if (found && !/Client modified/ && !/\[RSPack Client\] meteor-client:/) exit 1 }  # If found but neither string is present, exit 1
+    found && (/Client modified/ || /\[RSPack Client\] \[client-rspack\]:/) {exit 0}  # After context, check for "Client modified" or "[RSPack Client] [client-rspack]:"
+    END { if (found && !/Client modified/ && !/\[RSPack Client\] \[client-rspack\]:/) exit 1 }  # If found but neither string is present, exit 1
   ' "${logFile}"; do
     sleep 1
     waitSecs=$((waitSecs + 1))
@@ -396,9 +396,6 @@ function getMetricsStage() {
 
   findMetricStage "\[${stage}\]" "\(ProjectContext resolveConstraints\)" "Meteor(resolveConstraints)"
   findMetricStage "\[${stage}\]" "\(ProjectContext prepareProjectForBuild\)" "Meteor(prepareProjectForBuild)"
-  if [[ -n "${useRspack}" ]]; then
-    findMetricStage "\[${stage}\]" "\(RSPack Build App\)" "RSPack(Build App)"
-  fi
   findMetricStage "\[${stage}\]" "\(Build App\)" "Meteor(Build App)"
   findMetricStage "\[${stage}\]" "\(Server startup\)" "Meteor(Server startup)"
 
@@ -458,17 +455,6 @@ function reportStageMetrics() {
   if [[ -n "${METEOR_MONITOR_PROCESS}" ]]; then
     local totalProcess="$(eval "echo \${$(formatEnvCase "${stage}ProcessTime")}")"
     logMessage " * Total(Process): ${totalProcess} ms (+$((totalProcess - totalNum)) ms)"
-  fi
-
-  if [[ -n "${useRspack}" ]]; then
-    local totalBuildApp=0
-    while IFS= read -r line; do
-      if [[ "${line}" == *"Build App"* ]]; then
-        read num unit <<< $(parseNumberAndUnit "${line}")
-        ((totalBuildApp += num))
-      fi
-    done <<< "${metrics}"
-    logMessage " * Total(Build App): ${totalBuildApp} ${unit}"
   fi
 
   if [[ "${stage}" == *"Rebuild"* ]]; then
