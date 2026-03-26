@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { App as AppBasic } from './basic/client';
 import { App as AppComplex } from './complex/client';
-import { TasksCollection, initializeTaskCollection, registerTaskApi  } from './tasks-common';
+import { TasksCollection, initializeTaskCollection, registerTaskApi, registerComplexApi  } from './tasks-common';
 
 const AppBasicWrapper = (props) => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -25,4 +25,4 @@ const App = () => (
   </BrowserRouter>
 );
 
-export { TasksCollection, initializeTaskCollection, registerTaskApi, App };
+export { TasksCollection, initializeTaskCollection, registerTaskApi, registerComplexApi, App };

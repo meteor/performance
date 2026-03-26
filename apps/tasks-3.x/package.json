@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.23.5",
+    "lodash": "^4.17.23",
     "meteor-node-stubs": "^1.2.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "6.3.0",
-    "react-router-dom": "6.28.1"
+    "react-router-dom": "6.28.1",
+    "simpl-schema": "^3.4.7"
   },
   "meteor": {
     "mainModule": {

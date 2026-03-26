@@ -1,8 +1,10 @@
 import { Meteor } from 'meteor/meteor';
-import { tryMonitorExtras, initializeTaskCollection, registerTaskApi } from 'meteor/tasks-common';
+import { tryMonitorExtras, initializeTaskCollection, registerTaskApi, registerComplexApi, registerComplexPublications } from 'meteor/tasks-common';
 
 Meteor.startup(() => {
   tryMonitorExtras();
   initializeTaskCollection();
   registerTaskApi();
+  registerComplexApi();
+  registerComplexPublications();
 });

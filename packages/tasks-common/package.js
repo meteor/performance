@@ -11,8 +11,11 @@ Package.describe({
 });
 
 Package.onUse(function(api) {
-  api.versionsFrom('2.16');
+  api.versionsFrom(['2.16', '3.0.2']);
   api.use('ecmascript');
+  api.use('accounts-password');
+  api.use('reywood:publish-composite', 'server');
+  api.use('tunguska:reactive-aggregate', 'server');
   api.mainModule('tasks-common.client.jsx', ['client']);
   api.mainModule('tasks-common.server.js', ['server']);
 });
