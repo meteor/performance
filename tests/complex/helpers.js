@@ -17,50 +17,45 @@ const complexReactiveScenario = async (page) => {
   await page.waitForSelector('#register-btn', { state: 'visible' });
   await page.click('#register-btn');
   await page.waitForSelector('#username', { state: 'visible' });
+  const username = await page.textContent('#username');
 
-  // Step 2: Add tasks
+  // Step 2: Add tasks (checklists/comments are expanded by default)
   for (let t = 1; t <= TASK_COUNT; t++) {
     await page.click('.add-task');
-    await page.waitForSelector(`text="Task ${t}"`, { state: 'visible' });
+    await page.waitForSelector(`text="${username} Task ${t}"`, { state: 'visible' });
   }
 
-  // Step 3: For each task, expand and add checklists + comments
-  const expandButtons = await page.$$('.toggle-details');
-  for (let t = 0; t < expandButtons.length; t++) {
-    // Expand task
-    await expandButtons[t].click();
-
-    // Wait for checklist section to appear
-    await page.waitForSelector('.checklist-section', { state: 'visible' });
+  // Step 3: For each task, add checklists + comments (already expanded)
+  for (let t = 1; t <= TASK_COUNT; t++) {
+    // Wait for the checklist section of this task to be visible
+    const taskSections = await page.$$('.checklist-section');
+    const checklistBtn = (await page.$$('.add-checklist-item'))[t - 1];
 
     // Add checklist items
-    const addChecklistBtns = await page.$$('.add-checklist-item');
-    const checklistBtn = addChecklistBtns[addChecklistBtns.length - 1];
     for (let c = 1; c <= CHECKLIST_ITEMS_PER_TASK; c++) {
       await checklistBtn.click();
       await page.waitForSelector(`text="Item ${c}"`, { state: 'visible' });
     }
 
-    // Toggle first checklist item
+    // Toggle first checklist item of this task
     const checkboxes = await page.$$('.checklist-item input[type="checkbox"]');
     if (checkboxes.length > 0) {
       await checkboxes[checkboxes.length - CHECKLIST_ITEMS_PER_TASK].click();
     }
 
     // Add comments
-    const addCommentBtns = await page.$$('.add-comment');
-    const commentBtn = addCommentBtns[addCommentBtns.length - 1];
+    const commentBtn = (await page.$$('.add-comment'))[t - 1];
     for (let c = 1; c <= COMMENTS_PER_TASK; c++) {
       await commentBtn.click();
       await page.waitForSelector(`text="Comment ${c}"`, { state: 'visible' });
     }
 
-    // Add replies to the first comment
+    // Add replies to the first comment of this task
     const replyBtns = await page.$$('.add-subcomment');
     if (replyBtns.length > 0) {
-      const lastReplyBtn = replyBtns[replyBtns.length - COMMENTS_PER_TASK];
+      const replyBtn = replyBtns[replyBtns.length - COMMENTS_PER_TASK];
       for (let r = 1; r <= REPLIES_PER_COMMENT; r++) {
-        await lastReplyBtn.click();
+        await replyBtn.click();
         await page.waitForSelector(`text="Reply ${r}"`, { state: 'visible' });
       }
     }
@@ -77,7 +72,8 @@ const complexReactiveScenario = async (page) => {
 
   // Step 5: Remove all tasks
   await page.click('.remove-all-tasks');
-  await page.waitForSelector('.complex-task', { state: 'detached', timeout: 30000 });
+  // Wait until this user's tasks are gone
+  await page.waitForSelector(`text="${userId} Task 1"`, { state: 'detached', timeout: 30000 });
 
   // Step 6: Logout
   await page.click('#logout-btn');

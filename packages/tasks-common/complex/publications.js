@@ -4,19 +4,19 @@ import { ReactiveAggregate } from 'meteor/tunguska:reactive-aggregate';
 import { ComplexTasksCollection, ChecklistsCollection, CommentsCollection } from './collections';
 
 export const registerComplexPublications = () => {
-  // Publication 1: User's tasks (simple)
+  // Publication 1: All tasks (unscoped — every client sees all users' tasks)
   Meteor.publish('complex.tasks', function () {
     if (!this.userId) return this.ready();
-    return ComplexTasksCollection.find({ userId: this.userId });
+    return ComplexTasksCollection.find({});
   });
 
-  // Publication 2: Checklists for a specific task
+  // Publication 2: All checklists for a task (unscoped by user)
   Meteor.publish('complex.checklists', function ({ taskId }) {
     if (!this.userId) return this.ready();
-    return ChecklistsCollection.find({ taskId, userId: this.userId });
+    return ChecklistsCollection.find({ taskId });
   });
 
-  // Publication 3: Comments + subcomments for a task (publish-composite)
+  // Publication 3: Comments + subcomments for a task (publish-composite, unscoped)
   publishComposite('complex.taskComments', function ({ taskId }) {
     if (!this.userId) return { find() { return null; } };
     return {
@@ -31,13 +31,12 @@ export const registerComplexPublications = () => {
     };
   });
 
-  // Publication 4: Tasks with all nested data (publish-composite)
+  // Publication 4: All tasks with nested data (publish-composite, unscoped)
   publishComposite('complex.tasksWithDetails', function () {
     if (!this.userId) return { find() { return null; } };
-    const userId = this.userId;
     return {
       find() {
-        return ComplexTasksCollection.find({ userId });
+        return ComplexTasksCollection.find({});
       },
       children: [
         {
@@ -59,12 +58,11 @@ export const registerComplexPublications = () => {
     };
   });
 
-  // Publication 5: Reactive summary using reactive-aggregate
+  // Publication 5: Reactive summary across ALL users' tasks
   Meteor.publish('complex.summary', function () {
     if (!this.userId) return this.ready();
 
     ReactiveAggregate(this, ComplexTasksCollection, [
-      { $match: { userId: this.userId } },
       {
         $group: {
           _id: '$status',

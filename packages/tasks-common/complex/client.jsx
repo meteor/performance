@@ -165,7 +165,7 @@ const CommentItem = ({ comment, taskId }) => {
 const STATUSES = ['pending', 'in-progress', 'done'];
 
 const TaskRow = ({ task }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const handleStatusChange = useCallback(async (newStatus) => {
     await Meteor.callAsync('complex.updateTaskStatus', {
@@ -183,7 +183,7 @@ const TaskRow = ({ task }) => {
   return (
     <li className={`complex-task status-${task.status}`}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span className="task-description">{task.description}</span>
+        <span className="task-description">{task.username} {task.description}</span>
         <span className="task-status">[{task.status}]</span>
         <button className="cycle-status" onClick={() => handleStatusChange(nextStatus)}>
           &rarr; {nextStatus}
@@ -214,6 +214,7 @@ const ComplexDashboard = () => {
     setTaskCounter(next);
     await Meteor.callAsync('complex.insertTask', {
       description: `Task ${next}`,
+      username: Meteor.user()?.username,
     });
   }, [taskCounter]);
 
@@ -232,6 +233,7 @@ const ComplexDashboard = () => {
       <div id="user-section" style={{ marginBottom: 8 }}>
         <span>User: </span>
         <span id="username">{Meteor.user()?.username}</span>
+        <span id="visibleUsername" style={{ display: 'none' }}>{Meteor.user()?.username}</span>
         <button id="logout-btn" onClick={handleLogout} style={{ marginLeft: 8 }}>Logout</button>
       </div>
       <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>

@@ -3,11 +3,12 @@ import { ComplexTasksCollection, ChecklistsCollection, CommentsCollection } from
 
 export const registerComplexApi = () => {
   Meteor.methods({
-    'complex.insertTask'({ description }) {
+    'complex.insertTask'({ description, username }) {
       const userId = this.userId;
       if (!userId) throw new Meteor.Error('not-authorized');
       return ComplexTasksCollection.insertAsync({
         userId,
+        username,
         description,
         status: 'pending',
         createdAt: new Date(),
