@@ -75,7 +75,9 @@ export async function runArtilleryDriver({ scenario, scenarioName, app, appName,
   // (DDP connect that never resolves, etc.) used to lock the harness
   // forever; now we abort and surface partial metrics instead.
   const targetUrl = `http://localhost:${config.appPort}`;
-  const ARTILLERY_TIMEOUT_MS = 5 * 60 * 1000;
+  // Configurable via ARTILLERY_TIMEOUT_MS so sustained ≥5-min load profiles
+  // (warmup + 300s + VU drain) aren't truncated by the default 5-min cap.
+  const ARTILLERY_TIMEOUT_MS = Number(process.env.ARTILLERY_TIMEOUT_MS) || 5 * 60 * 1000;
   console.log(`\nRunning Artillery: ${scenario.config} (--target ${targetUrl})...`);
   const artilleryStart = Date.now();
   try {

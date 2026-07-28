@@ -24,3 +24,5 @@ otel/
 
 # Team coordination workspace (out of repo scope)
 .claude/
+
+.playwright-mcp/

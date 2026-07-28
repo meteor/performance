@@ -64,6 +64,11 @@ export default {
       config: 'artillery/ddp-reactive-extended.yml',
       description: 'DDP reactive CRUD, ~7-min extended load sized for M4 Pro (oplog×polling×CS × sockjs×uws matrix)',
     },
+    'ddp-reactive-lean': {
+      driver: 'artillery',
+      config: 'artillery/ddp-reactive-lean.yml',
+      description: 'DDP reactive CRUD, lean ~2-min light load for precise repeated runs (oplog×polling×CS × sockjs×uws matrix)',
+    },
     'ddp-non-reactive-light': {
       driver: 'artillery',
       config: 'artillery/ddp-non-reactive-light.yml',

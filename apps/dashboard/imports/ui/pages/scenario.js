@@ -106,6 +106,29 @@ const SCENARIOS = {
       '(<code class="font-mono text-[12px]">sockjs</code>/<code class="font-mono text-[12px]">uws</code>) ' +
       'each run actually used, so runs are comparable across the matrix.',
   },
+  'ddp-reactive-lean': {
+    name: 'ddp-reactive-lean',
+    driver: 'Artillery + SimpleDDP',
+    vus: 'up to 3 new DDP conns/s',
+    duration: '~2 min',
+    browser: false,
+    summary:
+      'Lean, precise version of the DDP reactive benchmark. Deliberately light load ' +
+      '(2 VU/s warm up → 3 VU/s sustained) kept well below machine capacity so timing ' +
+      'metrics reflect true latency without queueing noise. Meant to be run several times ' +
+      'per config and compared/medianed across the observer-driver × transport matrix.',
+    technical:
+      'Artillery drives raw SimpleDDP WebSocket clients: 2 VU/s warm up (15s) then 3 VU/s ' +
+      'sustained (100s). Each VU subscribes to <code class="font-mono text-[12px]">fetchTasks</code> ' +
+      'and runs insert/remove cycles, fanning reactive updates out through the configured observe ' +
+      'driver. Because load stays light (~15-25 concurrent connections), the server never approaches ' +
+      'saturation — so CPU, GC, method p95 and propagation latency are clean and reproducible across ' +
+      'repeated runs. The <code class="font-mono text-[12px]">runtime</code> field records the actual ' +
+      'observe driver (<code class="font-mono text-[12px]">oplog</code>/' +
+      '<code class="font-mono text-[12px]">polling</code>/<code class="font-mono text-[12px]">changeStreams</code>) ' +
+      'and transport (<code class="font-mono text-[12px]">sockjs</code>/<code class="font-mono text-[12px]">uws</code>) ' +
+      'so repeated runs stay comparable.',
+  },
   'ddp-non-reactive-light': {
     name: 'ddp-non-reactive-light',
     driver: 'Artillery + SimpleDDP',
