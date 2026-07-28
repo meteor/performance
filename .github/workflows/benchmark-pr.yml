@@ -1,0 +1,220 @@
+name: PR Benchmark
+
+# Triggers:
+# 1. Manual — from GitHub UI or dashboard (workflow_dispatch)
+# 2. Repository dispatch — called from meteor/meteor PR workflow
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to benchmark'
+        required: true
+        default: 'devel'
+      baseline:
+        description: 'Baseline branch/tag'
+        required: true
+        default: 'release-3.5'
+      scenario:
+        description: 'Benchmark scenario'
+        required: true
+        default: 'reactive-light'
+      pr_number:
+        description: 'PR number (optional, for comment posting)'
+        required: false
+
+  repository_dispatch:
+    types: [benchmark-pr]
+
+env:
+  METEOR_REPO: ${{ github.workspace }}/meteor
+  BENCH_API_KEY: ${{ secrets.BENCH_API_KEY }}
+  BENCH_DASHBOARD_URL: ${{ secrets.BENCH_DASHBOARD_URL }}
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest  # TODO: switch to self-hosted for stable results
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout performance repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      # Resolve inputs from workflow_dispatch or repository_dispatch.
+      # All ${{ }} values are interpolated into env vars rather than directly
+      # into the shell body to prevent command injection from untrusted
+      # repository_dispatch payloads. See https://github.blog/security/vulnerability-research/how-to-catch-github-actions-workflow-injections-before-attackers-do/
+      - name: Set benchmark parameters
+        id: params
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PAYLOAD_BRANCH: ${{ github.event.client_payload.branch }}
+          PAYLOAD_BASELINE: ${{ github.event.client_payload.baseline }}
+          PAYLOAD_SCENARIO: ${{ github.event.client_payload.scenario }}
+          PAYLOAD_PR_NUMBER: ${{ github.event.client_payload.pr_number }}
+          PAYLOAD_METEOR_REPO: ${{ github.event.client_payload.meteor_repo }}
+          INPUT_BRANCH: ${{ inputs.branch }}
+          INPUT_BASELINE: ${{ inputs.baseline }}
+          INPUT_SCENARIO: ${{ inputs.scenario }}
+          INPUT_PR_NUMBER: ${{ inputs.pr_number }}
+        run: |
+          if [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            echo "branch=$PAYLOAD_BRANCH" >> "$GITHUB_OUTPUT"
+            echo "baseline=$PAYLOAD_BASELINE" >> "$GITHUB_OUTPUT"
+            echo "scenario=${PAYLOAD_SCENARIO:-reactive-light}" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$PAYLOAD_PR_NUMBER" >> "$GITHUB_OUTPUT"
+            echo "meteor_repo=${PAYLOAD_METEOR_REPO:-meteor/meteor}" >> "$GITHUB_OUTPUT"
+          else
+            echo "branch=$INPUT_BRANCH" >> "$GITHUB_OUTPUT"
+            echo "baseline=$INPUT_BASELINE" >> "$GITHUB_OUTPUT"
+            echo "scenario=$INPUT_SCENARIO" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$INPUT_PR_NUMBER" >> "$GITHUB_OUTPUT"
+            echo "meteor_repo=meteor/meteor" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Clone Meteor core
+        env:
+          METEOR_REPO_SLUG: ${{ steps.params.outputs.meteor_repo }}
+          BASELINE: ${{ steps.params.outputs.baseline }}
+          BRANCH: ${{ steps.params.outputs.branch }}
+        run: |
+          git clone --no-single-branch --depth 50 "https://github.com/$METEOR_REPO_SLUG.git" "$METEOR_REPO"
+          cd "$METEOR_REPO"
+          git fetch --tags --depth 50 origin "$BASELINE" "$BRANCH"
+
+      - name: Install app dependencies
+        run: npm install
+        working-directory: apps/tasks-3.x
+
+      # ─── Run baseline benchmark ───
+      - name: Checkout baseline
+        env:
+          BASELINE: ${{ steps.params.outputs.baseline }}
+        run: |
+          cd "$METEOR_REPO"
+          git fetch origin "$BASELINE"
+          git checkout "$BASELINE"
+
+      - name: Run baseline benchmark
+        env:
+          SCENARIO: ${{ steps.params.outputs.scenario }}
+          BASELINE: ${{ steps.params.outputs.baseline }}
+        run: |
+          METEOR_CHECKOUT_PATH="$METEOR_REPO" \
+          node bench.js run \
+            --scenario "$SCENARIO" \
+            --tag "$BASELINE" \
+            --output results/baseline.json
+
+      # ─── Run target benchmark ───
+      - name: Checkout target branch
+        env:
+          BRANCH: ${{ steps.params.outputs.branch }}
+        run: |
+          cd "$METEOR_REPO"
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+
+      - name: Run target benchmark
+        env:
+          SCENARIO: ${{ steps.params.outputs.scenario }}
+          BRANCH: ${{ steps.params.outputs.branch }}
+        run: |
+          METEOR_CHECKOUT_PATH="$METEOR_REPO" \
+          node bench.js run \
+            --scenario "$SCENARIO" \
+            --tag "$BRANCH" \
+            --output results/target.json
+
+      # ─── Compare & Report ───
+      - name: Compare results
+        id: compare
+        run: |
+          node bench.js compare \
+            --baseline results/baseline.json \
+            --target results/target.json \
+            --format markdown > results/report.md || true
+          cat results/report.md
+          # Check if regression was detected (file contains "regression")
+          if grep -q "regression" results/report.md; then
+            echo "passed=false" >> $GITHUB_OUTPUT
+          else
+            echo "passed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push results to dashboard
+        if: env.BENCH_API_KEY != ''
+        timeout-minutes: 8
+        run: |
+          # Wake up Galaxy free tier (cold start can take up to 5 min)
+          for i in $(seq 1 30); do
+            if curl -sf https://meteor-benchmark-dashboard.sandbox.galaxycloud.app > /dev/null 2>&1; then
+              echo "Dashboard is up"; break
+            fi
+            echo "Waiting for dashboard cold start... ($i/30)"
+            sleep 10
+          done
+          node bench.js push --result results/baseline.json || true
+          node bench.js push --result results/target.json || true
+
+      - name: Comment on PR
+        if: steps.params.outputs.pr_number != ''
+        uses: actions/github-script@v7
+        env:
+          SCENARIO: ${{ steps.params.outputs.scenario }}
+          PR_NUMBER: ${{ steps.params.outputs.pr_number }}
+          DASHBOARD_URL: ${{ secrets.BENCH_DASHBOARD_URL }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('results/report.md', 'utf8');
+            const scenario = process.env.SCENARIO || '';
+            const prNumber = parseInt(process.env.PR_NUMBER, 10);
+            const dashboardUrl = process.env.DASHBOARD_URL || 'https://meteor-benchmark.meteorapp.com';
+            const runnerName = process.env.RUNNER_NAME || 'unknown';
+            const body = `### Benchmark Results\n\n${report}\n\n` +
+              `_Scenario: \`${scenario}\` | ` +
+              `Runner: \`${runnerName}\` | ` +
+              `[Dashboard](${dashboardUrl})_`;
+
+            // Find and update existing benchmark comment, or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body.includes('### Benchmark Results'));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
+      - name: Upload results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: results/
+          retention-days: 30

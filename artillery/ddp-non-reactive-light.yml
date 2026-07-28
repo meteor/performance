@@ -1,0 +1,13 @@
+config:
+  target: http://localhost:3000
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: DDP light load (no sub)
+  processor: '../tests/ddp-helpers.js'
+scenarios:
+  - name: Non-reactive DDP CRUD
+    engine: http
+    beforeScenario: nonReactiveCrud
+    flow:
+      - log: "DDP VU complete"

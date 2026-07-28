@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-01-04T00:00:00.000Z",
+  "tag": "devel-improved",
+  "meteor": {
+    "version": "devel",
+    "sha": "111aaaa"
+  },
+  "scenario": "reactive-light",
+  "app": "tasks-3.x",
+  "wall_clock_ms": 34000,
+  "metrics": {
+    "app_resources": {
+      "metric": "app_resources",
+      "name": "APP",
+      "pid": 40001,
+      "samples": 34,
+      "cpu": { "avg": 16.0, "max": 80.0, "unit": "percent" },
+      "memory": { "avg_mb": 130.0, "max_mb": 160.0, "unit": "MB" }
+    },
+    "db_resources": {
+      "metric": "db_resources",
+      "name": "DB",
+      "pid": 40002,
+      "samples": 34,
+      "cpu": { "avg": 3.2, "max": 6.0, "unit": "percent" },
+      "memory": { "avg_mb": 80.0, "max_mb": 100.0, "unit": "MB" }
+    },
+    "gc": {
+      "metric": "gc",
+      "unit": "ms",
+      "total_pause_ms": 150.0,
+      "count": 100,
+      "max_pause_ms": 30.0,
+      "avg_pause_ms": 1.5,
+      "minor": { "count": 80, "total_ms": 100.0 },
+      "major": { "count": 12, "total_ms": 48.0 },
+      "incremental": { "count": 8, "total_ms": 2.0 },
+      "weakcb": { "count": 0, "total_ms": 0 }
+    },
+    "event_loop_delay": {
+      "metric": "event_loop_delay",
+      "unit": "ms",
+      "min": 0.02,
+      "max": 40.0,
+      "mean": 0.8,
+      "stddev": 2.0,
+      "p50": 0.7,
+      "p95": 4.0,
+      "p99": 8.0,
+      "count": 180
+    }
+  }
+}

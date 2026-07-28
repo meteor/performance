@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-01-01T00:00:00.000Z",
+  "tag": "v3.5-baseline-with-zero",
+  "meteor": {
+    "version": "release/3.5",
+    "sha": "abc1234"
+  },
+  "scenario": "reactive-light",
+  "app": "tasks-3.x",
+  "wall_clock_ms": 0,
+  "metrics": {
+    "app_resources": {
+      "metric": "app_resources",
+      "name": "APP",
+      "pid": 10001,
+      "samples": 40,
+      "cpu": { "avg": 20.0, "max": 90.0, "unit": "percent" },
+      "memory": { "avg_mb": 140.0, "max_mb": 170.0, "unit": "MB" }
+    },
+    "db_resources": {
+      "metric": "db_resources",
+      "name": "DB",
+      "pid": 10002,
+      "samples": 40,
+      "cpu": { "avg": 4.0, "max": 7.0, "unit": "percent" },
+      "memory": { "avg_mb": 90.0, "max_mb": 110.0, "unit": "MB" }
+    },
+    "gc": {
+      "metric": "gc",
+      "unit": "ms",
+      "total_pause_ms": 200.0,
+      "count": 130,
+      "max_pause_ms": 40.0,
+      "avg_pause_ms": 1.54,
+      "minor": { "count": 95, "total_ms": 130.0 },
+      "major": { "count": 18, "total_ms": 80.0 },
+      "incremental": { "count": 17, "total_ms": 4.0 },
+      "weakcb": { "count": 0, "total_ms": 0 }
+    },
+    "event_loop_delay": {
+      "metric": "event_loop_delay",
+      "unit": "ms",
+      "min": 0.02,
+      "max": 50.0,
+      "mean": 1.0,
+      "stddev": 2.5,
+      "p50": 0.8,
+      "p95": 5.0,
+      "p99": 10.0,
+      "count": 200
+    }
+  }
+}

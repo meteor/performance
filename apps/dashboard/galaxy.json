@@ -1,0 +1,13 @@
+{
+  "commands": {
+    "install": "npm install",
+    "build": "npm run build",
+    "start": "npm start"
+  },
+  "health": {
+    "path": "/health"
+  },
+  "deploy": {
+    "rootDirectory": "apps/dashboard"
+  }
+}

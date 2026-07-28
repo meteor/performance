@@ -1,0 +1,25 @@
+config:
+  # target is overridden at runtime by drivers/artillery.js (--target +
+  # REMOTE_URL) to point at BENCH_PORT. Kept here so the file runs standalone.
+  target: http://localhost:3000
+  # Extended medium-to-long profile, sized for an Apple M4 Pro (12 cores).
+  # Heavier than ddp-reactive-5min (10 vs 8 VU/s) but still conservative so
+  # connections don't drop — a DDP VU session is short (~4-10s), so 10 VU/s
+  # holds ~50-100 concurrent connections, well within headroom.
+  phases:
+    - duration: 30
+      arrivalRate: 2
+      name: Warm up
+    - duration: 30
+      arrivalRate: 5
+      name: Ramp
+    - duration: 360
+      arrivalRate: 10
+      name: Sustained moderate-high reactive load
+  processor: '../tests/ddp-helpers.js'
+scenarios:
+  - name: Reactive DDP CRUD (shared high-fanout pub)
+    engine: http
+    beforeScenario: reactiveCrud
+    flow:
+      - log: "DDP VU complete"

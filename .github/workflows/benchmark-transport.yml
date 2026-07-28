@@ -1,0 +1,83 @@
+name: Transport Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to benchmark (must have pluggable transport)'
+        required: true
+        default: 'release-3.5'
+      scenario:
+        description: 'Benchmark scenario'
+        required: true
+        default: 'ddp-reactive-light'
+
+env:
+  METEOR_REPO: ${{ github.workspace }}/meteor
+  BENCH_API_KEY: ${{ secrets.BENCH_API_KEY }}
+  BENCH_DASHBOARD_URL: ${{ secrets.BENCH_DASHBOARD_URL }}
+
+jobs:
+  transport:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        transport: [sockjs, uws]
+      fail-fast: false
+
+    steps:
+      - name: Checkout performance repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        if: contains(inputs.scenario, 'reactive-light') || contains(inputs.scenario, 'reactive-crud')
+        run: npx playwright install chromium
+
+      - name: Clone Meteor core
+        run: |
+          git clone --no-single-branch --depth 50 https://github.com/meteor/meteor.git $METEOR_REPO
+          cd $METEOR_REPO
+          git fetch origin ${{ inputs.branch }}
+          git checkout ${{ inputs.branch }}
+
+      - name: Install app dependencies
+        run: npm install
+        working-directory: apps/tasks-3.x
+
+      - name: Run benchmark (${{ matrix.transport }})
+        run: |
+          METEOR_CHECKOUT_PATH=$METEOR_REPO \
+          node bench.js run \
+            --scenario ${{ inputs.scenario }} \
+            --tag "${{ inputs.branch }}-${{ matrix.transport }}" \
+            --env DDP_TRANSPORT=${{ matrix.transport }} \
+            --output results/${{ matrix.transport }}.json
+
+      - name: Push results to dashboard
+        if: env.BENCH_API_KEY != ''
+        timeout-minutes: 8
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf https://meteor-benchmark-dashboard.sandbox.galaxycloud.app > /dev/null 2>&1; then
+              echo "Dashboard is up"; break
+            fi
+            echo "Waiting for dashboard cold start... ($i/30)"
+            sleep 10
+          done
+          node bench.js push --result results/${{ matrix.transport }}.json || true
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: transport-${{ matrix.transport }}-${{ inputs.scenario }}
+          path: results/
+          retention-days: 30

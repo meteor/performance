@@ -33,9 +33,9 @@ To run a stress test on a galaxy server:
 
 - Prepare a new application container on Galaxy
 - Prepare secrets on `.env.prod` file
-    - `MONGO_URL_TASKS_3_X` and `MONGO_URL_TASKS_2_X`. Url to connect to the MongoDB instance for each application.
-    - `MONGO_VERSION` Version of MongoDB used to pre-clean your environment
-    - `REMOTE_URL_TASKS_3_X` `REMOTE_URL_TASKS_2_X`. Public endpoint to connect to your application.
+    - `MONGO_URL_TASKS_3_X`. URL to connect to the MongoDB instance for the application.
+    - `MONGO_VERSION`. Version of MongoDB used to pre-clean your environment.
+    - `REMOTE_URL_TASKS_3_X`. Public endpoint to connect to your application.
 
 Run the following monitoring command to start benchmarking:
 
@@ -46,15 +46,13 @@ npm install
 
 This will set up the remote context needed to run the playwright script.
 
-Remote stress testing helps gather extra metrics from MontiAPM for deeper performance analysis.
+Remote stress testing exercises the app on a real Galaxy container, giving more realistic numbers than a local run.
 
 For each benchmark, we recommend using a new Galaxy container to ensure a clean environment, preventing any interference with your performance results.
 
 ### Deploy
 
-The apps are deployed to Galaxy to benefit of further analysis with MontiAPM tool.
-
-To enable MontiAPM, use `ENABLE_APM`. MontiAPM may overload the app, so measure the metrics carefully, especially during CPU profiling. Enable or disable it in both apps for a fair comparison.
+The apps are deployed to Galaxy for remote stress testing.
 
 To deploy each app after changes:
 
@@ -64,7 +62,6 @@ To deploy each app after changes:
 
 Current apps are accessible at:
 
-- tasks-2.x: http://tasks-2.0-perf.meteorapp.com
 - tasks-3.x: http://tasks-3.0-perf.meteorapp.com
 
 

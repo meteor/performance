@@ -1,0 +1,222 @@
+<template name="detail">
+  {{#if Template.subscriptionsReady}}
+    {{#with run}}
+
+      {{!-- Breadcrumb --}}
+      <nav class="text-xs text-neutral-500 mb-3">
+        <a href="/" class="hover:text-neutral-700 dark:hover:text-neutral-300">Runs</a>
+        <span class="mx-1.5">/</span>
+        <a href="/scenario/{{scenario}}" class="hover:text-neutral-700 dark:hover:text-neutral-300">{{scenario}}</a>
+        <span class="mx-1.5">/</span>
+        <span class="text-neutral-700 dark:text-neutral-300 font-mono">{{tag}}</span>
+      </nav>
+
+      {{!-- Header band --}}
+      <div class="flex flex-wrap items-start justify-between gap-4 pb-4 mb-6 border-b border-neutral-200 dark:border-neutral-800">
+        <div>
+          <h1 class="text-2xl font-semibold text-neutral-950 dark:text-neutral-100 tracking-tight font-mono">{{tag}}</h1>
+          <div class="mt-1.5 flex flex-wrap items-center gap-3 text-[12px] text-neutral-500 font-tabular">
+            <span class="inline-block rounded-sm bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-mono text-[11px] px-1.5 py-0.5">{{versionLabel}}</span>
+            {{#if shortSha}}<span class="font-mono">sha {{shortSha}}</span>{{/if}}
+            <span>·</span>
+            <a href="/scenario/{{scenario}}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{scenario}}</a>
+            <span>·</span>
+            <span>{{formatDate timestamp}}</span>
+            <span>·</span>
+            <span class="text-neutral-700 dark:text-neutral-300">{{formatMs wall_clock_ms}}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <a href="/compare" class="text-sm px-3 py-1.5 rounded-md bg-indigo-500 hover:bg-indigo-600 text-white transition">Compare ▾</a>
+          {{#if prevRunId}}
+            <a href="/run/{{prevRunId}}" class="text-sm px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">← Prev run</a>
+          {{/if}}
+        </div>
+      </div>
+
+      {{!-- Verdict --}}
+      {{#if verdict}}
+        <div class="-mt-4 mb-6 text-sm {{verdict.class}} font-tabular">
+          {{verdict.arrow}} {{verdict.text}}
+        </div>
+      {{/if}}
+
+      <div class="flex gap-8">
+
+        <aside class="hidden md:block w-44 shrink-0">
+          <nav class="sticky top-6 space-y-1 text-sm">
+            <a href="#overview" class="{{pillClass true}}">Overview</a>
+            {{#if hasDdpSection}}<a href="#ddp" class="{{pillClass false}}">DDP</a>{{/if}}
+            {{#if hasMongoSection}}<a href="#mongo" class="{{pillClass false}}">Mongo</a>{{/if}}
+            {{#if hasObserverSection}}<a href="#observer" class="{{pillClass false}}">Observer</a>{{/if}}
+            {{#if hasBuildSection}}<a href="#build" class="{{pillClass false}}">Build</a>{{/if}}
+            {{#if hasMissingSection}}<a href="#missing" class="{{pillClass false}}">Not in run</a>{{/if}}
+          </nav>
+        </aside>
+
+        <div class="flex-1 min-w-0 space-y-10">
+
+          <section id="overview" class="scroll-mt-6">
+            <h2 class="text-[11px] uppercase tracking-wide text-neutral-500 mb-3">Overview</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {{> metricCard title="Run info" rows=runInfoRows}}
+              {{> metricCard title="App resources" rows=appResourcesRows}}
+              {{> metricCard title="DB resources" rows=dbResourcesRows}}
+              {{> metricCard title="Garbage collection" rows=gcRows}}
+            </div>
+          </section>
+
+          {{#if hasDdpSection}}
+            <section id="ddp" class="scroll-mt-6">
+              <h2 class="text-[11px] uppercase tracking-wide text-neutral-500 mb-3">DDP</h2>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {{#if hasDdpMethods}}
+                  {{> metricCard title="DDP methods" badge=ddpMethodsBadge tableRows=ddpMethodsRows tableHeaders=ddpMethodsHeaders footer="latency in ms · server-side method handler wall time"}}
+                {{/if}}
+                {{#if hasDdpSubscriptions}}
+                  {{> metricCard title="DDP subscriptions" badge=ddpSubsBadge tableRows=ddpSubsRows tableHeaders=ddpMethodsHeaders footer="latency in ms · sub-message arrival → ready dispatch"}}
+                {{/if}}
+                {{#if hasLiveUpdatePropagation}}
+                  {{> metricCard title="Live-update propagation" badge=lupBadge rows=lupRows footer="insertAsync → sendAdded latency · attributable to observer driver choice"}}
+                {{/if}}
+                {{#if hasDdpMessages}}
+                  {{> metricCard title="DDP messages" badge=ddpMsgsBadge rows=ddpMsgsRows tableRows=ddpMsgsByTypeRows tableHeaders=ddpMsgsByTypeHeaders footer="message counts pre-compression · workload chattiness"}}
+                {{/if}}
+                {{#if hasDdpFrameSize}}
+                  {{> metricCard title="DDP frame size" tableRows=ddpFrameRows tableHeaders=ddpFrameHeaders footer="bytes per DDP frame · JSON.stringify length · pre-compression"}}
+                {{/if}}
+                {{#if hasDdpCompression}}
+                  {{> metricCard title="DDP compression (coarse)" tableRows=ddpCompRows tableHeaders=ddpCompHeaders footer="socket.bytesRead/Written vs pre-compression JSON · includes WS framing overhead"}}
+                {{/if}}
+              </div>
+            </section>
+          {{/if}}
+
+          {{#if hasMongoSection}}
+            <section id="mongo" class="scroll-mt-6">
+              <h2 class="text-[11px] uppercase tracking-wide text-neutral-500 mb-3">Mongo</h2>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {{#if hasMongoOps}}
+                  {{> metricCard title="Opcounters" badge=mongoOpsBadge tableRows=mongoOpsRows tableHeaders=mongoOpsHeaders footer="serverStatus delta over the run · workload shape"}}
+                {{/if}}
+                {{#if hasMongoPool}}
+                  {{> metricCard title="Connection pool" badge=mongoPoolBadge tableRows=mongoPoolRows tableHeaders=mongoPoolHeaders footer="current = open · active = working · saturation when current ≈ active"}}
+                {{/if}}
+                {{#if hasMongoSlowQueries}}
+                  {{> metricCard title="Slow queries" badge=mongoSlowBadge tableRows=mongoSlowByOpRows tableHeaders=mongoSlowHeaders rows=mongoSlowSampleRows footer="profile.system entries · filter values redacted, keys only"}}
+                {{/if}}
+                {{#if hasMongoChangestream}}
+                  {{> metricCard title="Change-stream cursors" badge=changestreamBadge tableRows=changestreamRows tableHeaders=changestreamHeaders footer="active currentOp getmores for $changeStream pipelines · 250 ms sampling"}}
+                {{/if}}
+                {{#if hasMongoWiredtiger}}
+                  {{> metricCard title="WiredTiger cache" badge=wtBadge rows=wtRows footer="WT cache traffic over the run · hit ratio above 0.95 is healthy"}}
+                {{/if}}
+              </div>
+              {{#if hasMongoIndexUsage}}
+                {{#each mongoIndexCollections}}
+                  <div class="mt-4">
+                    {{> metricCard title=collectionTitle tableRows=indexes tableHeaders=indexHeaders footer="$indexStats delta over the run · ops_in_window=0 means dead-weight index"}}
+                  </div>
+                {{/each}}
+              {{/if}}
+            </section>
+          {{/if}}
+
+          {{#if hasObserverSection}}
+            <section id="observer" class="scroll-mt-6">
+              <h2 class="text-[11px] uppercase tracking-wide text-neutral-500 mb-3">Observer + Drivers</h2>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {{#if hasObserverPool}}
+                  {{> metricCard title="Observer pool" badge=observerPoolBadge tableRows=observerPoolRows tableHeaders=observerPoolHeaders footer="multiplexer = unique cursor description · handle = a subscription on that cursor"}}
+                {{/if}}
+                {{#if hasDriverFallbacks}}
+                  {{> metricCard title="Driver fallbacks" badge=driverBadge rows=driverRows tableRows=driverFallbackRows tableHeaders=driverFallbackHeaders footer="per-cursor driver actually selected vs first preference"}}
+                {{/if}}
+              </div>
+            </section>
+          {{/if}}
+
+          {{#if hasBuildSection}}
+            <section id="build" class="scroll-mt-6">
+              <h2 class="text-[11px] uppercase tracking-wide text-neutral-500 mb-3">Build</h2>
+              <div class="space-y-4">
+                {{#if hasBuildProfile}}
+                  {{> metricCard title="Build profile (top hot nodes)" badge=buildBadge tableRows=buildTopNodes tableHeaders=buildHeaders footer=buildFooter}}
+                {{/if}}
+                {{#if hasPluginCompile}}
+                  {{> metricCard title="Per-compiler-plugin time" badge=pluginBadge tableRows=pluginRows tableHeaders=pluginHeaders footer="extracted from METEOR_PROFILE=1 · sorted by self_ms desc"}}
+                {{/if}}
+              </div>
+            </section>
+          {{/if}}
+
+          {{#if hasMissingSection}}
+            <section id="missing" class="scroll-mt-6">
+              <h2 class="text-[11px] uppercase tracking-wide text-neutral-500 mb-3">Not in this run</h2>
+              <div class="flex flex-wrap gap-1.5">
+                {{#each missingMetrics}}
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded-sm bg-neutral-100 dark:bg-neutral-800/60 text-neutral-500">{{this}}</span>
+                {{/each}}
+              </div>
+            </section>
+          {{/if}}
+
+        </div>
+      </div>
+
+    {{else}}
+      <div class="text-center py-16 text-sm text-neutral-500">Run not found.</div>
+    {{/with}}
+  {{else}}
+    <div class="text-center py-16 text-sm text-neutral-500">Loading…</div>
+  {{/if}}
+</template>
+
+<template name="metricCard">
+  <div class="border border-neutral-200 dark:border-neutral-800 rounded-md overflow-hidden bg-white dark:bg-neutral-900/40">
+    <div class="flex items-center justify-between px-4 py-2 border-b border-neutral-200 dark:border-neutral-800">
+      <div class="text-sm font-medium text-neutral-800 dark:text-neutral-200">{{title}}</div>
+      {{#if badge}}<div class="text-[11px] text-neutral-500 font-tabular">{{badge}}</div>{{/if}}
+    </div>
+
+    {{#if rows.length}}
+      <table class="w-full text-sm font-tabular">
+        <tbody>
+          {{#each rows}}
+            <tr class="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0">
+              <td class="py-1 px-4 text-neutral-600 dark:text-neutral-400">{{label}}</td>
+              <td class="py-1 px-4 text-right text-neutral-800 dark:text-neutral-200">{{{value}}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    {{/if}}
+
+    {{#if tableRows.length}}
+      <table class="w-full text-sm font-tabular">
+        <thead class="text-[11px] uppercase tracking-wide text-neutral-500">
+          <tr class="border-b border-neutral-200 dark:border-neutral-800">
+            {{#each tableHeaders}}
+              <th class="py-1.5 px-4 {{cls}} font-medium">{{label}}</th>
+            {{/each}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each tableRows}}
+            <tr class="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0">
+              {{#each cells}}
+                <td class="py-1 px-4 {{cls}} text-neutral-800 dark:text-neutral-200">{{{value}}}</td>
+              {{/each}}
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    {{/if}}
+
+    {{#if footer}}
+      <div class="px-4 py-2 text-[11px] text-neutral-500 border-t border-neutral-100 dark:border-neutral-800/60">
+        {{footer}}
+      </div>
+    {{/if}}
+  </div>
+</template>

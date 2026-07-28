@@ -1,0 +1,113 @@
+name: Runtime Matrix Benchmark
+
+# Runs the same benchmark scenario across the (observer driver × DDP
+# transport) matrix and pushes each result independently so the dashboard
+# can compare the four combinations.
+#
+# Observer driver is selected via METEOR_REACTIVITY_ORDER (Meteor 3.x reads
+# the first entry as the preferred driver; later entries are fallbacks if
+# the first isn't available). Transport is selected via DDP_TRANSPORT.
+# Both env vars are passed through `node bench.js run --env KEY=VALUE` so
+# the Meteor process sees them.
+#
+# The harness's runtime-info-extractor captures the lines tasks-3.x logs
+# on startup and writes them to `runtime.observer_driver` / `runtime.transport`
+# on the result JSON — every pushed run carries its own matrix coordinates.
+#
+# All ${{ }} interpolations of inputs flow through step-level env: blocks
+# rather than directly into shell bodies; see commit 1.5 (d3e90ca) for
+# the rationale.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Meteor branch to benchmark'
+        required: true
+        default: 'release-3.5'
+      scenario:
+        description: 'Benchmark scenario'
+        required: true
+        default: 'reactive-light'
+
+env:
+  METEOR_REPO: ${{ github.workspace }}/meteor
+  BENCH_API_KEY: ${{ secrets.BENCH_API_KEY }}
+  BENCH_DASHBOARD_URL: ${{ secrets.BENCH_DASHBOARD_URL }}
+
+jobs:
+  runtime-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        observer: [changeStreams, oplog]
+        transport: [sockjs, uws]
+      fail-fast: false
+
+    steps:
+      - name: Checkout performance repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        if: contains(inputs.scenario, 'reactive-light') || contains(inputs.scenario, 'reactive-crud')
+        run: npx playwright install chromium
+
+      - name: Clone Meteor core
+        env:
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          git clone --no-single-branch --depth 50 https://github.com/meteor/meteor.git "$METEOR_REPO"
+          cd "$METEOR_REPO"
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+
+      - name: Install app dependencies
+        run: npm install
+        working-directory: apps/tasks-3.x
+
+      - name: Run benchmark (observer=${{ matrix.observer }} × transport=${{ matrix.transport }})
+        env:
+          SCENARIO: ${{ inputs.scenario }}
+          BRANCH: ${{ inputs.branch }}
+          OBSERVER: ${{ matrix.observer }}
+          TRANSPORT: ${{ matrix.transport }}
+        run: |
+          METEOR_CHECKOUT_PATH="$METEOR_REPO" \
+          node bench.js run \
+            --scenario "$SCENARIO" \
+            --tag "${BRANCH}-${OBSERVER}-${TRANSPORT}" \
+            --env "METEOR_REACTIVITY_ORDER=${OBSERVER}" \
+            --env "DDP_TRANSPORT=${TRANSPORT}" \
+            --output "results/${OBSERVER}-${TRANSPORT}.json"
+
+      - name: Push results to dashboard
+        if: env.BENCH_API_KEY != ''
+        timeout-minutes: 8
+        env:
+          OBSERVER: ${{ matrix.observer }}
+          TRANSPORT: ${{ matrix.transport }}
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf https://meteor-benchmark-dashboard.sandbox.galaxycloud.app > /dev/null 2>&1; then
+              echo "Dashboard is up"; break
+            fi
+            echo "Waiting for dashboard cold start... ($i/30)"
+            sleep 10
+          done
+          node bench.js push --result "results/${OBSERVER}-${TRANSPORT}.json" || true
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-matrix-${{ matrix.observer }}-${{ matrix.transport }}-${{ inputs.scenario }}
+          path: results/
+          retention-days: 30

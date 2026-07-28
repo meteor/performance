@@ -1,0 +1,61 @@
+<template name="mainLayout">
+  <div class="min-h-screen flex">
+
+    {{!-- Sidebar --}}
+    <aside class="hidden lg:flex w-60 shrink-0 flex-col border-r border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900">
+      {{!-- Brand --}}
+      <div class="px-5 pt-6 pb-5 border-b border-neutral-200 dark:border-neutral-800">
+        <a href="/" class="block">
+          <div class="text-[15px] font-semibold leading-tight text-neutral-950 dark:text-neutral-100">Meteor</div>
+          <div class="text-[15px] font-semibold leading-tight text-neutral-950 dark:text-neutral-100">Benchmark</div>
+          <div class="mt-1 text-[11px] text-neutral-500 font-mono">v0.1.0-beta</div>
+        </a>
+      </div>
+
+      {{!-- Primary nav --}}
+      <nav class="flex-1 py-4 text-sm">
+        <a href="/" class="{{navItemClass 'dashboard'}}">
+          <span class="inline-block w-4 mr-2 text-neutral-500">·</span>Runs
+        </a>
+        <a href="/compare" class="{{navItemClass 'compare'}}">
+          <span class="inline-block w-4 mr-2 text-neutral-500">·</span>Compare
+        </a>
+        <a href="/trends" class="{{navItemClass 'trends'}}">
+          <span class="inline-block w-4 mr-2 text-neutral-500">·</span>Trends
+        </a>
+
+        <div class="mt-6 mx-5 border-t border-dashed border-neutral-300 dark:border-neutral-800"></div>
+
+        <a href="#" class="{{navItemClass '__nope'}} opacity-50 cursor-default mt-3" onclick="return false;">
+          <span class="inline-block w-4 mr-2 text-neutral-500">·</span>Settings
+        </a>
+        <a href="#" class="{{navItemClass '__nope'}} opacity-50 cursor-default" onclick="return false;">
+          <span class="inline-block w-4 mr-2 text-neutral-500">·</span>Documentation
+        </a>
+      </nav>
+
+      {{!-- Footer block: theme toggle + user --}}
+      <div class="border-t border-neutral-200 dark:border-neutral-800 px-5 py-4 flex items-center justify-between">
+        <button class="js-theme-toggle inline-flex items-center justify-center w-8 h-8 rounded border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition"
+                title="Toggle theme">
+          {{themeIcon}}
+        </button>
+        <div class="text-xs text-neutral-500 truncate">Italo Jose</div>
+      </div>
+    </aside>
+
+    {{!-- Mobile top bar --}}
+    <header class="lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 h-12 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900">
+      <a href="/" class="text-sm font-semibold text-neutral-950 dark:text-neutral-100">Meteor Benchmark</a>
+      <button class="js-theme-toggle inline-flex items-center justify-center w-8 h-8 rounded border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200"
+              title="Toggle theme">
+        {{themeIcon}}
+      </button>
+    </header>
+
+    {{!-- Content --}}
+    <main class="flex-1 min-w-0 px-6 lg:px-10 pt-16 lg:pt-8 pb-12">
+      {{> Template.dynamic template=content}}
+    </main>
+  </div>
+</template>

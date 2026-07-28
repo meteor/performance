@@ -1,8 +1,28 @@
+# IDE / editor
 .idea
+.vscode/
+.DS_Store
+
+# Dependencies
 node_modules/
+
+# Build / cache
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Runtime output (benchmark results, GC dumps, logs)
+results/
+*.log
 /logs*
+
+# Local-only config (per-machine secrets, dev settings, observability stack)
 .env*
+settings.json
+otel/
+
+# Team coordination workspace (out of repo scope)
+.claude/
+
+.playwright-mcp/

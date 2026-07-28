@@ -37,8 +37,4 @@ async function nonReactiveAddAndRemoveTasks(page) {
   await addAndRemoveTasks({ page, reactive: false, taskCount });
 }
 
-module.exports = {
-  reactiveAddAndRemoveTasks,
-  nonReactiveAddAndRemoveTasks,
-  addAndRemoveTasks,
-}
+export { reactiveAddAndRemoveTasks, nonReactiveAddAndRemoveTasks, addAndRemoveTasks };

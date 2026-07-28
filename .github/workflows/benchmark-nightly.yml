@@ -1,0 +1,139 @@
+name: Nightly Benchmark
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Every night at 3am UTC
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to benchmark'
+        default: 'devel'
+
+env:
+  METEOR_REPO: ${{ github.workspace }}/meteor
+  BENCH_API_KEY: ${{ secrets.BENCH_API_KEY }}
+  BENCH_DASHBOARD_URL: ${{ secrets.BENCH_DASHBOARD_URL }}
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest  # TODO: switch to self-hosted for stable results
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        scenario: [reactive-light]
+      fail-fast: false
+
+    steps:
+      - name: Checkout performance repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      - name: Clone Meteor core
+        run: |
+          git clone --no-single-branch --depth 50 https://github.com/meteor/meteor.git $METEOR_REPO
+          cd $METEOR_REPO
+          git fetch --tags --depth 50
+
+      - name: Install app dependencies
+        run: npm install
+        working-directory: apps/tasks-3.x
+
+      - name: Set branch
+        id: params
+        run: |
+          echo "branch=${{ inputs.branch || 'devel' }}" >> $GITHUB_OUTPUT
+          echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+
+      - name: Checkout target branch
+        run: |
+          cd $METEOR_REPO
+          git checkout ${{ steps.params.outputs.branch }}
+
+      - name: Run benchmark
+        run: |
+          METEOR_CHECKOUT_PATH=$METEOR_REPO \
+          node bench.js run \
+            --scenario ${{ matrix.scenario }} \
+            --tag ${{ steps.params.outputs.branch }} \
+            --output results/nightly-${{ matrix.scenario }}-${{ steps.params.outputs.date }}.json
+
+      - name: Push results to dashboard
+        if: env.BENCH_API_KEY != ''
+        timeout-minutes: 8
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf https://meteor-benchmark-dashboard.sandbox.galaxycloud.app > /dev/null 2>&1; then
+              echo "Dashboard is up"; break
+            fi
+            echo "Waiting for dashboard cold start... ($i/30)"
+            sleep 10
+          done
+          node bench.js push \
+            --result results/nightly-${{ matrix.scenario }}-${{ steps.params.outputs.date }}.json
+
+      # Compare vs latest release baseline
+      - name: Get latest release branch
+        id: release
+        run: |
+          cd $METEOR_REPO
+          LATEST=$(git branch -r | grep 'origin/release-3\.' | sed 's|.*origin/||' | sort -t. -k2 -n | tail -1)
+          echo "tag=$LATEST" >> $GITHUB_OUTPUT
+          echo "Latest release branch: $LATEST"
+
+      - name: Run baseline (latest release)
+        run: |
+          cd $METEOR_REPO
+          git fetch origin ${{ steps.release.outputs.tag }}
+          git checkout ${{ steps.release.outputs.tag }}
+          cd ${{ github.workspace }}
+          METEOR_CHECKOUT_PATH=$METEOR_REPO \
+          node bench.js run \
+            --scenario ${{ matrix.scenario }} \
+            --tag ${{ steps.release.outputs.tag }} \
+            --output results/nightly-baseline-${{ matrix.scenario }}-${{ steps.params.outputs.date }}.json
+
+      - name: Push baseline to dashboard
+        if: env.BENCH_API_KEY != ''
+        timeout-minutes: 8
+        run: |
+          node bench.js push \
+            --result results/nightly-baseline-${{ matrix.scenario }}-${{ steps.params.outputs.date }}.json
+
+      - name: Compare
+        id: compare
+        run: |
+          node bench.js compare \
+            --baseline results/nightly-baseline-${{ matrix.scenario }}-${{ steps.params.outputs.date }}.json \
+            --target results/nightly-${{ matrix.scenario }}-${{ steps.params.outputs.date }}.json \
+            --format markdown > results/nightly-report-${{ matrix.scenario }}.md || true
+          cat results/nightly-report-${{ matrix.scenario }}.md
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-${{ matrix.scenario }}-${{ steps.params.outputs.date }}
+          path: results/
+          retention-days: 90
+
+  notify:
+    needs: nightly
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Notify regression
+        run: |
+          echo "::warning::Nightly benchmark detected a regression. Check the dashboard."
+          # TODO: Add Slack webhook notification here
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"⚠️ Nightly benchmark regression detected"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}

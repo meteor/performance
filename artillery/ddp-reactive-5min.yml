@@ -1,0 +1,18 @@
+config:
+  # target is overridden at runtime by drivers/artillery.js (--target +
+  # REMOTE_URL) to point at BENCH_PORT. Kept here so the file runs standalone.
+  target: http://localhost:3000
+  phases:
+    - duration: 30
+      arrivalRate: 2
+      name: Warm up
+    - duration: 300
+      arrivalRate: 8
+      name: Sustained moderate reactive load
+  processor: '../tests/ddp-helpers.js'
+scenarios:
+  - name: Reactive DDP CRUD (shared high-fanout pub)
+    engine: http
+    beforeScenario: reactiveCrud
+    flow:
+      - log: "DDP VU complete"

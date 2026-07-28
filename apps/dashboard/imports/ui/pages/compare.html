@@ -1,0 +1,144 @@
+<template name="compare">
+  <div class="max-w-7xl">
+    <h1 class="text-2xl font-semibold text-neutral-950 dark:text-neutral-100 tracking-tight mb-6">Compare</h1>
+
+    {{!-- Top filter row --}}
+    <div class="flex flex-wrap items-end gap-3 mb-5">
+      <div>
+        <label class="block text-[11px] uppercase tracking-wide text-neutral-500 mb-1">Scenario</label>
+        <select id="filterScenario"
+                class="text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 min-w-[12rem]">
+          <option value="">All scenarios</option>
+          {{#each scenarios}}
+            <option value="{{this}}" selected="{{isSelected this ../selectedScenario}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-[11px] uppercase tracking-wide text-neutral-500 mb-1">Run A</label>
+        <select id="runA"
+                class="text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono min-w-[22rem]">
+          <option value="">Pick a run…</option>
+          {{#each runOptions}}
+            <option value="{{_id}}" selected="{{isSelected _id ../selectedA}}">{{label}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <button id="swapAB"
+              class="text-xs px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+              title="Swap A ↔ B">⇄</button>
+
+      <div>
+        <label class="block text-[11px] uppercase tracking-wide text-neutral-500 mb-1">Run B</label>
+        <select id="runB"
+                class="text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono min-w-[22rem]">
+          <option value="">Pick a run…</option>
+          {{#each runOptions}}
+            <option value="{{_id}}" selected="{{isSelected _id ../selectedB}}">{{label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+
+    {{#if bothPicked}}
+      {{!-- Headline strip --}}
+      <div class="flex flex-wrap items-center justify-between gap-2 py-3 px-4 mb-4 border border-neutral-200 dark:border-neutral-800 rounded-md bg-neutral-50/50 dark:bg-neutral-900/40">
+        <div class="text-sm text-neutral-800 dark:text-neutral-200 font-mono">
+          {{runALabel}} <span class="text-neutral-500 mx-1">→</span> {{runBLabel}}
+        </div>
+        <div class="text-xs text-neutral-500 font-tabular">
+          {{summary.total}} metrics ·
+          <span class="text-orange-500">{{summary.regressions}} regressions</span> ·
+          <span class="text-green-500">{{summary.improvements}} improvements</span> ·
+          <span class="text-neutral-500">{{summary.neutral}} within noise</span>
+        </div>
+        <label class="flex items-center gap-1.5 text-xs text-neutral-700 dark:text-neutral-300">
+          <input type="checkbox" id="hideNoise" checked="{{hideNoise}}"
+                 class="rounded border-neutral-300 dark:border-neutral-700"/>
+          hide within-noise
+        </label>
+      </div>
+
+      {{!-- Scoreboard --}}
+      <div class="border border-neutral-200 dark:border-neutral-800 rounded-md overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-neutral-50 dark:bg-neutral-900/60 text-[11px] uppercase tracking-wide text-neutral-500 border-b border-neutral-200 dark:border-neutral-800">
+            <tr>
+              <th class="text-left font-medium py-2 px-3">Metric</th>
+              <th class="text-right font-medium py-2 px-3">A</th>
+              <th class="text-right font-medium py-2 px-3">B</th>
+              <th class="text-right font-medium py-2 px-3">Δ abs</th>
+              <th class="text-right font-medium py-2 px-3">Δ %</th>
+              <th class="text-right font-medium py-2 px-3">Status</th>
+              <th class="text-right font-medium py-2 px-3 w-16"></th>
+            </tr>
+          </thead>
+          <tbody class="font-tabular">
+            {{#each comparisonRows}}
+              <tr class="border-b border-neutral-100 dark:border-neutral-800/60 hover:bg-neutral-50 dark:hover:bg-neutral-900/40 cursor-pointer js-row-toggle" data-key="{{key}}">
+                <td class="py-1.5 px-3 font-mono text-[12px] text-neutral-800 dark:text-neutral-200">
+                  <span class="text-neutral-500 mr-1">{{toggleArrow}}</span>{{key}}
+                </td>
+                <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{aDisplay}}</td>
+                <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{bDisplay}}</td>
+                <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{deltaAbs}}</td>
+                <td class="py-1.5 px-3 text-right {{deltaClass}}">{{deltaPct}}</td>
+                <td class="py-1.5 px-3 text-right">
+                  <span class="inline-block rounded-sm text-[11px] font-medium px-1.5 py-0.5 {{statusClass}}">{{statusLabel}}</span>
+                </td>
+                <td class="py-1.5 px-3 text-right whitespace-nowrap">
+                  <a href="/run/{{aId}}" class="text-neutral-500 hover:text-indigo-500 text-[11px]" title="open run A" onclick="event.stopPropagation()">↗A</a>
+                  <a href="/run/{{bId}}" class="text-neutral-500 hover:text-indigo-500 text-[11px] ml-1" title="open run B" onclick="event.stopPropagation()">↗B</a>
+                </td>
+              </tr>
+              {{#if expanded}}
+                <tr class="bg-neutral-50 dark:bg-neutral-900/60 border-b border-neutral-200 dark:border-neutral-800">
+                  <td colspan="7" class="py-3 px-6 text-xs text-neutral-600 dark:text-neutral-400">
+                    {{#if drilldownRows.length}}
+                      <table class="w-full font-tabular">
+                        <thead class="text-[10px] uppercase tracking-wide text-neutral-500">
+                          <tr>
+                            <th class="text-left font-medium py-1 pr-3">Sub-key</th>
+                            <th class="text-right font-medium py-1 px-2">A</th>
+                            <th class="text-right font-medium py-1 px-2">B</th>
+                            <th class="text-right font-medium py-1 px-2">Δ %</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {{#each drilldownRows}}
+                            <tr>
+                              <td class="py-0.5 pr-3 font-mono text-[11px] text-neutral-700 dark:text-neutral-300">{{subKey}}</td>
+                              <td class="py-0.5 px-2 text-right text-neutral-700 dark:text-neutral-300">{{aDisplay}}</td>
+                              <td class="py-0.5 px-2 text-right text-neutral-700 dark:text-neutral-300">{{bDisplay}}</td>
+                              <td class="py-0.5 px-2 text-right {{deltaClass}}">{{deltaPct}}</td>
+                            </tr>
+                          {{/each}}
+                        </tbody>
+                      </table>
+                    {{else}}
+                      <div class="text-neutral-500 italic">No further breakdown available for this metric.</div>
+                    {{/if}}
+                  </td>
+                </tr>
+              {{/if}}
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+
+      {{#if onlyInOneCount}}
+        <div class="mt-3 text-xs text-neutral-500">
+          Not comparable in one run: {{onlyInOneText}}
+        </div>
+      {{/if}}
+
+    {{else}}
+      <div class="border border-dashed border-neutral-300 dark:border-neutral-800 rounded-md p-10 text-center text-sm text-neutral-500">
+        Pick two runs above to compare.
+      </div>
+    {{/if}}
+
+  </div>
+</template>

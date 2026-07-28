@@ -1,0 +1,123 @@
+<template name="scenario">
+  <div class="max-w-7xl">
+    {{#with info}}
+
+      {{!-- Breadcrumb --}}
+      <nav class="text-xs text-neutral-500 mb-3">
+        <a href="/" class="hover:text-neutral-700 dark:hover:text-neutral-300">Runs</a>
+        <span class="mx-1.5">/</span>
+        <span class="text-neutral-700 dark:text-neutral-300 font-mono">{{name}}</span>
+      </nav>
+
+      {{!-- Header band --}}
+      <div class="flex flex-wrap items-end justify-between gap-3 pb-4 mb-6 border-b border-neutral-200 dark:border-neutral-800">
+        <div>
+          <h1 class="text-2xl font-semibold text-neutral-950 dark:text-neutral-100 tracking-tight font-mono">{{name}}</h1>
+          <div class="mt-1 text-xs text-neutral-500 font-tabular">{{runCount}} runs · {{driver}}</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <a href="/compare" class="text-sm px-3 py-1.5 rounded-md bg-indigo-500 hover:bg-indigo-600 text-white transition">Compare runs →</a>
+          <a href="/trends" class="text-sm px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">View trends →</a>
+        </div>
+      </div>
+
+      {{!-- About + At-a-glance --}}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="border border-neutral-200 dark:border-neutral-800 rounded-md p-4 bg-white dark:bg-neutral-900/40">
+          <div class="text-[11px] uppercase tracking-wide text-neutral-500 mb-2">About this scenario</div>
+          <p class="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{{summary}}</p>
+        </div>
+
+        <div class="border border-neutral-200 dark:border-neutral-800 rounded-md p-4 bg-white dark:bg-neutral-900/40">
+          <div class="text-[11px] uppercase tracking-wide text-neutral-500 mb-2">At a glance</div>
+          <table class="w-full text-sm font-tabular">
+            <tbody>
+              <tr class="border-b border-neutral-100 dark:border-neutral-800/60">
+                <td class="py-1 text-neutral-600 dark:text-neutral-400">Driver</td>
+                <td class="py-1 text-right">
+                  <span class="inline-block rounded-sm bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-mono text-[11px] px-1.5 py-0.5">{{driver}}</span>
+                </td>
+              </tr>
+              <tr class="border-b border-neutral-100 dark:border-neutral-800/60">
+                <td class="py-1 text-neutral-600 dark:text-neutral-400">Virtual users</td>
+                <td class="py-1 text-right text-neutral-800 dark:text-neutral-200">{{vus}}</td>
+              </tr>
+              <tr class="border-b border-neutral-100 dark:border-neutral-800/60">
+                <td class="py-1 text-neutral-600 dark:text-neutral-400">Duration</td>
+                <td class="py-1 text-right text-neutral-800 dark:text-neutral-200">{{duration}}</td>
+              </tr>
+              <tr>
+                <td class="py-1 text-neutral-600 dark:text-neutral-400">Requires browser</td>
+                <td class="py-1 text-right text-neutral-800 dark:text-neutral-200">{{#if browser}}Yes (Chromium){{else}}No{{/if}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {{!-- Technical details accordion --}}
+      <div class="border border-neutral-200 dark:border-neutral-800 rounded-md mb-6 bg-white dark:bg-neutral-900/40">
+        <button id="techToggle"
+                class="w-full flex items-center justify-between text-left px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition">
+          <span>Technical details</span>
+          <span class="text-neutral-500">{{techArrow}}</span>
+        </button>
+        {{#if techOpen}}
+          <div class="px-4 pb-4 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 border-t border-neutral-100 dark:border-neutral-800/60">
+            <p class="pt-3">{{{technical}}}</p>
+          </div>
+        {{/if}}
+      </div>
+
+      {{!-- Runs table (filtered) --}}
+      <h2 class="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-3">Runs for this scenario</h2>
+
+      {{#if hasRuns}}
+        <div class="border border-neutral-200 dark:border-neutral-800 rounded-md overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-neutral-50 dark:bg-neutral-900/60 text-[11px] uppercase tracking-wide text-neutral-500 border-b border-neutral-200 dark:border-neutral-800">
+              <tr>
+                <th class="text-left font-medium py-2 px-3">When</th>
+                <th class="text-left font-medium py-2 px-3">Version</th>
+                <th class="text-left font-medium py-2 px-3">Tag</th>
+                <th class="text-right font-medium py-2 px-3">Duration</th>
+                <th class="text-right font-medium py-2 px-3">CPU</th>
+                <th class="text-right font-medium py-2 px-3">RAM</th>
+                <th class="text-right font-medium py-2 px-3">GC pause</th>
+                <th class="text-right font-medium py-2 px-3 w-8"></th>
+              </tr>
+            </thead>
+            <tbody class="font-tabular">
+              {{#each runs}}
+                <tr class="border-b border-neutral-100 dark:border-neutral-800/60 hover:bg-neutral-50 dark:hover:bg-neutral-900/40 transition">
+                  <td class="py-1.5 px-3 text-neutral-600 dark:text-neutral-400 whitespace-nowrap">{{whenAgo}}</td>
+                  <td class="py-1.5 px-3">
+                    <span class="inline-block rounded-sm bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-mono text-[11px] px-1.5 py-0.5">{{versionLabel}}</span>
+                  </td>
+                  <td class="py-1.5 px-3 font-mono text-[12px] text-neutral-700 dark:text-neutral-200">{{tag}}</td>
+                  <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{wallClock}}</td>
+                  <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{cpuAvg}}</td>
+                  <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{ramAvg}}</td>
+                  <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{gcPause}}</td>
+                  <td class="py-1.5 px-3 text-right">
+                    <a href="/run/{{_id}}" class="text-neutral-500 hover:text-indigo-500">↗</a>
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <div class="border border-dashed border-neutral-300 dark:border-neutral-800 rounded-md p-8 text-center text-sm text-neutral-500">
+          No runs yet for this scenario.
+        </div>
+      {{/if}}
+
+    {{else}}
+      <div class="text-center py-16">
+        <p class="text-sm text-neutral-500">Unknown scenario: <strong class="font-mono text-neutral-700 dark:text-neutral-300">{{scenarioName}}</strong></p>
+        <a href="/" class="inline-block mt-4 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">← back to runs</a>
+      </div>
+    {{/with}}
+  </div>
+</template>

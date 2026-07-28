@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* Meteor strips attributes from <body>, so use the canvas tokens here
+   instead of via Tailwind utilities on the element. */
+html, body {
+  background-color: #ffffff;
+  color: #313030;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+html.dark, html.dark body {
+  background-color: #0a0a0a;
+  color: #c9c6c5;
+}
+
+/* Tell Tailwind 4 where the markup lives. Without this, it scans relative
+   to this file (and would miss imports/) and `.html` files aren't on the
+   default extension list. Glob is rooted at this file. */
+@source "../client/**/*.html";
+@source "../client/**/*.js";
+@source "../imports/**/*.html";
+@source "../imports/**/*.js";
+
+/* Toggle dark mode via class on <html> so we control it, not OS prefs. */
+@variant dark (&:where(.dark, .dark *));
+
+/* Map our two custom font stacks into the Tailwind theme so `font-sans`
+   and `font-mono` resolve to Geist + JetBrains Mono without us repeating
+   the family in every utility class. */
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+}
+
+/* Tabular numerals — non-negotiable for every metric table so digits
+   line up column-to-column. Tailwind 4 ships @theme but not this utility
+   shorthand by default, so expose it here. */
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Sticky thead helper for the runs / compare scoreboard tables. */
+.thead-sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}

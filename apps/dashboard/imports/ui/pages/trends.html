@@ -1,0 +1,92 @@
+<template name="trends">
+  <div class="max-w-7xl">
+    <h1 class="text-2xl font-semibold text-neutral-950 dark:text-neutral-100 tracking-tight mb-6">Trends</h1>
+
+    {{!-- Filter row --}}
+    <div class="flex flex-wrap items-end gap-3 mb-5">
+      <div>
+        <label class="block text-[11px] uppercase tracking-wide text-neutral-500 mb-1">Scenario</label>
+        <select id="trendScenario"
+                class="text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 min-w-[12rem]">
+          {{#each scenarios}}
+            <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-[11px] uppercase tracking-wide text-neutral-500 mb-1">Metric</label>
+        <select id="trendMetric"
+                class="text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 min-w-[14rem]">
+          <optgroup label="Runtime">
+            <option value="wall_clock">Duration (s)</option>
+            <option value="cpu_avg">App CPU avg (%)</option>
+            <option value="cpu_max">App CPU max (%)</option>
+            <option value="ram_avg">App RAM avg (MB)</option>
+            <option value="ram_max">App RAM max (MB)</option>
+            <option value="gc_total">GC total pause (ms)</option>
+            <option value="gc_max">GC max pause (ms)</option>
+            <option value="gc_count">GC count</option>
+          </optgroup>
+          <optgroup label="DDP">
+            <option value="ddp_methods_total">Method calls (total)</option>
+            <option value="ddp_subs_total">Subscriptions (total)</option>
+            <option value="live_update_p95">Live-update p95 (ms)</option>
+            <option value="ddp_msgs_out">DDP messages out</option>
+          </optgroup>
+          <optgroup label="Mongo">
+            <option value="mongo_ops_total">Mongo ops (total)</option>
+            <option value="mongo_pool_max">Mongo pool max</option>
+          </optgroup>
+          <optgroup label="Build">
+            <option value="build_total">Build total (ms)</option>
+            <option value="plugin_total">Plugin compile (ms)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-[11px] uppercase tracking-wide text-neutral-500 mb-1">Segment by</label>
+        <div class="inline-flex rounded-md border border-neutral-300 dark:border-neutral-700 overflow-hidden text-sm">
+          <button id="segVersion" class="{{segClass 'version'}}">version</button>
+          <button id="segTag"     class="{{segClass 'tag'}}">tag</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[11px] uppercase tracking-wide text-neutral-500 mb-1">Date range</label>
+        <select id="trendRange"
+                class="text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+          <option value="7">7d</option>
+          <option value="30" selected>30d</option>
+          <option value="90">90d</option>
+          <option value="0">All</option>
+        </select>
+      </div>
+
+      <div class="ml-auto text-xs text-neutral-500 font-tabular pb-1">
+        {{runCount}} runs · {{segmentCount}} {{segmentNoun}}
+      </div>
+    </div>
+
+    <div class="border border-neutral-200 dark:border-neutral-800 rounded-md p-4 bg-white dark:bg-neutral-900/40 relative" style="min-height: 320px;">
+      <canvas id="trendChart" class="{{canvasVisibility}}" style="max-height: 360px;"></canvas>
+
+      {{#if hasData}}
+        <div class="mt-3 flex flex-wrap gap-3 text-xs text-neutral-500 font-tabular">
+          {{#each legendEntries}}
+            <span class="flex items-center gap-1.5">
+              <span class="inline-block w-2 h-2 rounded-full" style="background-color: {{color}};"></span>
+              <span class="text-neutral-700 dark:text-neutral-300">{{label}}</span>
+              <span class="text-neutral-500">{{count}} runs</span>
+            </span>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="absolute inset-0 flex items-center justify-center text-sm text-neutral-500">
+          No data for this scenario yet.
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</template>

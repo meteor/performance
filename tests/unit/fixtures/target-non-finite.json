@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-01-06T00:00:00.000Z",
+  "tag": "devel-broken",
+  "meteor": {
+    "version": "devel",
+    "sha": "333cccc"
+  },
+  "scenario": "reactive-light",
+  "app": "tasks-3.x",
+  "wall_clock_ms": 41000,
+  "metrics": {
+    "app_resources": {
+      "metric": "app_resources",
+      "name": "APP",
+      "pid": 60001,
+      "samples": 41,
+      "cpu": { "avg": null, "max": 92.0, "unit": "percent" },
+      "memory": { "avg_mb": 144.0, "max_mb": 175.0, "unit": "MB" }
+    },
+    "gc": {
+      "metric": "gc",
+      "unit": "ms",
+      "total_pause_ms": 210.0,
+      "count": 135,
+      "max_pause_ms": 42.0,
+      "avg_pause_ms": 1.56,
+      "minor": { "count": 99, "total_ms": 135.0 },
+      "major": { "count": 19, "total_ms": 83.0 },
+      "incremental": { "count": 17, "total_ms": 4.2 },
+      "weakcb": { "count": 0, "total_ms": 0 }
+    }
+  }
+}

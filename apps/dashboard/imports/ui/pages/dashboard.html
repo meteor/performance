@@ -1,0 +1,95 @@
+<template name="dashboard">
+  <div class="max-w-7xl">
+
+    {{!-- Header --}}
+    <div class="flex items-end justify-between mb-6">
+      <h1 class="text-2xl font-semibold text-neutral-950 dark:text-neutral-100 tracking-tight">Runs</h1>
+      <div class="text-xs text-neutral-500 font-tabular">
+        {{runCount}} runs · {{scenarioCount}} scenarios
+      </div>
+    </div>
+
+    {{!-- Filter bar --}}
+    <div class="flex flex-wrap items-center gap-3 mb-4">
+      <select id="filterScenario"
+              class="text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        <option value="">All scenarios</option>
+        {{#each scenarios}}
+          <option value="{{this}}">{{this}}</option>
+        {{/each}}
+      </select>
+
+      <input id="filterTag" type="search" placeholder="Filter by tag…"
+             class="text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 w-56">
+
+      {{#if hasActiveFilters}}
+        <button id="clearFilters"
+                class="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">
+          clear filters ✕
+        </button>
+      {{/if}}
+    </div>
+
+    {{#if Template.subscriptionsReady}}
+      {{#if hasRuns}}
+        <div class="border border-neutral-200 dark:border-neutral-800 rounded-md overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-neutral-50 dark:bg-neutral-900/60 text-[11px] uppercase tracking-wide text-neutral-500 border-b border-neutral-200 dark:border-neutral-800">
+              <tr>
+                <th class="text-left font-medium py-2 px-3">When</th>
+                <th class="text-left font-medium py-2 px-3">Version</th>
+                <th class="text-left font-medium py-2 px-3">Tag</th>
+                <th class="text-left font-medium py-2 px-3">Scenario</th>
+                <th class="text-right font-medium py-2 px-3">Duration</th>
+                <th class="text-right font-medium py-2 px-3">CPU</th>
+                <th class="text-right font-medium py-2 px-3">RAM</th>
+                <th class="text-right font-medium py-2 px-3">GC pause</th>
+                <th class="text-right font-medium py-2 px-3 w-8"></th>
+              </tr>
+            </thead>
+            <tbody class="font-tabular">
+              {{#each runs}}
+                <tr class="border-b border-neutral-100 dark:border-neutral-800/60 hover:bg-neutral-50 dark:hover:bg-neutral-900/40 transition">
+                  <td class="py-1.5 px-3 text-neutral-600 dark:text-neutral-400 whitespace-nowrap">{{whenAgo}}</td>
+                  <td class="py-1.5 px-3">
+                    <span class="inline-block rounded-sm bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-mono text-[11px] px-1.5 py-0.5">{{versionLabel}}</span>
+                  </td>
+                  <td class="py-1.5 px-3 font-mono text-[12px] text-neutral-700 dark:text-neutral-200">{{tag}}</td>
+                  <td class="py-1.5 px-3">
+                    <a href="/scenario/{{scenario}}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{scenario}}</a>
+                  </td>
+                  <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{wallClock}}</td>
+                  <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{cpuAvg}}</td>
+                  <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{ramAvg}}</td>
+                  <td class="py-1.5 px-3 text-right text-neutral-700 dark:text-neutral-200">{{gcPause}}</td>
+                  <td class="py-1.5 px-3 text-right">
+                    <a href="/run/{{_id}}" class="text-neutral-500 hover:text-indigo-500" title="open run">↗</a>
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+
+        {{#if hasMore}}
+          <div class="flex justify-center mt-4">
+            <button id="loadMore"
+                    class="text-sm px-4 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition">
+              Load more
+            </button>
+          </div>
+        {{/if}}
+      {{else}}
+        <div class="border border-neutral-200 dark:border-neutral-800 rounded-md p-8 text-center text-sm text-neutral-500">
+          No benchmark runs yet.
+          <div class="mt-2 font-mono text-xs text-neutral-600 dark:text-neutral-400">
+            node bench.js push --result &lt;file.json&gt;
+          </div>
+        </div>
+      {{/if}}
+    {{else}}
+      <div class="text-center py-16 text-neutral-500 text-sm">Loading…</div>
+    {{/if}}
+
+  </div>
+</template>

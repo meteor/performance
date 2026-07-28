@@ -1,0 +1,18 @@
+config:
+  target: http://localhost:3000
+  phases:
+    - duration: 15
+      arrivalRate: 2
+      name: Light load
+  ensure:
+    maxErrorRate: 1
+    max: 500
+  engines:
+    playwright:
+      globalTimeout: 120000
+      launchOptions:
+        slowMo: 500
+  processor: '../tests/test-helpers.js'
+scenarios:
+  - engine: playwright
+    testFunction: 'reactiveAddAndRemoveTasks'
