@@ -1,6 +1,16 @@
 # Meteor Benchmark Framework
 
+> ⚠️ **Experimental / work in progress.** This is an exploratory project. APIs, scenarios, metrics, and the dashboard are all subject to change, and things may break as it evolves. **Ideas, refactorings, and suggestions are very welcome** — feel free to open an issue or PR to propose improvements, question design decisions, or share results.
+
 A comprehensive benchmarking suite for Meteor applications. It allows you to run performance tests against different Meteor versions (both released versions and local checkouts) using various scenarios, including load testing with Artillery and browser automation with Playwright.
+
+## Legacy benchmarks: Meteor 2.x vs 3.x
+
+The original benchmarks comparing **Meteor 2.x against 3.x** are still preserved on the [`bench-2x-3x`](../../tree/bench-2x-3x) branch (a snapshot copy of `main`). If you're looking for the earlier version-comparison work rather than the current experimental framework, check out that branch:
+
+```bash
+git checkout bench-2x-3x
+```
 
 ## Prerequisites
 
