@@ -1,8 +1,11 @@
 # Change-stream audit contract foundation
 
-Status: accepted for initial implementation  
-Date: 2026-09-08  
-Project: `performance`  
+Status: accepted for initial implementation
+
+Date: 2026-09-08
+
+Project: `performance`
+
 Project root: `/Users/leonardo/Repositories/performance`
 
 ## Problem
@@ -461,18 +464,18 @@ coordination is required.
 
 - [x] Select `upstream/main` as the clean feature base.
 - [x] Preserve the discarded feature tip in a local backup ref.
-- [ ] Add branded primitives and exact identity contracts.
-- [ ] Add coordinate, capability, evidence, cleanup, and result contracts.
-- [ ] Add authored-case and compiled-plan contracts.
-- [ ] Add a type-only public export surface.
-- [ ] Add strict TypeScript configuration.
-- [ ] Add compile-time positive and negative examples.
-- [ ] Run the contract typecheck.
-- [ ] Run the existing JavaScript unit suite.
-- [ ] Confirm the final diff contains no runtime audit implementation.
-- [ ] Make `origin/main` exactly match `upstream/main`.
-- [ ] Force-push the reduced feature branch.
-- [ ] Verify both remote ref hashes.
+- [x] Add branded primitives and exact identity contracts.
+- [x] Add coordinate, capability, evidence, cleanup, and result contracts.
+- [x] Add authored-case and compiled-plan contracts.
+- [x] Add a type-only public export surface.
+- [x] Add strict TypeScript configuration.
+- [x] Add compile-time positive and negative examples.
+- [x] Run the contract typecheck.
+- [x] Run the existing JavaScript unit suite.
+- [x] Confirm the final diff contains no runtime audit implementation.
+- [x] Make `origin/main` exactly match `upstream/main`.
+- [x] Force-push the reduced feature branch.
+- [x] Verify both remote ref hashes.
 
 ## Acceptance criteria
 

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "moduleResolution": "NodeNext",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "strict": true,
+    "target": "ES2022",
+    "useUnknownInCatchVariables": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": [
+    "reliability/contracts/**/*.ts",
+    "tests/types/change-stream-audit-contracts.ts"
+  ]
+}

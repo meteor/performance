@@ -4,7 +4,8 @@
   "type": "module",
   "main": "bench.js",
   "scripts": {
-    "test": "node --test 'tests/unit/**/*.test.js'"
+    "test": "node --test 'tests/unit/**/*.test.js'",
+    "typecheck:audit-contracts": "tsc --project tsconfig.audit-contracts.json"
   },
   "author": "",
   "license": "ISC",
@@ -18,7 +19,8 @@
     "@types/node": "^20.14.11",
     "artillery": "^2.0.17",
     "m": "^1.9.0",
-    "pidusage": "^3.0.2"
+    "pidusage": "^3.0.2",
+    "typescript": "5.4.5"
   },
   "volta": {
     "node": "24.0.0"
