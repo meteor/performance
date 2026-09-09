@@ -1,6 +1,7 @@
 import type {
   AuditCaseOutcome,
   ByteCount,
+  CaseCoordinate,
   CaseDefinitionV1,
   CaseId,
   EvidenceEntryId,
@@ -36,7 +37,6 @@ const caseDefinition = {
     {
       topologies: ['replica_set'],
       transports: ['sockjs'],
-      observerOrders: [['changeStreams', 'oplog']],
     },
   ],
   parameters: {
@@ -56,7 +56,7 @@ const caseDefinition = {
     payloadBytes: { kind: 'literal', value: 64 },
   },
   preconditions: [
-    { kind: 'actual_observer_available', driver: 'changeStreams' },
+    { kind: 'change_stream_available' },
   ],
   steps: [
     {
@@ -69,9 +69,10 @@ const caseDefinition = {
   ],
   evidence: {
     requiredProducers: ['mongodb', 'ddp_client', 'meteor_probe'],
-    observer: {
-      kind: 'selected',
-      driver: { kind: 'coordinate', field: 'observerOrder' },
+    changeStream: {
+      driver: 'changeStreams',
+      selectionEvidence: 'required',
+      lifecycleEvidence: 'required',
     },
     transportIdentity: 'required',
     fault: null,
@@ -144,10 +145,32 @@ void invalidObservedReference;
 const invalidOrderedQuery: CaseDefinitionV1['steps'][number] = {
   id: stepId,
   kind: 'subscribe',
-  // @ts-expect-error An ordered query requires an explicit, non-empty sort.
-  query: { kind: 'ordered' },
+  // @ts-expect-error Ordered observers are outside the change-stream audit.
+  query: { kind: 'ordered', sort: [{ field: '_id', direction: 'ascending' }] },
   clients: { kind: 'fixture', field: 'subscriberIds' },
   onFailure: 'fail_case',
 };
 
 void invalidOrderedQuery;
+
+const invalidLegacyObserver: CaseCoordinate = {
+  caseId,
+  transport: 'sockjs',
+  topology: 'replica_set',
+  // @ts-expect-error The audit has no legacy oplog-driver coordinate.
+  observer: 'oplog',
+  seed,
+};
+
+void invalidLegacyObserver;
+
+const invalidStandaloneTopology: CaseCoordinate = {
+  caseId,
+  transport: 'sockjs',
+  // @ts-expect-error Standalone MongoDB cannot provide change streams.
+  topology: 'standalone',
+  observer: 'changeStreams',
+  seed,
+};
+
+void invalidStandaloneTopology;

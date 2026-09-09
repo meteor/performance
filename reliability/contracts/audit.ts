@@ -19,16 +19,15 @@ import type {
   UInt32,
 } from './primitives.js';
 
-export type ObserverDriver = 'changeStreams' | 'oplog' | 'polling';
+export type ChangeStreamObserver = 'changeStreams';
 export type DdpTransport = 'sockjs' | 'sockjs-polling' | 'uws';
-export type MongoTopology = 'replica_set' | 'sharded_cluster' | 'standalone';
+export type MongoTopology = 'replica_set' | 'sharded_cluster';
 
 export interface CaseCoordinate {
   readonly caseId: CaseId;
   readonly transport: DdpTransport;
   readonly topology: MongoTopology;
-  /** Ordered, non-empty, and unique after runtime validation. */
-  readonly observerOrder: NonEmptyReadonlyArray<ObserverDriver>;
+  readonly observer: ChangeStreamObserver;
   /** An unsigned 32-bit integer after runtime validation. */
   readonly seed: UInt32;
   readonly faultId?: FaultId;
@@ -37,14 +36,10 @@ export interface CaseCoordinate {
 export interface ApplicabilityScope {
   readonly topologies: NonEmptyReadonlyArray<MongoTopology>;
   readonly transports: NonEmptyReadonlyArray<DdpTransport>;
-  readonly observerOrders: NonEmptyReadonlyArray<
-    NonEmptyReadonlyArray<ObserverDriver>
-  >;
 }
 
 export type CapabilityExpectation =
   | 'supported'
-  | 'fallback_required'
   | 'not_supported'
   | 'out_of_scope';
 
@@ -56,7 +51,7 @@ interface CapabilityDefinitionBase {
 
 export type CapabilityDefinition =
   | (CapabilityDefinitionBase & {
-      readonly expectation: 'supported' | 'fallback_required';
+      readonly expectation: 'supported';
       readonly requiredCases: NonEmptyReadonlyArray<CaseId>;
       readonly applicability: NonEmptyReadonlyArray<ApplicabilityScope>;
     })
@@ -104,7 +99,7 @@ export interface HarnessIdentity {
 
 export interface MongoMemberIdentity {
   readonly name: string;
-  readonly role: 'primary' | 'secondary' | 'mongos' | 'config' | 'standalone';
+  readonly role: 'primary' | 'secondary' | 'mongos' | 'config';
 }
 
 interface MongoEnvironmentIdentityBase {
@@ -121,9 +116,6 @@ export type MongoEnvironmentIdentity =
   | (MongoEnvironmentIdentityBase & {
       readonly topology: 'sharded_cluster';
       readonly clusterName: string;
-    })
-  | (MongoEnvironmentIdentityBase & {
-      readonly topology: 'standalone';
     });
 
 export interface AuditIdentity {
@@ -186,8 +178,7 @@ export type OracleFamily =
   | 'event_absent'
   | 'revision_monotonic'
   | 'field_absent'
-  | 'observer_identity'
-  | 'fallback_identity'
+  | 'change_stream_identity'
   | 'transport_identity'
   | 'session_identity'
   | 'fault_witness'

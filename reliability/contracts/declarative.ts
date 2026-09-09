@@ -1,10 +1,10 @@
 import type {
   ApplicabilityScope,
+  ChangeStreamObserver,
   DdpTransport,
   EvidenceProducer,
   MongoTopology,
   ObservedEvidenceProducer,
-  ObserverDriver,
   OracleFamily,
 } from './audit.js';
 import type {
@@ -31,7 +31,7 @@ export type DeclarativeValueReference =
   | Readonly<{ kind: 'parameter'; name: ParameterName }>
   | Readonly<{
       kind: 'coordinate';
-      field: 'seed' | 'transport' | 'topology' | 'observerOrder';
+      field: 'seed' | 'transport' | 'topology' | 'observer';
     }>
   | Readonly<{ kind: 'run'; field: 'runId' }>
   | Readonly<{ kind: 'fixture'; field: 'documents' | 'subscriberIds' }>
@@ -59,23 +59,8 @@ export type DeclarativeSelector =
       value: DeclarativeValueReference;
     }>;
 
-export interface DeclarativeSortField {
-  readonly field: string;
-  readonly direction: 'ascending' | 'descending';
-}
-
 export type DeclarativeQuery =
   | Readonly<{ kind: 'unordered' }>
-  | Readonly<{
-      kind: 'ordered';
-      sort: NonEmptyReadonlyArray<DeclarativeSortField>;
-    }>
-  | Readonly<{
-      kind: 'windowed';
-      sort: NonEmptyReadonlyArray<DeclarativeSortField>;
-      skip: DeclarativeValueReference;
-      limit: DeclarativeValueReference;
-    }>
   | Readonly<{
       kind: 'selector';
       selector: DeclarativeSelector;
@@ -87,12 +72,7 @@ export type DeclarativeQuery =
   | Readonly<{
       kind: 'multiple_projections';
       projections: NonEmptyReadonlyArray<NonEmptyReadonlyArray<string>>;
-    }>
-  | Readonly<{
-      kind: 'unsupported_selector';
-      operator: 'json_schema';
-    }>
-  | Readonly<{ kind: 'change_stream_unavailable' }>;
+    }>;
 
 export type DeclarativeMutation =
   | Readonly<{
@@ -213,14 +193,7 @@ export type FaultController =
   | 'watch_setup_pause';
 
 export type CasePrecondition =
-  | Readonly<{
-      kind: 'actual_observer_available';
-      driver: ObserverDriver;
-    }>
-  | Readonly<{
-      kind: 'observer_driver_unavailable';
-      driver: ObserverDriver;
-    }>
+  | Readonly<{ kind: 'change_stream_available' }>
   | Readonly<{
       kind: 'topology_available' | 'topology_matches_coordinate';
       topology: MongoTopology;
@@ -234,21 +207,15 @@ export type CasePrecondition =
       controller: FaultController;
     }>;
 
-export type ObserverEvidenceRequirement =
-  | Readonly<{
-      kind: 'selected';
-      driver: DeclarativeValueReference;
-    }>
-  | Readonly<{
-      kind: 'fallback';
-      from: ObserverDriver;
-      to: ObserverDriver;
-      reasonRequired: true;
-    }>;
+export interface ChangeStreamEvidenceRequirement {
+  readonly driver: ChangeStreamObserver;
+  readonly selectionEvidence: 'required';
+  readonly lifecycleEvidence: 'required' | 'diagnostic';
+}
 
 export interface CaseEvidenceRequirements {
   readonly requiredProducers: NonEmptyReadonlyArray<ObservedEvidenceProducer>;
-  readonly observer: ObserverEvidenceRequirement;
+  readonly changeStream: ChangeStreamEvidenceRequirement;
   readonly transportIdentity: 'required' | 'diagnostic';
   readonly fault: Readonly<{
     kind: 'activated_and_restored';
@@ -330,7 +297,7 @@ export interface CompiledCasePlanV1 {
     caseId: CaseId;
     transport: DdpTransport;
     topology: MongoTopology;
-    observerOrder: NonEmptyReadonlyArray<ObserverDriver>;
+    observer: ChangeStreamObserver;
     seed: UInt32;
     faultId?: FaultId;
   }>;

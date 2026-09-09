@@ -120,6 +120,8 @@ Create a small, reviewable contract package that:
 - Runtime or integration tests.
 - Dashboard and result-writer integration.
 - Oplog-driver, polling-driver, or observer-fallback correctness coverage.
+- Standalone MongoDB, ordered observers, and selectors that Meteor routes away
+  from its change-stream driver.
 - Any claim that the future audit is executable.
 
 ```text
@@ -277,8 +279,8 @@ runtime boundary.
           v           v                     v           v
       transport   topology              observer      seed
        sockjs     replica_set        changeStreams    uint32
-   sockjs-polling standalone
-         uws      sharded_cluster
+   sockjs-polling sharded_cluster
+         uws
 ```
 
 The type system closes the vocabulary but cannot enforce numeric bounds,
@@ -537,7 +539,10 @@ coordination is required.
 7. `origin/main` resolves to the same commit as `upstream/main`.
 8. `origin/feat/change-stream-audit` resolves to the reduced branch tip.
 9. Audit contracts cannot express oplog or polling as observer implementations;
-   those names appear only in historical context and explicit exclusions.
+   those names appear only in historical context, explicit exclusions, and a
+   compile-time rejection fixture.
+10. Coordinates exclude standalone MongoDB, and authored queries exclude
+    ordered/windowed observers and deliberately unsupported selectors.
 
 ## Review order
 
