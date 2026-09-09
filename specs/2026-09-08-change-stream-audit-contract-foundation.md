@@ -11,12 +11,12 @@ Project root: `/Users/leonardo/Repositories/performance`
 ## Problem
 
 Meteor needs a correctness audit that can eventually prove change-stream,
-oplog, polling, publication, DDP, recovery, and cleanup behavior across a
-bounded matrix. The first implementation attempted to deliver that entire
-system at once. Its final form added 82 files and roughly 17,900 lines on top
-of the benchmark platform, including an executable harness, owned MongoDB and
-Meteor processes, a raw DDP client, fixture instrumentation, a declarative
-interpreter, a large case catalog, validators, and tests.
+publication, DDP, recovery, and cleanup behavior across a bounded matrix. The
+first implementation also modeled Meteor's legacy oplog and polling observer
+drivers. Its final form added 82 files and roughly 17,900 lines on top of the
+benchmark platform, including an executable harness, owned MongoDB and Meteor
+processes, a raw DDP client, fixture instrumentation, a declarative interpreter,
+a large case catalog, validators, and tests.
 
 That implementation supplied useful design evidence, but it crossed too many
 boundaries for an initial review. This change establishes only the durable
@@ -90,6 +90,7 @@ implementation.
 Create a small, reviewable contract package that:
 
 - names the closed dimensions of an audit coordinate;
+- fixes change streams as the only observer implementation under audit;
 - models authored cases as discriminated unions;
 - separates expected state from independently observed evidence;
 - represents capability support and applicability without a case catalog;
@@ -118,6 +119,7 @@ Create a small, reviewable contract package that:
 - Case catalogs, profiles, generated data, and negative-control catalogs.
 - Runtime or integration tests.
 - Dashboard and result-writer integration.
+- Oplog-driver, polling-driver, or observer-fallback correctness coverage.
 - Any claim that the future audit is executable.
 
 ```text
@@ -139,8 +141,8 @@ Create a small, reviewable contract package that:
 - TypeScript contracts are design-time guidance, not a trust boundary.
 - Data entering from JSON, processes, sockets, databases, or Meteor must be
   treated as `unknown` until a later runtime-validation layer is implemented.
-- A case executes against exactly one transport, topology, observer order,
-  profile, seed, release identity, and harness revision.
+- A case executes against exactly one transport, topology, profile, seed,
+  release identity, and harness revision, using the change-stream driver.
 - Evidence producers are independent enough that expected-model output cannot
   masquerade as observed system evidence.
 - Cleanup is part of correctness, not a best-effort epilogue.
@@ -152,13 +154,56 @@ The following choices remain intentionally open:
 - the serialization format and runtime schema library;
 - the exact first set of executable cases;
 - whether a compiler consumes authored objects, JSON, or generated definitions;
-- how Meteor exposes authoritative observer and fallback evidence;
+- how Meteor exposes authoritative change-stream selection and lifecycle
+  evidence;
 - how sharded-cluster and multi-instance environments are owned;
 - which identities belong in benchmark results versus separate audit artifacts;
 - whether the benchmark dashboard should ingest correctness results.
 
 These uncertainties do not prevent agreement on the boundary shapes. They do
 prevent treating the shapes as a final compatibility promise.
+
+## Product boundary
+
+MongoDB change streams are the supported application-facing API. They still use
+the replica-set oplog as replication infrastructure, so oplog retention and
+resume-token availability remain environmental facts. The audit does not
+exercise Meteor's separate oplog-tailing observer driver.
+
+```text
+                  MongoDB implementation detail
+                  =============================
+
+                         replica-set oplog
+                                |
+                                | supplies history
+                                v
+  AUDIT BOUNDARY --->   MongoDB Change Stream API
+                                |
+                                v
+                       Meteor change-stream driver
+                                |
+                                v
+                         publication + DDP
+                                |
+                                v
+                          client-observed state
+
+  In scope:  everything from the Change Stream API boundary downward
+  Metadata:  oplog-window facts that constrain resume-token availability
+  Excluded:  Meteor's legacy direct oplog-tailing observer implementation
+```
+
+Meteor 3.5 makes change streams the first-choice reactivity driver, while still
+documenting oplog and polling as fallbacks. This audit intentionally has a
+narrower goal than Meteor's compatibility matrix: prove the change-stream path
+or report that its prerequisites were unavailable.
+
+Primary references:
+
+- <https://docs.meteor.com/performance/change-streams-observer-driver>
+- <https://docs.meteor.com/cli/environment-variables#METEOR_REACTIVITY_ORDER>
+- <https://www.mongodb.com/docs/manual/changeStreams/>
 
 ## Contract model
 
@@ -230,15 +275,16 @@ runtime boundary.
           +-----------+----------+----------+-----------+
           |           |                     |           |
           v           v                     v           v
-      transport   topology           observerOrder    seed
-       sockjs     replica_set       [changeStreams,    uint32
-   sockjs-polling standalone           oplog, ...]
+      transport   topology              observer      seed
+       sockjs     replica_set        changeStreams    uint32
+   sockjs-polling standalone
          uws      sharded_cluster
 ```
 
 The type system closes the vocabulary but cannot enforce numeric bounds,
-non-empty arrays, uniqueness, or a valid observer fallback order. Those are
-documented invariants for future runtime validation.
+non-empty arrays, uniqueness, or whether the actual observer is the requested
+change-stream driver. Those are documented invariants for future runtime
+validation.
 
 ### Authored case
 
@@ -357,7 +403,7 @@ a new named type; it does not widen the existing version with optional fields.
 The initial implementation must encode these invariants:
 
 - discriminants select the valid fields for every value reference, parameter,
-  precondition, step, observer expectation, and outcome;
+  precondition, step, change-stream expectation, and outcome;
 - expected-model evidence is distinct from system-observed evidence;
 - a plan contains resolved values, not unresolved authored parameters;
 - case and run results carry exact coordinate and identity objects;
@@ -376,7 +422,7 @@ The following require future runtime validation:
 - maximum collection sizes and nesting depth;
 - step ordering and barrier closure;
 - plan and ledger digest correctness;
-- release, topology, observer, and cleanup attestation truth.
+- release, topology, change-stream, and cleanup attestation truth.
 
 ```text
   TypeScript can prove                 Runtime must prove
@@ -490,6 +536,8 @@ coordination is required.
    client, application probe, case catalog, or generated definition remains.
 7. `origin/main` resolves to the same commit as `upstream/main`.
 8. `origin/feat/change-stream-audit` resolves to the reduced branch tip.
+9. Audit contracts cannot express oplog or polling as observer implementations;
+   those names appear only in historical context and explicit exclusions.
 
 ## Review order
 
