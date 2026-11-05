@@ -14,6 +14,9 @@ env:
   BENCH_API_KEY: ${{ secrets.BENCH_API_KEY }}
   BENCH_DASHBOARD_URL: ${{ secrets.BENCH_DASHBOARD_URL }}
 
+permissions:
+  contents: read
+
 jobs:
   nightly:
     runs-on: ubuntu-latest  # TODO: switch to self-hosted for stable results
@@ -126,6 +129,7 @@ jobs:
           retention-days: 90
 
   notify:
+    permissions: {}
     needs: nightly
     runs-on: ubuntu-latest
     if: failure()
