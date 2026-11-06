@@ -30,8 +30,14 @@ env:
   BENCH_API_KEY: ${{ secrets.BENCH_API_KEY }}
   BENCH_DASHBOARD_URL: ${{ secrets.BENCH_DASHBOARD_URL }}
 
+permissions:
+  contents: read
+
 jobs:
   benchmark:
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest  # TODO: switch to self-hosted for stable results
     timeout-minutes: 30
 

@@ -17,6 +17,9 @@ env:
   BENCH_API_KEY: ${{ secrets.BENCH_API_KEY }}
   BENCH_DASHBOARD_URL: ${{ secrets.BENCH_DASHBOARD_URL }}
 
+permissions:
+  contents: read
+
 jobs:
   transport:
     runs-on: ubuntu-latest
